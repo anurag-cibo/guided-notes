@@ -2,6 +2,8 @@
 
 Eine ruhige Android-App für bis zu fünf aktive Ziele und ihre Zwischenziele. **The Guide** ist ein flexibler Arbeitsname; das Repository heißt weiterhin `guided-notes`.
 
+**Stand 17.09.2026:** Die erste Android-Version läuft; der Nutzer bestätigt Start und grundsätzliche Funktion. Die Oberfläche ist noch rudimentär und gestalterisch nicht zufriedenstellend. Die nächste gemeinsame Arbeit soll auf dieser funktionierenden Basis aufbauen. Kontext für weitere Chats: [Projektübergabe](docs/project-handoff.md).
+
 ## Erste Version
 
 Ziel anlegen → Motivation festhalten → Zwischenziele hinzufügen → Fortschritt und Status pflegen. Ziele, Zwischenziele und Archiv werden offline in SQLite gespeichert, ohne Konto. Zwei Hauptbereiche, klare Zurück-Navigation und eine eigene Archivseite halten den Ablauf klein.
