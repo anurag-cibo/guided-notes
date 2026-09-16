@@ -1,75 +1,84 @@
-# Guided Notes
+# The Guide
 
-Eine kleine, geführte Notizen-App: Gedanken festhalten, einen nächsten Schritt wählen und den eigenen Fortschritt nachvollziehen. Android zuerst; iOS später, Desktop optional.
+Eine minimalistische App, die große Ziele in überschaubare Zwischenziele übersetzt und Fortschritt sichtbar macht. Android zuerst, iOS später; Desktop bleibt eine Option.
 
-**Status:** Projektvorbereitung. Dieses Repository enthält zunächst Produktumfang und Arbeitsregeln, noch keine ausführbare App. „Guided Notes“ ist ein Arbeitsname. Der folgende Ablauf ist ein Vorschlag zur Erprobung, keine bereits validierte Produktanforderung.
+**Status:** Produktplanung, noch kein App-Code. **The Guide** ist der vorläufige App-Name und darf sich ändern. Das Repository heißt weiterhin **guided-notes**. Namen und Branding sind keine Voraussetzung für den technischen Start.
 
-## Die erste Version
+## Produktkern
 
-Wir prüfen eine einfache Hypothese: Wenige freiwillige Leitfragen helfen dabei, aus einer Notiz eine konkrete Handlung zu machen, ohne zusätzlichen Verwaltungsaufwand zu erzeugen.
+Der ursprüngliche Vorschlag einer geführten Notizen-App wird durch die Ziele-Struktur konkretisiert. Der frühere Ansatz „eine Notiz, ein nächster Schritt“ ist keine verbindliche Vorgabe mehr. Ob freie Notizen zusätzlich sinnvoll sind, bleibt Teil der Produktplanung.
 
-1. Eine Textnotiz erstellen, bearbeiten und wiederfinden.
-2. Optional beantworten: „Was beschäftigt mich?“ und „Was ist mein nächster kleiner Schritt?“
-3. Höchstens einen nächsten Schritt pro Notiz festhalten und als erledigt markieren; das lässt sich rückgängig machen.
-4. In einer schlichten Übersicht sehen, welche Schritte offen oder erledigt sind. Keine Bewertung der persönlichen Produktivität.
+### Ziele
 
-Alles funktioniert offline und ohne Konto. Eine normale, ungeführte Notiz bleibt jederzeit möglich.
+- Übersicht mit bis zu fünf großen Zielen als schlichten, abgerundeten Karten.
+- Eine Plus-Karte erscheint unter den vorhandenen Zielen, solange die Grenze nicht erreicht ist; auch im leeren Zustand.
+- Zielkarten öffnen die Zieldetails. Das Archiv steht unterhalb der Ziele.
+- Eine Detailseite zeigt Name, Motivation („Warum?“), Fortschritt, Zeitdarstellung, Zwischenziele und Statusaktionen.
+- Ein Zwischenziel in den Details führt direkt zum entsprechenden Eintrag auf der Zwischenziele-Seite.
 
-### Wann der erste Prototyp seinen Zweck erfüllt
+Ob die Grenze nur aktive Ziele betrifft und wie erreichte Ziele, Archivieren, Wiederherstellen und Löschen zusammenhängen, wird vor der Umsetzung geklärt. Archivieren soll die zugehörigen Zwischenziele aus der aktiven Übersicht entfernen; Löschen ebenso, aber mit Schutz vor versehentlichem Datenverlust.
 
-- Eine Notiz samt nächstem Schritt bleibt nach einem vollständigen App-Neustart erhalten.
-- Erstellen, Bearbeiten, Löschen und Erledigen funktionieren im Flugmodus; Fehler beim Speichern sind sichtbar.
-- Versehentliches Löschen ist durch Rückfrage oder Rückgängig-Funktion abgesichert.
-- Der Ablauf wird mehrere Tage mit eigenen Beispielen ausprobiert. Entscheidend ist, ob die Führung hilft oder stört; weitere Funktionen folgen erst aus diesem Feedback.
+### Zwischenziele
 
-Vor der Umsetzung klären wir anhand von drei echten Beispielen, was „geführt“ konkret bedeuten soll: Tagesreflexion, Projektfortschritt oder etwas anderes. Der vorgeschlagene Ablauf darf dadurch noch kleiner werden.
+- Beliebig viele Zwischenziele, nach ihrem großen Ziel gruppiert, mit einer leicht erreichbaren Hinzufügen-Aktion.
+- Zugehörigkeit über den Namen des Ziels und ein gemeinsames Emoji erkennbar; Bilder sind eine spätere Gestaltungsoption.
+- Fortschritt, Zeit und auswählbarer Status sind sichtbar. Statusänderung erfolgt über den jeweiligen Eintrag.
+- Statusvorschlag aus dem Input: „Not started“, „On track“, „Off track / on hold“, optional „At risk“, „Achieved“. Bedeutung, deutsche Bezeichnungen und Abgrenzung werden noch entschieden.
+- Statusfarben sind ergänzende Signale; Information muss auch ohne Farberkennung verständlich bleiben.
 
-## Bewusst später
+Fortschritt und verstrichene/verbleibende Zeit sind verschiedene Größen. Ihre Berechnung und Darstellung sind offen; die Beispielprozente im Referenzbild sind keine Datenmodell-Vorgabe.
 
-Accounts, Cloud-Synchronisierung, KI-Funktionen, Erinnerungen, Kalender, Fokus-Timer, Gewohnheiten, Streaks, komplexe Statistiken, Zusammenarbeit und Desktop sind kein Bestandteil der ersten Version. Ein Backend-Anbieter wird noch nicht festgelegt.
+### Spätere Ergänzung: Tages- und Wochenaufgaben
 
-Bevor die App für wichtige echte Notizen genutzt wird, brauchen wir einen einfachen Export und einen geprüften Weg zur Wiederherstellung. Lokale Speicherung allein ist kein Backup.
+Eine zusätzliche Seite bietet zwei Bereiche für konfigurierbare Tages- und Wochenaufgaben. Tagesaufgaben lassen sich abhaken, Wochenaufgaben gegebenenfalls mehrfach bis zu einer Zielanzahl. Abgeschlossene Zeiträume bleiben im eigenen Archiv erhalten. Neue Tage bzw. Wochen beginnen mit frischen Erledigungsständen.
+
+Vor der Umsetzung werden Tageswechsel, Wochenbeginn, Zeitzone, verpasste Zeiträume und Änderungen an Vorlagen geklärt. Ein Zurücksetzen darf alte Ergebnisse nicht überschreiben. Ein eigener Hintergrunddienst wird dadurch nicht automatisch erforderlich.
+
+## Gestaltung
+
+Ruhig, minimalistisch und möglichst selbsterklärend: wenig Text, klare Typografie, großzügiger Abstand und wenige eindeutige Aktionen. Die gewünschte Apple-artige Ruhe dient als Gestaltungsrichtung; Android-Bedienung, Zurück-Navigation, Lesbarkeit und ausreichend große Touch-Flächen bleiben wichtig.
+
+Die Kopfzeile kann je nach Seite passende Aktionen zeigen: Einstellungen, Sprung zu einem Zielcluster oder Bearbeitung der Routinen. Konkrete Symbole und Navigation werden im Entwurf geprüft; ein Pinsel ist beispielsweise nur ein Vorschlag für „Bearbeiten“.
+
+Die [UI-Referenz](docs/reference/ui-inspiration.png) ist eine Inspiration aus dem bereitgestellten Kollegen-Input, kein fertiges Design und keine verbindliche Spezifikation. Begrüßungsblöcke, Fotos, Farben, doppelte Fortschrittsanzeigen und zusätzliche Einstellungen müssen nicht übernommen werden. Funktionen, die nur das Bild ergänzt (z. B. Benachrichtigungen oder Spracheinstellungen), sind dadurch nicht beauftragt.
+
+Hell-/Dunkelmodus, Zielbilder und optionale Streaks liegen im späteren Backlog. Ein Tutorial wird nur bei beobachtetem Erklärungsbedarf erwogen; zunächst soll der Kernablauf selbst verständlich sein.
 
 ## Technische Richtung
 
 | Bereich | Startpunkt |
 | --- | --- |
-| App | Flutter und Dart; zunächst nur Android einrichten |
-| Daten | Lokal auf dem Gerät; SQLite mit Drift als bevorzugter Ansatz beim ersten Speicherschritt |
-| Aufbau | Kleine Dateien nach Funktionen gruppieren; zusätzliche Schichten erst bei konkretem Bedarf |
-| State und Navigation | Zunächst Flutter-Bordmittel; Riverpod bzw. go_router erst bei nachgewiesenem Bedarf |
-| Zusammenarbeit | Ein GitHub-Repository, Issues, kurze Branches und Pull Requests |
+| App | Flutter und Dart; zunächst Android |
+| Speicherung | Offline und ohne Konto, SQLite mit Drift als bevorzugter Ansatz |
+| Aufbau | Kleine Module nach Funktionen, zusätzliche Schichten bei konkretem Bedarf |
+| State/Navigation | Flutter-Bordmittel; weitere Pakete nur begründet |
+| Qualität | Formatierung, Analyse, gezielte Tests und Android-Build ab dem Grundgerüst |
+| Zusammenarbeit | Ein Repository, GitHub Issues, kurze Branches, Pull Requests |
 
-Flutter unterstützt die später gewünschten Plattformen. Trotzdem müssen Oberfläche und Plugins pro Plattform geprüft werden; iOS-Builds benötigen macOS und Xcode. Drift bietet relationale Speicherung für Dart/Flutter. Versionen und konkrete Abhängigkeiten werden beim Implementierungsstart geprüft und festgehalten.
+Flutter unterstützt die später gewünschten Plattformen; Plugins und Bedienung müssen je Plattform geprüft werden. iOS-Builds benötigen macOS und Xcode. SDK- und Paketversionen werden bei der Einrichtung geprüft und dokumentiert. Quellen: [Flutter-Plattformen](https://docs.flutter.dev/reference/supported-platforms), [Plattformeinrichtung](https://docs.flutter.dev/platform-integration), [Drift](https://drift.simonbinder.eu/).
 
-Quellen: [Flutter-Plattformen](https://docs.flutter.dev/reference/supported-platforms), [Plattformeinrichtung](https://docs.flutter.dev/platform-integration), [Drift](https://drift.simonbinder.eu/).
+Das Datenmodell folgt den geklärten Regeln für Ziele und Zwischenziele. Es erhält stabile IDs, eindeutige Beziehungen und notwendige Zeitangaben. Wiederkehrende Aufgaben bekommen erst mit ihrer Umsetzung Vorlagen und getrennte Zeitraumergebnisse. Keine allgemeine Ereignis- oder Sync-Architektur auf Vorrat.
 
-### Datenmodell: nur das heute Benötigte
+Cloud, Accounts, KI, Kalender, Zusammenarbeit und Desktop gehören nicht zum aktuellen Kernumfang. Ein Export mit geprüfter Wiederherstellung ist vor der Nutzung mit wichtigen eigenen Daten erforderlich; lokale Speicherung allein ist kein Backup.
 
-Als Ausgangspunkt genügt eine Notiz mit ID, Text, optionalem nächstem Schritt, Erledigt-Zeitpunkt sowie Erstellungs- und Änderungszeitpunkt. Dauerhafte IDs und eindeutig behandelte Zeitangaben sind sinnvoll. Fortschritt wird zunächst direkt aus den gespeicherten Schritten abgeleitet.
+## Planung und Reihenfolge
 
-Keine vorsorglichen Sync-Felder, Löschmarkierungen oder allgemeine Ereignistabelle. Wenn später eine echte Verlaufsauswertung benötigt wird, entscheiden wir anhand ihrer Anforderungen über ein zusätzliches Datenmodell. Datenbankänderungen müssen vorhandene Notizen erhalten und durch Migrationen abgesichert werden.
+Der aktuelle Aufgabenstatus und konkrete Akzeptanzkriterien stehen ausschließlich in den [GitHub Issues](https://github.com/anurag-cibo/guided-notes/issues). Kategorien beschreiben die Art der Arbeit; Prioritäten beschreiben ihre Reihenfolge:
 
-## Arbeiten im Repository
+| Kategorien | Bedeutung |
+| --- | --- |
+| `typ:technik` | Projektbasis, Speicherung, technische Qualität |
+| `typ:planung` | Produktregeln, UX-Entscheidungen, Auswertung |
+| `typ:feature` | Nutzerfunktionen mit User Story |
 
-Die verbindlichen Arbeitsregeln stehen in [AGENTS.md](AGENTS.md). Eine zusätzliche PROJECT.md wäre momentan eine zweite Kopie derselben Informationen.
+| Priorität | Bedeutung |
+| --- | --- |
+| `prio:P0` | Jetzt: technische Basis und notwendige Produkt-/UX-Planung, gleichrangig |
+| `prio:P1` | Danach: Kernablauf und Voraussetzungen für verlässliche Eigennutzung |
+| `prio:P2` | Später: Routinen und weitere Ergänzungen; noch keine Umsetzungszusage |
 
-- README: Produktumfang und aktuelle technische Richtung.
-- AGENTS.md: Workflow für Menschen und Coding-Agenten.
-- GitHub Issues: Aufgaben, Akzeptanzkriterien und offene Entscheidungen.
-- Pull Requests: Umsetzung, Prüfung und Bezug zum Issue.
-
-Ein separates GitHub Project, ADR-Verzeichnis oder detailliertes Prioritätssystem ist zum Start nicht erforderlich.
-
-## Nächste kleine Schritte
-
-Diese Liste beschreibt die Reihenfolge, keinen parallel gepflegten Aufgabenstatus. Sobald GitHub verfügbar ist, liegen die konkreten Aufgaben in Issues.
-
-1. **Kernablauf klären:** Drei reale Notizen und den gewünschten Nutzen der Führung beschreiben; ein Beispiel als Prototyp auswählen.
-2. **Android-Grundgerüst:** Flutter einrichten, SDK-Version dokumentieren, App auf Gerät oder Emulator starten und minimale CI ergänzen.
-3. **Notiz dauerhaft speichern:** Eine Notiz offline erstellen, bearbeiten, wieder öffnen und geschützt löschen; Fehler und Neustart prüfen.
-4. **Führung und Fortschritt erproben:** Optionalen nächsten Schritt ergänzen, Erledigen/Rückgängig anbieten, einfache Übersicht testen.
+Jedes aktive Issue erhält genau eine Kategorie und eine Priorität. Abhängigkeiten im Issue gehen der Reihenfolge nach Nummer vor. Die technische Einrichtung kann beginnen, während Produktregeln geklärt werden; Datenmodell und fachliche Features warten auf ihre jeweiligen Entscheidungen. Ein zusätzliches Projektboard ist vorerst nicht nötig.
 
 ## Entwicklung starten
 
-Es gibt noch kein Flutter-Projekt und damit noch keine ausführbaren Build- oder Testbefehle. Beim Grundgerüst werden Setup, SDK-Version und tatsächliche Befehle hier ergänzt. Bis dahin werden ausschließlich Dokumentation und Projektorganisation geändert.
+Die [AGENTS.md](AGENTS.md) beschreibt den Workflow. Noch existiert kein Flutter-Projekt und damit kein ausführbarer App-Build. Setup, SDK-Version und überprüfte Befehle werden mit dem Grundgerüst ergänzt. Der aktuelle Auftrag umfasst Dokumentation und Backlog, keine App-Implementierung.
