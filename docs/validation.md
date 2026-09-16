@@ -27,6 +27,7 @@ Keine mehrtägige Nutzererprobung behauptet; diese gehört zu #4. Der ursprüngl
 
 ## Ergänzung · Kernablauf, Gestaltung und Backup · 17.09.2026
 
+- Abschließende [GitHub-CI](https://github.com/anurag-cibo/guided-notes/actions/runs/35159852006) einschließlich Formatierung, Analyse, 17 Tests und Android-Build bestanden. Review-Korrektur bestätigt; [PR #26](https://github.com/anurag-cibo/guided-notes/pull/26) als `0c9352c` zusammengeführt. #9, #11 und #12 geschlossen; #4 bleibt auf ausdrücklichen Nutzerwunsch offen.
 - Formatprüfung (22 Dart-Dateien), statische Analyse und `git diff --check`: bestanden. Normaler Android-Debug-Build erfolgreich.
 - Ziele, Details, Zwischenziele und Datensicherung mit synthetischen Beispielen im Emulator visuell geprüft. Lokale Screenshots: `outputs/ui-goals.png`, `outputs/ui-detail.png`, `outputs/ui-milestones.png`, `outputs/ui-backup.png`. Dabei doppelte Leerzustandsangaben und die wenig hilfreiche Anzeige `0/0` entfernt. Die Vorschau verwendet nur eine In-Memory-Datenbank. Dies ist keine Nutzerbeobachtung ohne Anleitung und kein mehrtägiger Nutzungstest.
 - `flutter test`: **17 Tests bestanden**. Neu sind Backup-Rundlauf auf echter SQLite-Datei mit erneutem Öffnen, alle Statuswerte, Unicode und Fristen, inkompatible/fehlerhafte Dateien, Schutz bestehender Daten und erzwungener Rollback mitten im Import. Archivieren, Wiederherstellen und Löschen werden zusätzlich nach Datei-Neuöffnung geprüft.
