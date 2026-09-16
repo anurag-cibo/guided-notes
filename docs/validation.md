@@ -23,7 +23,25 @@ Stand: 16.09.2026. Lokal: Windows 11, Flutter 3.47.4 (Release-Tag 9584c6713b), D
 
 Beim ersten Versuch der zweiphasigen Prüfung entfernte Flutter die Test-App nach Phase 1 automatisch. Ursache anhand der Flutter-CLI und des fehlenden Android-Pakets geklärt; beide Phasen mit `--no-uninstall` erfolgreich wiederholt. Das ist in der README reproduzierbar dokumentiert.
 
-Keine mehrtägige Nutzererprobung behauptet; diese gehört zu #4. Export/Import (#12) bleibt vor wichtigen eigenen Daten offen.
+Keine mehrtägige Nutzererprobung behauptet; diese gehört zu #4. Der ursprüngliche Stand ohne Export/Import ist durch die folgende Prüfung ergänzt.
+
+## Ergänzung · Kernablauf, Gestaltung und Backup · 17.09.2026
+
+- Formatprüfung (22 Dart-Dateien), statische Analyse und `git diff --check`: bestanden. Normaler Android-Debug-Build erfolgreich.
+- Ziele, Details, Zwischenziele und Datensicherung mit synthetischen Beispielen im Emulator visuell geprüft. Lokale Screenshots: `outputs/ui-goals.png`, `outputs/ui-detail.png`, `outputs/ui-milestones.png`, `outputs/ui-backup.png`. Dabei doppelte Leerzustandsangaben und die wenig hilfreiche Anzeige `0/0` entfernt. Die Vorschau verwendet nur eine In-Memory-Datenbank. Dies ist keine Nutzerbeobachtung ohne Anleitung und kein mehrtägiger Nutzungstest.
+- `flutter test`: **17 Tests bestanden**. Neu sind Backup-Rundlauf auf echter SQLite-Datei mit erneutem Öffnen, alle Statuswerte, Unicode und Fristen, inkompatible/fehlerhafte Dateien, Schutz bestehender Daten und erzwungener Rollback mitten im Import. Archivieren, Wiederherstellen und Löschen werden zusätzlich nach Datei-Neuöffnung geprüft.
+- Widgettests prüfen Motivation bearbeiten, überfällige und fehlende Fristen, getrennten Zielerfolg, Archivfilter, Löschbestätigung samt Abbruch, Importvorschau samt Abbruch/Bestätigung und Export. Bestehende Tests für doppelte Schriftgröße und lange Listen bestehen weiterhin.
+- Android-Kernablauf und anschließender Prozessneustart: beide Phasen erneut bestanden. Der Flugmodus war bei dieser Wiederholung aus; der ältere Offline-Nachweis bleibt oben dokumentiert.
+- `integration_test/backup_test.dart`: echter Android-Export über `ACTION_CREATE_DOCUMENT`, Auswahl derselben Datei über `ACTION_OPEN_DOCUMENT`, bytegleicher Inhalt und Import in eine separate leere Testdatenbank; erneute Öffnung und vollständiger Vergleich bestanden. Der Test berührt nicht die echte `guide.sqlite` und entfernt seine temporären Datenbanken.
+- Die Drift-Debugwarnung zu mehreren Datenbanken tritt in den Backup-Tests auf, weil Quelle und Ziel gleichzeitig geöffnet werden. Sie verwenden ausdrücklich verschiedene Dateien bzw. getrennte In-Memory-Verbindungen, keinen gemeinsamen Executor.
+
+Der native Dateidialogtest benötigt eine Person oder Geräteautomation für **Speichern** und die anschließende Auswahl der erzeugten Datei:
+
+```powershell
+.\tool\flutter.ps1 test integration_test/backup_test.dart -d emulator-5554 --no-uninstall
+```
+
+Er verwendet synthetische Daten. Die exportierte Testdatei bleibt am gewählten Speicherort. Nach Integrationstests wieder die normale App mit `lib/main.dart` bauen/installieren, damit kein Test-Einstieg ausgeliefert wird.
 
 ## Erste Nutzerrückmeldung · 17.09.2026
 

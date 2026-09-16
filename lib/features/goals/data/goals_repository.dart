@@ -2,10 +2,53 @@ import 'package:drift/drift.dart';
 
 import '../../../data/app_database.dart';
 import '../domain/models.dart';
+import 'backup_codec.dart';
 
 class GoalsRepository {
   GoalsRepository(this.database);
   final AppDatabase database;
+
+  Future<String> exportBackup() async => BackupCodec.encode(await load());
+
+  /// Import only into an empty store; validation and writes are all-or-nothing.
+  Future<void> importBackup(String source) async {
+    final snapshot = BackupCodec.decode(source);
+    await database.transaction(() async {
+      final current = await load();
+      if (current.goals.isNotEmpty || current.milestones.isNotEmpty) {
+        throw const RuleViolation(
+          'Wiederherstellen ist nur in einer leeren App möglich. Vorhandene Ziele und das Archiv bleiben unverändert.',
+        );
+      }
+      for (final g in snapshot.goals) {
+        await database.customStatement(
+          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived) VALUES (?,?,?,?,?,?,?)',
+          [
+            g.id,
+            g.title,
+            g.emoji,
+            g.motivation,
+            BackupCodec.date(g.dueDate),
+            g.achieved ? 1 : 0,
+            g.archived ? 1 : 0,
+          ],
+        );
+      }
+      for (final m in snapshot.milestones) {
+        await database.customStatement(
+          'INSERT INTO milestones(id,goal_id,title,progress,status,due_date) VALUES (?,?,?,?,?,?)',
+          [
+            m.id,
+            m.goalId,
+            m.title,
+            m.progress,
+            m.status.name,
+            BackupCodec.date(m.dueDate),
+          ],
+        );
+      }
+    });
+  }
 
   Future<GoalSnapshot> load() => database.transaction(() async {
     final goals = await database

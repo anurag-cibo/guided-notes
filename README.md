@@ -2,7 +2,7 @@
 
 Eine ruhige Android-App für bis zu fünf aktive Ziele und ihre Zwischenziele. **The Guide** ist ein flexibler Arbeitsname; das Repository heißt weiterhin `guided-notes`.
 
-**Stand 17.09.2026:** Die erste Android-Version läuft; der Nutzer bestätigt Start und grundsätzliche Funktion. Die Oberfläche ist noch rudimentär und gestalterisch nicht zufriedenstellend. Die nächste gemeinsame Arbeit soll auf dieser funktionierenden Basis aufbauen. Kontext für weitere Chats: [Projektübergabe](docs/project-handoff.md).
+**Stand 17.09.2026:** Die Android-Version läuft. Ziele, Details und Zwischenziele wurden anhand der UI-Inspiration ruhiger gestaltet; Archivaktionen und Datensicherung sind geprüft. Die gestalterische Rückmeldung und mehrtägige Nutzererprobung bleiben in #4 offen. Kontext für weitere Chats: [Projektübergabe](docs/project-handoff.md).
 
 ## Erste Version
 
@@ -16,7 +16,13 @@ Ziel anlegen → Motivation festhalten → Zwischenziele hinzufügen → Fortsch
 
 Beispiele, genaue Status-/Zeitregeln und der reduzierte Screenflow stehen in [Produktentscheidungen](docs/product-decisions.md). Die [UI-Inspiration](docs/reference/ui-inspiration.png) bleibt eine Anregung und keine verbindliche Spezifikation.
 
-Routinen mit Tages-/Wochenhistorie, Bilder, Hell-/Dunkelwahl, Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kalender und Zusammenarbeit gehören nicht zum aktuellen Kern. **Vor wichtigen eigenen Daten fehlt noch der geprüfte Export/Import aus Issue #12.**
+Routinen mit Tages-/Wochenhistorie, Bilder, Hell-/Dunkelwahl, Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kalender und Zusammenarbeit gehören nicht zum aktuellen Kern.
+
+## Daten sichern
+
+Über das Schild-Symbol **Datensicherung** oben rechts lassen sich alle Ziele, Zwischenziele und das Archiv als JSON-Datei exportieren. Android öffnet die Dateiauswahl für den Speicherort. Die Datei enthält auch Motivationstexte und ist unverschlüsselt; eine Kopie außerhalb des Geräts schützt vor Geräteverlust.
+
+**Wiederherstellen ist nur in einer leeren App möglich**, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import wird die Anzahl der Ziele und Zwischenziele zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Unterstützt wird das versionierte Format `the-guide`, Version 1, bis 10 MB. Details: [Speicherstrategie](docs/storage.md).
 
 ## Entwicklung starten
 

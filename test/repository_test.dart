@@ -59,6 +59,18 @@ void main() {
       expect(restored.progressFor(id), 100);
       await repository.setArchived(id, false);
       expect((await repository.load()).activeGoals, hasLength(1));
+      await database.close();
+      database = AppDatabase(NativeDatabase(file));
+      repository = GoalsRepository(database);
+      expect((await repository.load()).goal(id)!.archived, isFalse);
+      expect((await repository.load()).progressFor(id), 100);
+      await repository.setArchived(id, true);
+      await repository.deleteGoal(id);
+      await database.close();
+      database = AppDatabase(NativeDatabase(file));
+      repository = GoalsRepository(database);
+      expect((await repository.load()).goals, isEmpty);
+      expect((await repository.load()).milestones, isEmpty);
     },
   );
   test('rapid creates and restores cannot exceed five active goals', () async {

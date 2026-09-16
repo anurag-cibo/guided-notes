@@ -18,6 +18,21 @@ class GoalList extends StatelessWidget {
     return ListView(
       padding: pagePadding,
       children: [
+        if (!archived) ...[
+          Text(
+            'Schön, dass du da bist.',
+            style: Theme.of(context).textTheme.headlineSmall
+                ?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          const Text('Kleine Schritte. Deine Richtung.'),
+          const SizedBox(height: 28),
+          Text(
+            'Deine Ziele · ${goals.length} von 5',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          gap,
+        ],
         if (goals.isEmpty)
           EmptyMessage(
             archived ? 'Keine archivierten Ziele' : 'Noch keine Ziele',
@@ -28,7 +43,7 @@ class GoalList extends StatelessWidget {
         for (final goal in goals)
           Card(
             child: InkWell(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute<void>(
@@ -44,21 +59,50 @@ class GoalList extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(goal.emoji, style: const TextStyle(fontSize: 28)),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xffedf3ee),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            goal.emoji,
+                            style: const TextStyle(fontSize: 28),
+                          ),
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
-                            goal.title,
-                            style: Theme.of(context).textTheme.titleLarge,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                goal.title,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.w700),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                controller.snapshot.forGoal(goal.id).isEmpty
+                                    ? 'Noch keine Zwischenziele'
+                                    : '${controller.snapshot.forGoal(goal.id).where((m) => m.status == MilestoneStatus.achieved).length}/${controller.snapshot.forGoal(goal.id).length} Zwischenziele erreicht',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
                           ),
                         ),
                         const Icon(Icons.chevron_right),
                       ],
                     ),
-                    gap,
-                    ProgressSummary(controller.snapshot.progressFor(goal.id)),
-                    const SizedBox(height: 8),
-                    Text(deadlineLabel(goal.dueDate, achieved: goal.achieved)),
+                    if (controller.snapshot.progressFor(goal.id) != null) ...[
+                      gap,
+                      ProgressSummary(controller.snapshot.progressFor(goal.id)),
+                    ],
+                    if (goal.achieved || goal.dueDate != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        deadlineLabel(goal.dueDate, achieved: goal.achieved),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -74,6 +118,13 @@ class GoalList extends StatelessWidget {
             ),
             icon: const Icon(Icons.add),
             label: const Text('Ziel hinzufügen'),
+          ),
+        if (!archived && goals.length == 5)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Text(
+              'Fünf Ziele im Fokus. Archiviere eines, um Platz für ein neues zu schaffen.',
+            ),
           ),
         if (!archived) ...[
           gap,

@@ -91,14 +91,46 @@ class _MilestonesViewState extends State<MilestonesView> {
         rows.add((
           id: 'milestone-${milestone.id}',
           child: Card(
-            color: milestone.id == _focusMilestone
-                ? Theme.of(context).colorScheme.secondaryContainer
+            color: switch (milestone.status) {
+              MilestoneStatus.achieved ||
+              MilestoneStatus.onTrack => const Color(0xffeaf6ee),
+              MilestoneStatus.offTrack => const Color(0xfffff1df),
+              MilestoneStatus.onHold => const Color(0xfff0edf7),
+              MilestoneStatus.notStarted => const Color(0xffedf2f7),
+            },
+            shape: milestone.id == _focusMilestone
+                ? RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    ),
+                  )
                 : null,
             child: ListTile(
               contentPadding: const EdgeInsets.all(16),
               title: Text(milestone.title),
-              subtitle: Text(
-                '${milestone.status.label} · ${milestone.progress} %\n${deadlineLabel(milestone.dueDate, achieved: milestone.status == MilestoneStatus.achieved)}',
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Text('${milestone.status.label} · ${milestone.progress} %'),
+                  const SizedBox(height: 8),
+                  LinearProgressIndicator(
+                    value: milestone.progress / 100,
+                    minHeight: 5,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  if (milestone.dueDate != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      deadlineLabel(
+                        milestone.dueDate,
+                        achieved: milestone.status == MilestoneStatus.achieved,
+                      ),
+                    ),
+                  ],
+                ],
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.push(
