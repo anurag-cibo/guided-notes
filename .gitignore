@@ -23,6 +23,7 @@ local.properties
 .DS_Store
 Thumbs.db
 .idea/
+*.iml
 
 # Flutter/Dart outputs (platform-specific rules follow with the scaffold)
 .dart_tool/

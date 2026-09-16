@@ -1,84 +1,71 @@
 # The Guide
 
-Eine minimalistische App, die große Ziele in überschaubare Zwischenziele übersetzt und Fortschritt sichtbar macht. Android zuerst, iOS später; Desktop bleibt eine Option.
+Eine ruhige Android-App für bis zu fünf aktive Ziele und ihre Zwischenziele. **The Guide** ist ein flexibler Arbeitsname; das Repository heißt weiterhin `guided-notes`.
 
-**Status:** Produktplanung, noch kein App-Code. **The Guide** ist der vorläufige App-Name und darf sich ändern. Das Repository heißt weiterhin **guided-notes**. Namen und Branding sind keine Voraussetzung für den technischen Start.
+## Erste Version
 
-## Produktkern
+Ziel anlegen → Motivation festhalten → Zwischenziele hinzufügen → Fortschritt und Status pflegen. Ziele, Zwischenziele und Archiv werden offline in SQLite gespeichert, ohne Konto. Zwei Hauptbereiche, klare Zurück-Navigation und eine eigene Archivseite halten den Ablauf klein.
 
-Der ursprüngliche Vorschlag einer geführten Notizen-App wird durch die Ziele-Struktur konkretisiert. Der frühere Ansatz „eine Notiz, ein nächster Schritt“ ist keine verbindliche Vorgabe mehr. Ob freie Notizen zusätzlich sinnvoll sind, bleibt Teil der Produktplanung.
+- Maximal fünf aktive, also nicht archivierte Ziele. Erreichte Ziele zählen bis zum Archivieren mit.
+- Beliebig viele Zwischenziele, nach Ziel gruppiert, mit Status, 0–100 % Fortschritt und optionaler Frist.
+- Zielfortschritt ist das gleichgewichtete Mittel seiner Zwischenziele. Zielerfolg ist eine separate bewusste Markierung.
+- Archivieren erhält alle Inhalte; Wiederherstellen prüft die Fünf-Ziele-Grenze. Endgültiges Löschen verlangt eine Bestätigung und entfernt die zugehörigen Zwischenziele atomar.
+- Motivation genügt zunächst als Freitext. Ein eigener Bereich für freie Notizen ist nicht Teil dieses Starts.
 
-### Ziele
+Beispiele, genaue Status-/Zeitregeln und der reduzierte Screenflow stehen in [Produktentscheidungen](docs/product-decisions.md). Die [UI-Inspiration](docs/reference/ui-inspiration.png) bleibt eine Anregung und keine verbindliche Spezifikation.
 
-- Übersicht mit bis zu fünf großen Zielen als schlichten, abgerundeten Karten.
-- Eine Plus-Karte erscheint unter den vorhandenen Zielen, solange die Grenze nicht erreicht ist; auch im leeren Zustand.
-- Zielkarten öffnen die Zieldetails. Das Archiv steht unterhalb der Ziele.
-- Eine Detailseite zeigt Name, Motivation („Warum?“), Fortschritt, Zeitdarstellung, Zwischenziele und Statusaktionen.
-- Ein Zwischenziel in den Details führt direkt zum entsprechenden Eintrag auf der Zwischenziele-Seite.
-
-Ob die Grenze nur aktive Ziele betrifft und wie erreichte Ziele, Archivieren, Wiederherstellen und Löschen zusammenhängen, wird vor der Umsetzung geklärt. Archivieren soll die zugehörigen Zwischenziele aus der aktiven Übersicht entfernen; Löschen ebenso, aber mit Schutz vor versehentlichem Datenverlust.
-
-### Zwischenziele
-
-- Beliebig viele Zwischenziele, nach ihrem großen Ziel gruppiert, mit einer leicht erreichbaren Hinzufügen-Aktion.
-- Zugehörigkeit über den Namen des Ziels und ein gemeinsames Emoji erkennbar; Bilder sind eine spätere Gestaltungsoption.
-- Fortschritt, Zeit und auswählbarer Status sind sichtbar. Statusänderung erfolgt über den jeweiligen Eintrag.
-- Statusvorschlag aus dem Input: „Not started“, „On track“, „Off track / on hold“, optional „At risk“, „Achieved“. Bedeutung, deutsche Bezeichnungen und Abgrenzung werden noch entschieden.
-- Statusfarben sind ergänzende Signale; Information muss auch ohne Farberkennung verständlich bleiben.
-
-Fortschritt und verstrichene/verbleibende Zeit sind verschiedene Größen. Ihre Berechnung und Darstellung sind offen; die Beispielprozente im Referenzbild sind keine Datenmodell-Vorgabe.
-
-### Spätere Ergänzung: Tages- und Wochenaufgaben
-
-Eine zusätzliche Seite bietet zwei Bereiche für konfigurierbare Tages- und Wochenaufgaben. Tagesaufgaben lassen sich abhaken, Wochenaufgaben gegebenenfalls mehrfach bis zu einer Zielanzahl. Abgeschlossene Zeiträume bleiben im eigenen Archiv erhalten. Neue Tage bzw. Wochen beginnen mit frischen Erledigungsständen.
-
-Vor der Umsetzung werden Tageswechsel, Wochenbeginn, Zeitzone, verpasste Zeiträume und Änderungen an Vorlagen geklärt. Ein Zurücksetzen darf alte Ergebnisse nicht überschreiben. Ein eigener Hintergrunddienst wird dadurch nicht automatisch erforderlich.
-
-## Gestaltung
-
-Ruhig, minimalistisch und möglichst selbsterklärend: wenig Text, klare Typografie, großzügiger Abstand und wenige eindeutige Aktionen. Die gewünschte Apple-artige Ruhe dient als Gestaltungsrichtung; Android-Bedienung, Zurück-Navigation, Lesbarkeit und ausreichend große Touch-Flächen bleiben wichtig.
-
-Die Kopfzeile kann je nach Seite passende Aktionen zeigen: Einstellungen, Sprung zu einem Zielcluster oder Bearbeitung der Routinen. Konkrete Symbole und Navigation werden im Entwurf geprüft; ein Pinsel ist beispielsweise nur ein Vorschlag für „Bearbeiten“.
-
-Die [UI-Referenz](docs/reference/ui-inspiration.png) ist eine Inspiration aus dem bereitgestellten Kollegen-Input, kein fertiges Design und keine verbindliche Spezifikation. Begrüßungsblöcke, Fotos, Farben, doppelte Fortschrittsanzeigen und zusätzliche Einstellungen müssen nicht übernommen werden. Funktionen, die nur das Bild ergänzt (z. B. Benachrichtigungen oder Spracheinstellungen), sind dadurch nicht beauftragt.
-
-Hell-/Dunkelmodus, Zielbilder und optionale Streaks liegen im späteren Backlog. Ein Tutorial wird nur bei beobachtetem Erklärungsbedarf erwogen; zunächst soll der Kernablauf selbst verständlich sein.
-
-## Technische Richtung
-
-| Bereich | Startpunkt |
-| --- | --- |
-| App | Flutter und Dart; zunächst Android |
-| Speicherung | Offline und ohne Konto, SQLite mit Drift als bevorzugter Ansatz |
-| Aufbau | Kleine Module nach Funktionen, zusätzliche Schichten bei konkretem Bedarf |
-| State/Navigation | Flutter-Bordmittel; weitere Pakete nur begründet |
-| Qualität | Formatierung, Analyse, gezielte Tests und Android-Build ab dem Grundgerüst |
-| Zusammenarbeit | Ein Repository, GitHub Issues, kurze Branches, Pull Requests |
-
-Flutter unterstützt die später gewünschten Plattformen; Plugins und Bedienung müssen je Plattform geprüft werden. iOS-Builds benötigen macOS und Xcode. SDK- und Paketversionen werden bei der Einrichtung geprüft und dokumentiert. Quellen: [Flutter-Plattformen](https://docs.flutter.dev/reference/supported-platforms), [Plattformeinrichtung](https://docs.flutter.dev/platform-integration), [Drift](https://drift.simonbinder.eu/).
-
-Das Datenmodell folgt den geklärten Regeln für Ziele und Zwischenziele. Es erhält stabile IDs, eindeutige Beziehungen und notwendige Zeitangaben. Wiederkehrende Aufgaben bekommen erst mit ihrer Umsetzung Vorlagen und getrennte Zeitraumergebnisse. Keine allgemeine Ereignis- oder Sync-Architektur auf Vorrat.
-
-Cloud, Accounts, KI, Kalender, Zusammenarbeit und Desktop gehören nicht zum aktuellen Kernumfang. Ein Export mit geprüfter Wiederherstellung ist vor der Nutzung mit wichtigen eigenen Daten erforderlich; lokale Speicherung allein ist kein Backup.
-
-## Planung und Reihenfolge
-
-Der aktuelle Aufgabenstatus und konkrete Akzeptanzkriterien stehen ausschließlich in den [GitHub Issues](https://github.com/anurag-cibo/guided-notes/issues). Kategorien beschreiben die Art der Arbeit; Prioritäten beschreiben ihre Reihenfolge:
-
-| Kategorien | Bedeutung |
-| --- | --- |
-| `typ:technik` | Projektbasis, Speicherung, technische Qualität |
-| `typ:planung` | Produktregeln, UX-Entscheidungen, Auswertung |
-| `typ:feature` | Nutzerfunktionen mit User Story |
-
-| Priorität | Bedeutung |
-| --- | --- |
-| `prio:P0` | Jetzt: technische Basis und notwendige Produkt-/UX-Planung, gleichrangig |
-| `prio:P1` | Danach: Kernablauf und Voraussetzungen für verlässliche Eigennutzung |
-| `prio:P2` | Später: Routinen und weitere Ergänzungen; noch keine Umsetzungszusage |
-
-Als Startkonvention erhält jedes aktive Issue eine Kategorie und eine Priorität; Einteilung und Workflow können wir bei Bedarf anpassen. Abhängigkeiten im Issue gehen der Reihenfolge nach Nummer vor. Die technische Einrichtung kann beginnen, während Produktregeln geklärt werden; Datenmodell und fachliche Features warten auf ihre jeweils benötigten Entscheidungen. Ein zusätzliches Projektboard ist vorerst nicht nötig.
+Routinen mit Tages-/Wochenhistorie, Bilder, Hell-/Dunkelwahl, Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kalender und Zusammenarbeit gehören nicht zum aktuellen Kern. **Vor wichtigen eigenen Daten fehlt noch der geprüfte Export/Import aus Issue #12.**
 
 ## Entwicklung starten
 
-Die [AGENTS.md](AGENTS.md) beschreibt den Workflow. Noch existiert kein Flutter-Projekt und damit kein ausführbarer App-Build. Setup, SDK-Version und überprüfte Befehle werden mit dem Grundgerüst ergänzt. Der aktuelle Auftrag umfasst Dokumentation und Backlog, keine App-Implementierung.
+Voraussetzungen: Git, **Flutter 3.47.4 / Dart 3.13.3**, Android SDK und JDK 21. CI und lokale Einrichtung verwenden dieselbe Flutter-Version. Android Studio stellt hier JDK und SDK bereit. Flutter verwaltet die durch das Android-Projekt angeforderten Build-Werkzeuge; der erste Build braucht Netzwerkzugriff und kann länger dauern.
+
+```powershell
+# Nur beim ersten Einrichten, falls kein passendes Flutter-SDK vorhanden ist:
+git clone --depth 1 --branch 3.47.4 https://github.com/flutter/flutter.git work/flutter
+
+# Der Wrapper nutzt FLUTTER_ROOT, das lokale work/flutter oder Flutter im PATH.
+.\tool\flutter.ps1 doctor -v
+.\tool\flutter.ps1 pub get --enforce-lockfile
+.\tool\flutter.ps1 devices
+.\tool\flutter.ps1 run -d emulator-5554
+```
+
+Ein Android-Gerät mit USB-Debugging oder einen Emulator über den Device Manager in Android Studio starten. Falls Android-Lizenzen noch fehlen: `flutter doctor --android-licenses`. Geräte-ID aus `flutter devices` übernehmen. Für ein vorhandenes SDK im PATH kann überall direkt `flutter` verwendet werden.
+
+```powershell
+.\tool\flutter.ps1 analyze lib test integration_test
+.\tool\flutter.ps1 test
+.\tool\flutter.ps1 build apk --debug
+```
+
+Die installierbare APK liegt unter `build/app/outputs/flutter-apk/app-debug.apk`. Es ist ein Entwicklungsbuild mit Debug-Signierung. Änderungen an der Oberfläche lassen sich mit `flutter run` und Hot Reload schnell ausprobieren.
+
+## Aufbau
+
+| Bereich | Verantwortung |
+| --- | --- |
+| `lib/features/goals/domain` | Unveränderliche Modelle, Statusregeln, Fortschritts- und Kalenderberechnung |
+| `lib/data` | SQLite-Schema, Verbindung und Versionsverwaltung mit Drift |
+| `lib/features/goals/data` | Parametrisierte Datenzugriffe und atomare Fachoperationen |
+| `lib/features/goals/application` | Lade-/Speicherzustand, Fehler und Aktualisierung der Ansichten |
+| `lib/features/goals/presentation` | Kleine Screens/Formulare und gemeinsame UI-Elemente |
+| `lib/app.dart` | Theme, deutsche Lokalisierung und Einstieg |
+
+Navigator und ChangeNotifier reichen für diesen Ablauf. Keine vorsorglichen Routing-, State-, Sync- oder Ereignisframeworks. Drift wird mit explizitem SQL für zwei kleine Tabellen verwendet; daher kein zusätzlicher Codegenerator. Fachmodell und Widgets kennen keine SQL-Zeilen. Details zur [Speicherung und Migration](docs/storage.md).
+
+## Prüfung und Zusammenarbeit
+
+GitHub Actions prüft Formatierung, Analyse, Fachregel-/Persistenz-/Widgettests und einen Android-Debug-Build. Ein APK-Artefakt steht nach erfolgreichem CI-Lauf bereit. Die Tests decken unter anderem die Fünf-Ziele-Grenze bei schnellen Aktionen, Fremdschlüssel, Transaktionsrollback, Dateineustart, den ersten Bedienablauf, große Schrift und einen Sprung ans Ende einer langen Zwischenzielliste ab.
+
+Der Android-Test läuft in zwei getrennten Prozessen auf einem Testgerät; Phase 2 prüft die Daten der ersten Phase und entfernt ausschließlich ihr synthetisches Testziel:
+
+```powershell
+.\tool\flutter.ps1 test integration_test/app_test.dart -d emulator-5554 --no-uninstall
+# App vollständig stoppen, optional Flugmodus aktivieren, danach:
+.\tool\flutter.ps1 test integration_test/app_test.dart -d emulator-5554 --no-uninstall --dart-define=VERIFY_RESTART=true
+```
+
+Nicht gegen einen wichtigen Datenbestand ausführen. Das Testziel heißt `Android-Testziel`; es wird nicht in eine neu installierte App vorbefüllt.
+
+Aktueller Aufgabenstand und Akzeptanzkriterien: [GitHub Issues](https://github.com/anurag-cibo/guided-notes/issues). Arbeitskonventionen: [AGENTS.md](AGENTS.md). Reproduzierbare Prüfungen und Android-Nachweis: [Validierung](docs/validation.md).
