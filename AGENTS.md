@@ -2,6 +2,8 @@
 
 Diese Datei beschreibt unseren aktuellen Arbeitsstil, keinen dauerhaft festgelegten Prozess. Wir passen Vorgehen, Werkzeuge und Detailgrad an die Aufgabe und neue Erfahrungen an. Aktuelle Nutzerwünsche gehen vor; Produktumfang und technische Richtung stehen in README.md.
 
+Zum Einstieg in einen neuen Chat [Projektübergabe](docs/project-handoff.md) und README.md lesen; den aktuellen Aufgabenstand anschließend in GitHub prüfen.
+
 ## Zusammenarbeit
 
 - Kleine, nutzbare Schritte bevorzugen. Nur so viel Planung und Struktur ergänzen, wie die nächste Umsetzung benötigt.

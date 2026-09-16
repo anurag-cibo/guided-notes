@@ -25,6 +25,10 @@ Beim ersten Versuch der zweiphasigen Prüfung entfernte Flutter die Test-App nac
 
 Keine mehrtägige Nutzererprobung behauptet; diese gehört zu #4. Export/Import (#12) bleibt vor wichtigen eigenen Daten offen.
 
+## Erste Nutzerrückmeldung · 17.09.2026
+
+App im sichtbaren Android-Emulator gestartet. Der Nutzer bestätigt Start und grundsätzliche Funktion, bewertet die Oberfläche aber als sehr rudimentär und gestalterisch noch nicht zufriedenstellend. Dies ersetzt keine systematische oder mehrtägige Erprobung. Kontext und Einstieg für weitere Chats: [Projektübergabe](project-handoff.md).
+
 ## Einrichtungshinweise
 
 Das SDK ist lokal unter dem ignorierten `work/flutter` installiert. Der Release-Tag wird bewusst festgehalten; `flutter doctor` meldet deshalb gegebenenfalls einen unbekannten Branch und einen fehlenden globalen PATH-Eintrag. Der PowerShell-Wrapper funktioniert ohne globale PATH-Änderung. Fehlendes Visual Studio betrifft nur Windows-Desktop, nicht das Android-Projekt.
