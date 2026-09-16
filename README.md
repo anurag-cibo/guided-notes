@@ -77,7 +77,7 @@ Der aktuelle Aufgabenstatus und konkrete Akzeptanzkriterien stehen ausschließli
 | `prio:P1` | Danach: Kernablauf und Voraussetzungen für verlässliche Eigennutzung |
 | `prio:P2` | Später: Routinen und weitere Ergänzungen; noch keine Umsetzungszusage |
 
-Jedes aktive Issue erhält genau eine Kategorie und eine Priorität. Abhängigkeiten im Issue gehen der Reihenfolge nach Nummer vor. Die technische Einrichtung kann beginnen, während Produktregeln geklärt werden; Datenmodell und fachliche Features warten auf ihre jeweiligen Entscheidungen. Ein zusätzliches Projektboard ist vorerst nicht nötig.
+Als Startkonvention erhält jedes aktive Issue eine Kategorie und eine Priorität; Einteilung und Workflow können wir bei Bedarf anpassen. Abhängigkeiten im Issue gehen der Reihenfolge nach Nummer vor. Die technische Einrichtung kann beginnen, während Produktregeln geklärt werden; Datenmodell und fachliche Features warten auf ihre jeweils benötigten Entscheidungen. Ein zusätzliches Projektboard ist vorerst nicht nötig.
 
 ## Entwicklung starten
 
