@@ -34,6 +34,7 @@ Keine mehrtägige Nutzererprobung behauptet; diese gehört zu #4. Der ursprüngl
 - Android-Kernablauf und anschließender Prozessneustart: beide Phasen erneut bestanden. Der Flugmodus war bei dieser Wiederholung aus; der ältere Offline-Nachweis bleibt oben dokumentiert.
 - `integration_test/backup_test.dart`: echter Android-Export über `ACTION_CREATE_DOCUMENT`, Auswahl derselben Datei über `ACTION_OPEN_DOCUMENT`, bytegleicher Inhalt und Import in eine separate leere Testdatenbank; erneute Öffnung und vollständiger Vergleich bestanden. Der Test berührt nicht die echte `guide.sqlite` und entfernt seine temporären Datenbanken.
 - Die Drift-Debugwarnung zu mehreren Datenbanken tritt in den Backup-Tests auf, weil Quelle und Ziel gleichzeitig geöffnet werden. Sie verwenden ausdrücklich verschiedene Dateien bzw. getrennte In-Memory-Verbindungen, keinen gemeinsamen Executor.
+- Review-Nachbesserung: Beim Zerstören der Android-Activity wird ein noch wartender Dateiaufruf explizit abgebrochen. Späte Ergebnisse eines I/O-Threads werden danach ignoriert, damit derselbe Aufruf nicht doppelt beantwortet wird. Android-Build erneut bestanden; erzwungene Activity-Neuerzeugung während Dateiauswahl wurde nicht separat im Gerätetest nachgewiesen.
 
 Der native Dateidialogtest benötigt eine Person oder Geräteautomation für **Speichern** und die anschließende Auswahl der erzeugten Datei:
 

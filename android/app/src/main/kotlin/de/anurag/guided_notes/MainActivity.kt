@@ -13,6 +13,16 @@ class MainActivity : FlutterActivity() {
     private var contents: String? = null
     private val limit = 10 * 1024 * 1024
 
+    override fun onDestroy() {
+        // Resolve the Dart call before Flutter detaches/destroys the engine.
+        // A recreated activity must never leave the old screen waiting forever.
+        val result = pending
+        pending = null
+        contents = null
+        result?.error("cancelled", "Dateivorgang durch App-Neustart abgebrochen.", null)
+        super.onDestroy()
+    }
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "de.anurag.guided_notes/backup")
@@ -79,9 +89,15 @@ class MainActivity : FlutterActivity() {
                     Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
                         .decode(ByteBuffer.wrap(bytes)).toString()
                 }
-                runOnUiThread { pending = null; contents = null; result.success(value) }
+                runOnUiThread {
+                    if (pending !== result) return@runOnUiThread
+                    pending = null
+                    contents = null
+                    result.success(value)
+                }
             } catch (_: Exception) {
                 runOnUiThread {
+                    if (pending !== result) return@runOnUiThread
                     pending = null
                     contents = null
                     result.error("file", "Datei konnte nicht verarbeitet werden.", null)
