@@ -19,7 +19,7 @@ Stand: 16.09.2026. Lokal: Windows 11, Flutter 3.47.4 (Release-Tag 9584c6713b), D
 - Android-Integration Phase 1: bestanden. Über die echte Oberfläche Ziel und Motivation angelegt, Zwischenziel erstellt und erreicht, 100 % Gesamtfortschritt geprüft, zum Zwischenziel und zurück navigiert.
 - Anschließend normalen App-Build mit `adb install -r` installiert, Prozess mit `am force-stop` beendet und `MainActivity` neu gestartet. Das synthetische Ziel mit 100 % Fortschritt war im normalen App-Build sichtbar; Screenshot lokal unter `outputs/android-goals.png`. Flugmodus war eingeschaltet (`airplane_mode_on = 1`).
 - Android-Integration Phase 2: bestanden. Nach weiterem vollständigem Prozessstopp vorhandene Motivation, Status und berechneten Fortschritt verglichen. Anschließend ausschließlich das eigene synthetische Testziel samt Kinddaten entfernt.
-- CI-Workflow ist eingerichtet, aber **noch nicht auf GitHub ausgeführt**: Der Push wurde von der automatischen Freigabeprüfung abgelehnt. Es wurden keine Remote-Issues als erledigt geschlossen.
+- Der GitHub-Workflow prüft Formatierung, Analyse, Tests und Android-Build und stellt die Debug-APK als Artefakt bereit. Die zugehörigen Läufe und ihr Status sind in [PR #24](https://github.com/anurag-cibo/guided-notes/pull/24/checks) verlinkt. Der lokale Prüfnachweis oben ergänzt diese CI um die tatsächlichen Android-Gerätetests.
 
 Beim ersten Versuch der zweiphasigen Prüfung entfernte Flutter die Test-App nach Phase 1 automatisch. Ursache anhand der Flutter-CLI und des fehlenden Android-Pakets geklärt; beide Phasen mit `--no-uninstall` erfolgreich wiederholt. Das ist in der README reproduzierbar dokumentiert.
 
