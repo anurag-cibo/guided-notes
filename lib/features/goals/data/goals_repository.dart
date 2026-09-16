@@ -3,10 +3,14 @@ import 'package:drift/drift.dart';
 import '../../../data/app_database.dart';
 import '../domain/models.dart';
 import 'backup_codec.dart';
+import '../../todos/data/todos_repository.dart';
 
 class GoalsRepository {
-  GoalsRepository(this.database);
+  GoalsRepository(this.database, {DateTime Function()? now})
+    : now = now ?? DateTime.now;
   final AppDatabase database;
+  final DateTime Function() now;
+  late final TodosRepository todos = TodosRepository(database, now);
 
   Future<String> exportBackup() async => BackupCodec.encode(await load());
 
@@ -15,9 +19,9 @@ class GoalsRepository {
     final snapshot = BackupCodec.decode(source);
     await database.transaction(() async {
       final current = await load();
-      if (current.goals.isNotEmpty || current.milestones.isNotEmpty) {
+      if (!current.isEmpty) {
         throw const RuleViolation(
-          'Wiederherstellen ist nur in einer leeren App möglich. Vorhandene Ziele und das Archiv bleiben unverändert.',
+          'Wiederherstellen ist nur in einer leeren App möglich. Vorhandene Ziele, Todos und Archive bleiben unverändert.',
         );
       }
       for (final g in snapshot.goals) {
@@ -47,10 +51,30 @@ class GoalsRepository {
           ],
         );
       }
+      for (final t in snapshot.todoTemplates) {
+        await database.customStatement(
+          'INSERT INTO todo_templates(id,title,frequency,target,active) VALUES(?,?,?,?,?)',
+          [t.id, t.title, t.frequency.name, t.target, t.active ? 1 : 0],
+        );
+      }
+      for (final e in snapshot.todoEntries) {
+        await database.customStatement(
+          'INSERT INTO todo_entries(template_id,period,title,frequency,target,completed) VALUES(?,?,?,?,?,?)',
+          [
+            e.templateId,
+            e.period,
+            e.title,
+            e.frequency.name,
+            e.target,
+            e.completed,
+          ],
+        );
+      }
     });
   }
 
   Future<GoalSnapshot> load() => database.transaction(() async {
+    await todos.ensureCurrentPeriods();
     final goals = await database
         .customSelect('SELECT * FROM goals ORDER BY id')
         .get();
@@ -69,6 +93,8 @@ class GoalsRepository {
           dueDate: _date(r.readNullable<String>('due_date')),
         ),
       ),
+      todoTemplates: await todos.templates(),
+      todoEntries: await todos.entries(),
     );
   });
 

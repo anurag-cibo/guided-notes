@@ -19,7 +19,28 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  Future<void> _createTodos() async {
+    await customStatement('''CREATE TABLE todo_templates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL CHECK(length(trim(title)) > 0),
+      frequency TEXT NOT NULL CHECK(frequency IN ('daily','weekly')),
+      target INTEGER NOT NULL CHECK(target BETWEEN 1 AND 999),
+      active INTEGER NOT NULL CHECK(active IN (0,1)),
+      CHECK(frequency != 'daily' OR target = 1)
+    )''');
+    await customStatement('''CREATE TABLE todo_entries (
+      template_id INTEGER NOT NULL REFERENCES todo_templates(id),
+      period TEXT NOT NULL,
+      title TEXT NOT NULL CHECK(length(trim(title)) > 0),
+      frequency TEXT NOT NULL CHECK(frequency IN ('daily','weekly')),
+      target INTEGER NOT NULL CHECK(target BETWEEN 1 AND 999),
+      completed INTEGER NOT NULL CHECK(completed BETWEEN 0 AND target),
+      PRIMARY KEY(template_id, period),
+      CHECK(frequency != 'daily' OR target = 1)
+    )''');
+  }
 
   @override
   Iterable<TableInfo<Table, Object?>> get allTables => const [];
@@ -61,9 +82,16 @@ class AppDatabase extends GeneratedDatabase {
         BEFORE UPDATE OF archived ON goals WHEN OLD.archived = 1 AND NEW.archived = 0
         AND (SELECT count(*) FROM goals WHERE archived = 0) >= 5
         BEGIN SELECT RAISE(ABORT, 'active_goal_limit'); END''');
+      await _createTodos();
     },
     onUpgrade: (_, from, to) async {
-      throw StateError('Keine Migration von Schema $from nach $to vorhanden.');
+      if (from == 1 && to == 2) {
+        await _createTodos();
+      } else {
+        throw StateError(
+          'Keine Migration von Schema $from nach $to vorhanden.',
+        );
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

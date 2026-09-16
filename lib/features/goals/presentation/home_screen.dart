@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import '../../todos/presentation/todos_view.dart';
+import '../../todos/domain/todo_models.dart';
 
 import '../application/goals_controller.dart';
 import 'common.dart';
@@ -13,8 +18,42 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _tab = 0;
+  Timer? _timer;
+  late String _day;
+  @override
+  void initState() {
+    super.initState();
+    _day = calendarDate(widget.controller.repository.now());
+    WidgetsBinding.instance.addObserver(this);
+    _timer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => _refreshPeriod(),
+    );
+  }
+
+  void _refreshPeriod() {
+    final day = calendarDate(widget.controller.repository.now());
+    if (day == _day || widget.controller.loading || widget.controller.saving) {
+      return;
+    }
+    _day = day;
+    widget.controller.load();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshPeriod();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: widget.controller,
@@ -27,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(_tab == 0 ? 'The Guide' : 'Zwischenziele'),
+            title: Text(['The Guide', 'Zwischenziele', 'Todos'][_tab]),
             actions: [
               IconButton(
                 tooltip: 'Datensicherung',
@@ -59,7 +98,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               : _tab == 0
               ? GoalList(controller: c)
-              : MilestonesView(controller: c),
+              : _tab == 1
+              ? MilestonesView(controller: c)
+              : TodosView(controller: c),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _tab,
             onDestinationSelected: (index) => setState(() => _tab = index),
@@ -72,6 +113,11 @@ class _HomeScreenState extends State<HomeScreen> {
               NavigationDestination(
                 icon: Icon(Icons.checklist),
                 label: 'Zwischenziele',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.check_box_outlined),
+                selectedIcon: Icon(Icons.check_box),
+                label: 'Todos',
               ),
             ],
           ),

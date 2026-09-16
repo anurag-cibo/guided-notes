@@ -62,3 +62,18 @@ Zwischenziele                   Archiv
 - Material-Elemente mit mindestens 48 dp Touch-Fläche, flexible statt fester Texthöhen, scrollende Formulare und große Schrift. Fortschritt wird einmal pro Kontext beschriftet; Frist ist eine Textzeile statt einer zweiten Prozentanzeige. Statusinformationen bleiben ohne Farben verständlich.
 
 Die technische Basis verwendet Flutter-Navigator und Listenable/ChangeNotifier. Ein State- oder Routing-Paket hat für diesen begrenzten Ablauf keinen konkreten Nutzen. Speicherung, Fachmodell und Widgets werden getrennt, damit spätere Gestaltung keine Datenmigration erfordert.
+
+## Todos: Tages- und Wochenaufgaben
+
+Am 17.09.2026 ausdrücklich als nächster Schritt beauftragt: ein Todos-Tab mit Tages- und Wochenaufgaben (#13–#17). Damit wird die bisherige Zurückstellung der Routinen aufgehoben; Nutzererprobung #4 bleibt offen. Die folgenden kleinen Produktentscheidungen konkretisieren den ersten Stand und können nach Nutzung angepasst werden.
+
+- Dritter Hauptbereich **Todos**, unabhängig von Zielen und deren Fortschritt. Android-Zurück führt von diesem Tab zuerst zu Ziele.
+- Tagesaufgaben einmal abhaken oder rückgängig machen. Wochenaufgaben haben eine positive Zielanzahl von 1 bis 999; Plus/Minus zeigt beispielsweise „2 von 3 erledigt“. Überzählige Erledigungen sind nicht möglich.
+- Tagesbeginn ist lokale Mitternacht; Wochen laufen Montag bis Sonntag. Kalenderdaten statt 24-Stunden-Dauern verhindern Verschiebungen durch Sommerzeit. Beispiel: Sonntag, 20.09.2026 → Montag, 21.09.2026 erzeugt neue Tages- und Wochenstände.
+- Die lokale Gerätezeit gilt auch nach Zeitzonen- oder Uhrzeitänderung. Bei Rückkehr zu einem schon gespeicherten Zeitraum wird dessen Stand wiederverwendet. Es gibt keine vertrauenswürdige externe Uhr und keine Rekonstruktion tatsächlicher Aktivitätszeitpunkte.
+- Aktuelle Stände entstehen beim Laden/Starten, Wiederaufnehmen nach Datumswechsel und spätestens 15 Sekunden nach einem Datumswechsel in der geöffneten App. Kein Hintergrunddienst. Mehrfaches Öffnen erzeugt keine Duplikate.
+- Ausgelassene Zeiträume ohne App-Nutzung werden nicht nachträglich angelegt. Vorhandene Stände bleiben erhalten; Erledigungen werden niemals erfunden. Eine neue Vorlage erscheint sofort im aktuellen Zeitraum.
+- Titel, Häufigkeit und Zielanzahl werden pro Zeitraum eingefroren. Bearbeitung ändert Titel/Zielanzahl ab dem nächsten neu angelegten Zeitraum; täglich/wöchentlich bleibt für eine Vorlage fest. Zum Wechsel eine neue Aufgabe anlegen und die bisherige beenden.
+- **Aufgabe beenden** verlangt Bestätigung und stoppt künftige Wiederholungen. Der aktuelle Zeitraum bleibt abhakbar; seine Karte erklärt das Ende. Vorlage und alte Ergebnisse bleiben für Historie und Backup erhalten. Kein endgültiges Löschen von Historie in diesem Schritt.
+- Am Ende des Tabs liegt **Vergangene Zeiträume**: eine nur lesbare Liste mit Zeitraum, damaligem Titel und Erledigungsstand. Bei zurückgestellter Gerätezeit können dort auch bereits gespeicherte spätere Daten erscheinen.
+- Drei getrennte Bereiche im Code: Todo-Fachmodell, Datenzugriff und Oberfläche. Bestehende SQLite-Verbindung, Änderungssteuerung und Backup werden mitgenutzt.

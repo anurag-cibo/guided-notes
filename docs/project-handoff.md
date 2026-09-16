@@ -2,6 +2,12 @@
 
 Diese Momentaufnahme hält die bisherige Arbeit und das Nutzerfeedback für weitere Chats fest. Sie ist keine zweite Aufgabenliste; aktueller Status und Akzeptanzkriterien stehen in den [GitHub Issues](https://github.com/anurag-cibo/guided-notes/issues).
 
+## Neuer Arbeitsstand: Todos · 17.09.2026
+
+Auf ausdrücklichen Folgeauftrag wurde auf dem lokalen Branch `feat/todos` der dritte Tab **Todos** mit Tages- und Wochenaufgaben umgesetzt (#13–#17). Noch nicht nach `main` zusammengeführt. Enthalten: Anlegen, tägliches Abhaken/Rückgängig, Wochenziel und Plus/Minus, Bearbeiten für den nächsten Zeitraum, bestätigtes Beenden und eine nur lesbare Historie. Unabhängig von Zielen; lokale Kalendertage, Wochenbeginn Montag, keine erfundenen Stände ausgelassener Zeiträume. Vollständige Regeln in [Produktentscheidungen](product-decisions.md#todos-tages--und-wochenaufgaben).
+
+Schema 2 migriert bestehende Ziele unverändert und speichert Vorlagen getrennt von Zeitraum-Snapshots. Backupformat 2 enthält Todos und Historie; Format 1 bleibt lesbar. Flutter-Analyse ohne Befunde, 25 Tests sowie Android-Todos-Gerätetest bestanden; Debug-APK gebaut und als Update im Emulator gestartet. Der Gerätetest verwendet eine separate temporäre Datenbank und wurde mit `--no-uninstall` ausgeführt. #4 bleibt weiterhin für Nutzererprobung offen. Der folgende Übergabetext beschreibt den vorherigen, bereits integrierten Stand.
+
 ## Ergebnis und Rückmeldung
 
 Die ursprünglich als Notiz-App bezeichnete Anwendung ist inzwischen ein Ziele-/Zwischenziele-Prototyp mit dem flexiblen Arbeitsnamen **The Guide**. Der Nutzer wollte zunächst eine startbare Android-App und modularen, leicht erweiterbaren Code. Diese Basis ist vorhanden.

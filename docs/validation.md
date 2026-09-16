@@ -1,5 +1,13 @@
 # Validierung
 
+## Todos-Erweiterung · 17.09.2026
+
+- `flutter analyze --no-pub lib test integration_test`: keine Befunde.
+- `flutter test --no-pub`: 25 Tests bestanden. Neu: reale Schema-1-Migration und Datei-Neustart, Tages-/Wochenwechsel, Sommerzeit-/Jahresgrenzen, Uhr-Rückstellung, ausgelassene Zeiträume, historische Vorlagenwerte, Beenden, Zählergrenzen, Backupformat 2/Legacy-Import und Import-Rollback sowie Bedienung mit großer Schrift.
+- `flutter test integration_test/todos_test.dart -d emulator-5554 --no-uninstall --no-pub`: bestanden. Tagesaufgabe anlegen/abhaken, Wochenaufgabe anlegen/zählen, vollständiges Schließen und Wiederöffnen der temporären SQLite-Datei, Rückgängig. Separate temporäre Datenbank; reale App-Inhalte bleiben unberührt. Dies prüft Datenbank-Neustart im Testprozess, keinen vollständigen Prozessneustart.
+- `flutter build apk --debug --no-pub`: erfolgreich. Danach normale APK unter `outputs/the-guide-debug.apk` gesichert und per `adb install -r` installiert; kein Test-Einstieg in der ausgelieferten APK.
+- Neuer Backupinhalt ist über Codec-/Repositorytests abgedeckt; der Android-System-Dateidialog wurde für diese Änderung nicht erneut durchlaufen. Zeitzonenwechsel sind durch Kalenderschlüsselregeln abgedeckt, nicht durch Umstellen der Emulator-Zeitzone getestet.
+
 Stand: 16.09.2026. Lokal: Windows 11, Flutter 3.47.4 (Release-Tag 9584c6713b), Dart 3.13.3, JDK 21 aus Android Studio. Android-Testgerät: vorhandener Emulator „Medium_Phone_API_36.0“, Android 16 / API 36, x86_64.
 
 ## Automatisierte Prüfungen
