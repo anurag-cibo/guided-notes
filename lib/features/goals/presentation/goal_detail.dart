@@ -44,23 +44,54 @@ class GoalDetail extends StatelessWidget {
         body: ListView(
           padding: pagePadding,
           children: [
-            Text(
-              '${goal.emoji} ${goal.title}',
-              style: Theme.of(context).textTheme.headlineMedium,
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xffe8f1eb),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(goal.emoji, style: const TextStyle(fontSize: 44)),
+                  gap,
+                  Text(
+                    goal.title,
+                    style: Theme.of(context).textTheme.headlineMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  gap,
+                  ProgressSummary(controller.snapshot.progressFor(goalId)),
+                  if (goal.achieved || goal.archived) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      [
+                        if (goal.achieved) 'Ziel erreicht',
+                        if (goal.archived) 'Archiviert',
+                      ].join(' · '),
+                    ),
+                  ],
+                ],
+              ),
             ),
             gap,
-            Text('Warum?', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Warum ist dir dieses Ziel wichtig?',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
-            Text(
-              goal.motivation.isEmpty
-                  ? 'Was macht dieses Ziel für dich wichtig?'
-                  : goal.motivation,
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  goal.motivation.isEmpty
+                      ? 'Was macht dieses Ziel für dich wichtig?'
+                      : goal.motivation,
+                ),
+              ),
             ),
-            gap,
-            ProgressSummary(controller.snapshot.progressFor(goalId)),
-            gap,
             Text(
-              'Frist: ${deadlineLabel(goal.dueDate, achieved: goal.achieved)}',
+              'Frist: ${goal.dueDate == null ? 'Ohne Frist' : MaterialLocalizations.of(context).formatMediumDate(goal.dueDate!)}${goal.dueDate != null && !goal.achieved ? ' · ${deadlineLabel(goal.dueDate)}' : ''}',
             ),
             gap,
             Text(
@@ -75,27 +106,32 @@ class GoalDetail extends StatelessWidget {
                 ),
               ),
             for (final milestone in milestones)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(milestone.title),
-                subtitle: Text(
-                  '${milestone.status.label} · ${milestone.progress} %',
-                ),
-                trailing: goal.archived
-                    ? null
-                    : const Icon(Icons.chevron_right),
-                onTap: goal.archived
-                    ? null
-                    : () => Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => MilestonesScreen(
-                            controller: controller,
-                            focusGoalId: goalId,
-                            focusMilestoneId: milestone.id,
+              Card(
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
+                  title: Text(milestone.title),
+                  subtitle: Text(
+                    '${milestone.status.label} · ${milestone.progress} %',
+                  ),
+                  trailing: goal.archived
+                      ? null
+                      : const Icon(Icons.chevron_right),
+                  onTap: goal.archived
+                      ? null
+                      : () => Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => MilestonesScreen(
+                              controller: controller,
+                              focusGoalId: goalId,
+                              focusMilestoneId: milestone.id,
+                            ),
                           ),
                         ),
-                      ),
+                ),
               ),
             if (!goal.archived) ...[
               OutlinedButton.icon(

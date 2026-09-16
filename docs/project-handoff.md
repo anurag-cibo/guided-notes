@@ -8,7 +8,7 @@ Die ursprünglich als Notiz-App bezeichnete Anwendung ist inzwischen ein Ziele-/
 
 Am 17.09.2026 wurde der zuvor unsichtbare Test-Emulator mit einem sichtbaren Fenster gestartet und die normale App geöffnet. Der Nutzer bestätigt: Die App startet und funktioniert grundsätzlich, ist aber sehr rudimentär und gestalterisch noch nicht hübsch. Das ist eine erste informelle Rückmeldung, keine vollständige Funktionsabnahme oder mehrtägige Nutzererprobung. Konkrete Probleme einzelner Screens, Farben oder Bedienhandlungen wurden noch nicht benannt.
 
-**Für die Fortsetzung:** Die aktuelle Oberfläche ist ein funktionierender Ausgangspunkt, kein freigegebenes Enddesign. Gemeinsam die sichtbaren Screens anschauen und daraus konkrete gestalterische Verbesserungen ableiten. Die bisher gewünschte Richtung bleibt ruhig, minimalistisch und selbsterklärend. Die vorhandene UI-Referenz ist Inspiration, keine verbindliche Vorlage. Ein neues Design oder eine neue Funktionsrunde wurde mit dieser Dokumentationsaktualisierung noch nicht beauftragt.
+**Fortsetzung am 17.09.2026:** Der Nutzer hat die Bearbeitung der vier P1-Issues und eine grobe Orientierung an der Referenz beauftragt. Die Oberfläche wurde mit warmem Hintergrund, kompakten Karten, Emoji-Flächen, klareren Details und dezenten Statusfarben überarbeitet. Datensicherung ist über das Schild-Symbol erreichbar. Keine Routinen, Bilder oder weiteren P2-Funktionen wurden ergänzt. Die aktuelle Gestaltung braucht noch Nutzerrückmeldung; systematische Beobachtung ohne Anleitung und mehrtägige Erprobung in #4 bleiben offen.
 
 ## Bisher umgesetzt
 
@@ -18,7 +18,8 @@ Am 17.09.2026 wurde der zuvor unsichtbare Test-Emulator mit einem sichtbaren Fen
 - Produktkern, drei synthetische Beispiele, erste Nutzungsstrecke, Status-/Fortschritts-/Zeitregeln und reduzierter Screenflow dokumentiert.
 - Ziele anlegen und bearbeiten, Motivation, optionales Emoji und optionale Frist; höchstens fünf nicht archivierte Ziele.
 - Zwischenziele nach Ziel gruppiert, mit Status und Fortschritt; direkte Eintragssprünge und Cluster-Auswahl für lange Listen.
-- Details sowie Archivieren, Wiederherstellen und bestätigtes endgültiges Löschen bereits im Code vorhanden. Die separaten Issues #9 und #11 wurden in diesem Paket nicht geschlossen; bei Fortsetzung ihre Kriterien und noch nötigen gezielten Prüfungen abgleichen.
+- Details sowie Archivieren, Wiederherstellen und bestätigtes endgültiges Löschen vorhanden. Für #9 und #11 wurden gezielte Widget- und Persistenzprüfungen ergänzt. Fristen bleiben auch bei erreichten Zielen als Datum sichtbar; Zielerfolg wird separat angezeigt.
+- Export/Import (#12): versioniertes JSON inklusive Archiv; echte Android-Dateiauswahl, Vorschau und Bestätigung. Import nur in leere App, keine Überschreibung oder Zusammenführung. Ungültige Dateien und Teilfehler erhalten den bestehenden Datenbestand. Maximal 10 MB; Datei unverschlüsselt. Rundlauf über den Android-Dateidialog und erneute Datenbanköffnung geprüft.
 - Offline-Speicherung mit Drift/SQLite, Fremdschlüsseln, Transaktionen und zusätzlicher Absicherung der Fünf-Ziele-Grenze in der Datenbank.
 - Subagenten dürfen laut AGENTS.md eingesetzt werden, wenn die Gesamtkosten einschließlich Koordination und Prüfung sinken, ohne Qualität einzubüßen. Bisher wurde ohne Subagenten gearbeitet.
 
@@ -26,7 +27,7 @@ Am 17.09.2026 wurde der zuvor unsichtbare Test-Emulator mit einem sichtbaren Fen
 
 Fünf **aktive**, nicht fünf insgesamt gespeicherte Ziele. Erreichte Ziele zählen bis zum ausdrücklichen Archivieren mit. Zielfortschritt ist das gleichgewichtete Mittel der Zwischenziele; die bewusste Zielerfolg-Markierung bleibt davon getrennt. Erreichen archiviert nicht automatisch. Fristen sind optionale Kalenderdaten, keine zweite Fortschrittsanzeige. Motivation genügt zunächst als Freitext; kein eigener Notizbereich.
 
-Details: [Produktentscheidungen](product-decisions.md). Speicherung und künftige Schemaänderungen: [Speicherstrategie](storage.md). Routinen, Bilder, Streaks, Hell-/Dunkelwahl, Cloud und Accounts sind nicht Teil der aktuellen Umsetzung. Export mit geprüfter Wiederherstellung (#12) fehlt noch vor Nutzung mit wichtigen eigenen Daten. Nutzererprobung und Vereinfachung bleiben in #4.
+Details: [Produktentscheidungen](product-decisions.md). Speicherung, Backupformat und künftige Schemaänderungen: [Speicherstrategie](storage.md). Routinen, Bilder, Streaks, Hell-/Dunkelwahl, Cloud und Accounts sind nicht Teil der aktuellen Umsetzung. Backups regelmäßig außerhalb des Geräts aufbewahren. Nutzererprobung und weitere Vereinfachung bleiben in #4.
 
 ## Technischer Einstieg
 
@@ -45,6 +46,6 @@ Architektur: `domain` für Modelle und Fachregeln, `data` für Datenbank und Rep
 
 ## Bereits nachgewiesene Qualität
 
-Elf Fachregel-, Persistenz-, Fehler- und Widgettests, Formatierung und Analyse bestanden. Android-Debug-Build lokal und in [GitHub-CI](https://github.com/anurag-cibo/guided-notes/actions/runs/35148618767) erfolgreich. Zwei Android-Integrationstests belegen den ersten Ablauf und erhaltene Daten nach vollständigem Prozessneustart im Flugmodus. Große Schrift und ein Sprung zum 80. Zwischenziel wurden ebenfalls geprüft.
+17 Fachregel-, Persistenz-, Backup-, Fehler- und Widgettests bestanden. Android-Debug-Build erfolgreich. Die zwei Phasen des Android-Kernablauftests wurden nach der UI-Änderung erneut erfolgreich ausgeführt; zusätzlich der native Backup-Rundlauf. Der frühere Offline-Nachweis bleibt in der Validierung dokumentiert; beim aktuellen Neustarttest war der Flugmodus aus. Große Schrift und ein Sprung zum 80. Zwischenziel wurden ebenfalls geprüft.
 
 Der Test-Runner deinstalliert die App standardmäßig am Ende: Für die zweiphasige Persistenzprüfung ist `--no-uninstall` nötig. Tests nur mit Testdaten ausführen; sie erzeugen und entfernen ihr synthetisches Ziel. Vollständige Befehle und Grenzen des Nachweises: [README](../README.md) und [Validierung](validation.md).

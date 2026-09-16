@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../application/goals_controller.dart';
 import 'common.dart';
+import 'backup_screen.dart';
 import 'goal_list.dart';
 import 'milestones_screen.dart';
 
@@ -25,7 +26,23 @@ class _HomeScreenState extends State<HomeScreen> {
           if (!didPop && _tab != 0) setState(() => _tab = 0);
         },
         child: Scaffold(
-          appBar: AppBar(title: Text(_tab == 0 ? 'Ziele' : 'Zwischenziele')),
+          appBar: AppBar(
+            title: Text(_tab == 0 ? 'The Guide' : 'Zwischenziele'),
+            actions: [
+              IconButton(
+                tooltip: 'Datensicherung',
+                icon: const Icon(Icons.shield_outlined),
+                onPressed: c.loading || c.error != null
+                    ? null
+                    : () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => BackupScreen(controller: c),
+                        ),
+                      ),
+              ),
+            ],
+          ),
           body: c.loading
               ? const Center(child: CircularProgressIndicator())
               : c.error != null

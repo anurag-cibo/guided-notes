@@ -19,4 +19,16 @@ Bei jeder zukünftigen Schemaänderung:
 3. Mit neuer Version öffnen; IDs, Beziehungen, Titel, Fristen und Status vergleichen. `PRAGMA foreign_key_check` muss leer bleiben.
 4. Fehlgeschlagene Migration muss vorhandene Daten erhalten. Neueres Schema mit alter App nicht öffnen/überschreiben. Migration und erneutes Öffnen testen.
 
-Aktuelle Persistenztests verwenden temporäre echte SQLite-Dateien, schließen Verbindungen vollständig und öffnen dieselbe Datei erneut. Sie prüfen zusätzlich Fremdschlüssel, Trigger, Rollback und kaskadierendes Löschen. Export und validierter Import sind ein eigenes noch offenes Feature (#12).
+Aktuelle Persistenztests verwenden temporäre echte SQLite-Dateien, schließen Verbindungen vollständig und öffnen dieselbe Datei erneut. Sie prüfen zusätzlich Fremdschlüssel, Trigger, Rollback und kaskadierendes Löschen.
+
+## Datensicherung · Format 1
+
+Ein UTF-8-JSON-Dokument mit `format: "the-guide"`, `version: 1`, `goals` und `milestones` enthält alle gespeicherten Felder inklusive IDs, Beziehungen, Motivation, Emoji, Fristen, Zielerfolg und Archivstatus. Das Format ist unabhängig von der SQLite-Schemaversion. Abgeleiteter Fortschritt wird nach dem Import neu berechnet.
+
+Der Export liest einen konsistenten Snapshot in einer Transaktion. Androids Storage Access Framework speichert bzw. öffnet die Datei über einen kleinen MethodChannel; keine zusätzliche Speicherberechtigung und kein Dateiauswahl-Paket nötig. Datei-I/O läuft außerhalb des UI-Threads. Dateien sind unverschlüsselt, maximal 10 MB groß und müssen gültiges UTF-8 enthalten.
+
+Import erfolgt ausschließlich in einen leeren Datenbestand (einschließlich Archiv). Vorhandene Daten werden weder ersetzt noch zusammengeführt. Diese bewusst kleine erste Lösung eignet sich zur Wiederherstellung auf einem neuen Gerät. Vor der Bestätigung zeigt die Oberfläche die Anzahl der Ziele, archivierten Ziele und Zwischenziele.
+
+Der Decoder prüft Formatversion, Feldtypen, positive eindeutige IDs, Beziehungen, maximal fünf aktive Ziele, Status/Fortschritt und reale Kalenderdaten von 1900 bis 2200 entsprechend der Datumsauswahl. Erst nach vollständiger Validierung werden sämtliche Zeilen in einer Transaktion angelegt. Die Leerheitsprüfung geschieht innerhalb derselben Transaktion; ein Fehler rollt alle neuen Zeilen zurück. Es gibt keine Schemaänderung für dieses Feature.
+
+Tests belegen Export/Import-Rundlauf einschließlich Archiv, sämtlicher Statuswerte, Unicode, Fristen und erneuter Dateiöffnung. Fehlerfälle umfassen inkompatible Versionen, ungültige Daten, verwaiste/duplizierte IDs, bestehende Daten und einen erzwungenen Datenbankfehler während des Imports. Ein Android-Gerätetest prüft zusätzlich den echten System-Dateidialog mit temporären Testdatenbanken.
