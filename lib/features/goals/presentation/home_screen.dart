@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../application/goals_controller.dart';
 import 'common.dart';
-import 'goal_editor.dart';
 import 'goal_list.dart';
 import 'milestones_screen.dart';
 
@@ -64,10 +63,3 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   );
 }
-
-void openGoalEditor(BuildContext context, GoalsController controller) =>
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => GoalEditor(controller: controller),
-      ),
-    );

@@ -61,9 +61,9 @@ GitHub Actions prüft Formatierung, Analyse, Fachregel-/Persistenz-/Widgettests 
 Der Android-Test läuft in zwei getrennten Prozessen auf einem Testgerät; Phase 2 prüft die Daten der ersten Phase und entfernt ausschließlich ihr synthetisches Testziel:
 
 ```powershell
-.\tool\flutter.ps1 test integration_test/app_test.dart -d emulator-5554
+.\tool\flutter.ps1 test integration_test/app_test.dart -d emulator-5554 --no-uninstall
 # App vollständig stoppen, optional Flugmodus aktivieren, danach:
-.\tool\flutter.ps1 test integration_test/app_test.dart -d emulator-5554 --dart-define=VERIFY_RESTART=true
+.\tool\flutter.ps1 test integration_test/app_test.dart -d emulator-5554 --no-uninstall --dart-define=VERIFY_RESTART=true
 ```
 
 Nicht gegen einen wichtigen Datenbestand ausführen. Das Testziel heißt `Android-Testziel`; es wird nicht in eine neu installierte App vorbefüllt.
