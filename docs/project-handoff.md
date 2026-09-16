@@ -12,6 +12,8 @@ Am 17.09.2026 wurde der zuvor unsichtbare Test-Emulator mit einem sichtbaren Fen
 
 ## Bisher umgesetzt
 
+**Abschluss dieses Arbeitsstands:** [PR #26](https://github.com/anurag-cibo/guided-notes/pull/26) wurde nach erfolgreicher CI und abgeschlossenem Review per Squash nach `main` zusammengeführt (Commit `0c9352c`). Die Issues #9, #11 und #12 sind geschlossen. Der Nutzer bestätigt ausdrücklich, dass #4 für Rückmeldung und mehrtägige Erprobung offen bleiben soll. Es ist keine weitere Umsetzung aus diesem Chat ausstehend.
+
 Über [PR #24](https://github.com/anurag-cibo/guided-notes/pull/24) nach erfolgreicher Build-CI auf `main` zusammengeführt; Merge-Commit `8c1eac1`. Damit wurden die Issues #1, #2, #3, #5, #6, #7, #8 und #10 geschlossen.
 
 - Flutter-Android-Projekt, festgelegte SDK-Version, deutsche Lokalisierung und GitHub Actions mit Debug-APK-Artefakt.
@@ -40,12 +42,18 @@ Flutter **3.47.4**, Dart **3.13.3**, JDK 21. SDK lokal unter dem ignorierten `wo
 
 Der vorhandene AVD heißt `Medium_Phone_API_36.0` (Android 16 / API 36, x86_64). Bei der Übergabe war die App im sichtbaren Emulator geöffnet; in späteren Chats den tatsächlichen Gerätestatus erneut prüfen. Paket/Activity: `de.anurag.guided_notes/.MainActivity`. Wenn der Emulator nicht läuft, über den Device Manager in Android Studio öffnen. App-Daten erhalten; zum normalen Testen nicht deinstallieren oder den Emulator zurücksetzen.
 
+Zum Abschluss wurde die aktuelle normale APK einschließlich der Review-Korrektur erneut mit `adb install -r` installiert und gestartet; vorhandene Nutzerdaten blieben erhalten. Erkennbar ist die neue Oberfläche an „Schön, dass du da bist.“ und dem Schild-Symbol für Datensicherung. Das Flutter-App-Symbol blieb unverändert. Die synthetischen Vorschauziele sind nicht Teil der normalen App. Der Nutzer hatte zuletzt „Neues Ziel“ geöffnet; laufende Eingaben bei der nächsten Arbeit respektieren. Die kurzzeitig gesetzte Emulator-Testoption `always_finish_activities` wurde auf ihren vorherigen, nicht gesetzten Zustand zurückgesetzt.
+
 Der normale auslieferbare Debug-Build liegt lokal unter `outputs/the-guide-debug.apk`. Screenshots des synthetischen Teststands und des leeren Starts liegen unter `outputs/android-goals.png` und `outputs/android-empty.png`. `outputs/` und das SDK sind absichtlich nicht in Git enthalten; auf einem anderen Rechner APK neu bauen oder das CI-Artefakt verwenden. Die Integrationstests können die APK im Build-Verzeichnis durch einen Test-Einstieg ersetzen; für normales Ausprobieren `flutter run` oder erneut `flutter build apk --debug` verwenden.
+
+Aktuelle UI-Vorschau mit synthetischen Daten: `outputs/ui-goals.png`, `outputs/ui-detail.png`, `outputs/ui-milestones.png` und `outputs/ui-backup.png`. Die älteren `android-*.png` zeigen den Stand vor der Überarbeitung.
 
 Architektur: `domain` für Modelle und Fachregeln, `data` für Datenbank und Repository, `application` für den Controller, `presentation` für Screens und Formulare. Theme und App-Einstieg in `lib/app.dart`. Flutter-Navigator und ChangeNotifier; kein zusätzliches State-/Routing-Paket. Gestaltung lässt sich überwiegend in `presentation` und `app.dart` ändern, ohne die Datenstruktur anzufassen.
 
 ## Bereits nachgewiesene Qualität
 
 17 Fachregel-, Persistenz-, Backup-, Fehler- und Widgettests bestanden. Android-Debug-Build erfolgreich. Die zwei Phasen des Android-Kernablauftests wurden nach der UI-Änderung erneut erfolgreich ausgeführt; zusätzlich der native Backup-Rundlauf. Der frühere Offline-Nachweis bleibt in der Validierung dokumentiert; beim aktuellen Neustarttest war der Flugmodus aus. Große Schrift und ein Sprung zum 80. Zwischenziel wurden ebenfalls geprüft.
+
+Die abschließende [CI für PR #26](https://github.com/anurag-cibo/guided-notes/actions/runs/35159852006) ist grün. Der einzige Review-Befund (wartender Dateiaufruf bei Activity-Ende) wurde in `e6d756c` behoben und vom Review als erledigt bestätigt. Der gesonderte Gerätetest einer erzwungenen Activity-Neuerzeugung bleibt eine dokumentierte Testgrenze, kein behaupteter Nachweis.
 
 Der Test-Runner deinstalliert die App standardmäßig am Ende: Für die zweiphasige Persistenzprüfung ist `--no-uninstall` nötig. Tests nur mit Testdaten ausführen; sie erzeugen und entfernen ihr synthetisches Ziel. Vollständige Befehle und Grenzen des Nachweises: [README](../README.md) und [Validierung](validation.md).
