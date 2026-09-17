@@ -60,3 +60,18 @@ App im sichtbaren Android-Emulator gestartet. Der Nutzer bestätigt Start und gr
 ## Einrichtungshinweise
 
 Das SDK ist lokal unter dem ignorierten `work/flutter` installiert. Der Release-Tag wird bewusst festgehalten; `flutter doctor` meldet deshalb gegebenenfalls einen unbekannten Branch und einen fehlenden globalen PATH-Eintrag. Der PowerShell-Wrapper funktioniert ohne globale PATH-Änderung. Fehlendes Visual Studio betrifft nur Windows-Desktop, nicht das Android-Projekt.
+
+## Einstellungen und beide Darstellungen · 17.09.2026
+
+- 29 Unit-/Widgettests erfolgreich. Neue Tests prüfen Migration 2 → 3 und Datei-Neustart, unbekannte Darstellungswerte, Schreibfehler ohne falsche Erfolgsauswahl, Lösch-Rollback, anschließenden Backup-Import und Themewechsel einschließlich Systemmodus. Bestehende Migration-1-Tests prüfen nun den vollständigen Weg bis Schema 3.
+- Einstellungen bei 390 × 844 logischen Pixeln und doppelter Schriftgröße geprüft, einschließlich Abbruch und Bestätigung des Gesamtlöschens. Bestehende große-Schrift-Tests für Ziele und Todos bleiben grün.
+- Flutter-Analyse ohne Befunde. Android-Test `appearance_test.dart` auf API 36 erfolgreich: separate temporäre Datenbank, Ziele/Details/Zwischenziele/Todos/Einstellungen in Hell und Dunkel, Darstellungswahl und Daten nach vollständigem Datenbank-Schließen/Wiederöffnen erhalten.
+- Zehn Screenshots erzeugt und visuell geprüft. Testbedingte Tap-Markierungen können kurzzeitig sichtbar sein. Kein Nachweis formaler WCAG-Konformität oder mehrtägiger Nutzung.
+
+```powershell
+.\tool\flutter.ps1 drive --driver integration_test/screenshot_driver.dart --target integration_test/appearance_test.dart -d emulator-5554 --keep-app-running
+# Danach immer wieder den normalen App-Einstieg bauen:
+.\tool\flutter.ps1 build apk --debug
+```
+
+`--keep-app-running` verhindert die standardmäßige Deinstallation durch `flutter drive`. Der Test verwendet ausschließlich seine temporäre Datenbank. Screenshots landen lokal in `outputs/appearance-*.png`. Der neue Gesamtlöschvorgang wurde nur gegen synthetische Testdaten geprüft, nie gegen den regulären App-Datenbestand. Native Dateidialoge wurden in diesem Schritt nicht erneut geprüft; der bestehende Backup-Widgettest bleibt erfolgreich.

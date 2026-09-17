@@ -23,45 +23,54 @@ class TodosView extends StatelessWidget {
           'Hake ab, was du geschafft hast. Morgen beginnt ein neuer Tag.',
         ),
         const SizedBox(height: 28),
-        for (final frequency in TodoFrequency.values) ...[
-          Text(
-            frequency == TodoFrequency.daily ? 'Heute' : 'Diese Woche',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 4),
-          Text(_periodLabel(context, frequency, now)),
-          gap,
-          if (!controller.snapshot.todoEntries.any(
-            (e) => e.frequency == frequency && e.isCurrent(now),
-          ))
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(
-                frequency == TodoFrequency.daily
-                    ? 'Was möchtest du jeden Tag tun?'
-                    : 'Was möchtest du mehrmals pro Woche tun?',
+        for (final frequency in TodoFrequency.values)
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    frequency == TodoFrequency.daily ? 'Heute' : 'Diese Woche',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(_periodLabel(context, frequency, now)),
+                  gap,
+                  if (!controller.snapshot.todoEntries.any(
+                    (e) => e.frequency == frequency && e.isCurrent(now),
+                  ))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Text(
+                        frequency == TodoFrequency.daily
+                            ? 'Was möchtest du jeden Tag tun?'
+                            : 'Was möchtest du mehrmals pro Woche tun?',
+                      ),
+                    ),
+                  for (final entry in controller.snapshot.todoEntries.where(
+                    (e) => e.frequency == frequency && e.isCurrent(now),
+                  ))
+                    _TodoCard(controller: controller, entry: entry),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton.icon(
+                      onPressed: controller.saving
+                          ? null
+                          : () => _openEditor(context, frequency),
+                      icon: const Icon(Icons.add),
+                      label: Text(
+                        frequency == TodoFrequency.daily
+                            ? 'Tagesaufgabe hinzufügen'
+                            : 'Wochenaufgabe hinzufügen',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
               ),
             ),
-          for (final entry in controller.snapshot.todoEntries.where(
-            (e) => e.frequency == frequency && e.isCurrent(now),
-          ))
-            _TodoCard(controller: controller, entry: entry),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
-              onPressed: controller.saving
-                  ? null
-                  : () => _openEditor(context, frequency),
-              icon: const Icon(Icons.add),
-              label: Text(
-                frequency == TodoFrequency.daily
-                    ? 'Tagesaufgabe hinzufügen'
-                    : 'Wochenaufgabe hinzufügen',
-              ),
-            ),
           ),
-          const SizedBox(height: 28),
-        ],
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.history),
@@ -111,102 +120,100 @@ class _TodoCard extends StatelessWidget {
       (t) => t.id == entry.templateId,
     );
     final done = entry.completed == entry.target;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (entry.frequency == TodoFrequency.daily)
-                  Checkbox(
-                    value: done,
-                    onChanged: controller.saving
-                        ? null
-                        : (value) => runMutation(
-                            context,
-                            controller,
-                            (r) => r.todos.changeCount(
-                              entry,
-                              value == true ? 1 : -1,
-                            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (entry.frequency == TodoFrequency.daily)
+                Checkbox(
+                  value: done,
+                  onChanged: controller.saving
+                      ? null
+                      : (value) => runMutation(
+                          context,
+                          controller,
+                          (r) => r.todos.changeCount(
+                            entry,
+                            value == true ? 1 : -1,
                           ),
-                    semanticLabel: entry.title,
-                  ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      entry.title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        decoration: done ? TextDecoration.lineThrough : null,
-                      ),
+                        ),
+                  semanticLabel: entry.title,
+                ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    entry.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      decoration: done ? TextDecoration.lineThrough : null,
                     ),
                   ),
                 ),
-                if (template.active)
-                  IconButton(
-                    tooltip: '${entry.title} bearbeiten',
-                    icon: const Icon(Icons.more_horiz),
-                    onPressed: controller.saving
-                        ? null
-                        : () => Navigator.push(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (_) => TodoEditor(
-                                controller: controller,
-                                frequency: template.frequency,
-                                template: template,
-                              ),
+              ),
+              if (template.active)
+                IconButton(
+                  tooltip: '${entry.title} bearbeiten',
+                  icon: const Icon(Icons.more_horiz),
+                  onPressed: controller.saving
+                      ? null
+                      : () => Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => TodoEditor(
+                              controller: controller,
+                              frequency: template.frequency,
+                              template: template,
                             ),
                           ),
+                        ),
+                ),
+            ],
+          ),
+          if (entry.frequency == TodoFrequency.weekly)
+            Wrap(
+              spacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                IconButton(
+                  tooltip: '${entry.title}: einmal rückgängig',
+                  icon: const Icon(Icons.remove_circle_outline),
+                  onPressed: controller.saving || entry.completed == 0
+                      ? null
+                      : () => runMutation(
+                          context,
+                          controller,
+                          (r) => r.todos.changeCount(entry, -1),
+                        ),
+                ),
+                Semantics(
+                  liveRegion: true,
+                  child: Text(
+                    '${entry.completed} von ${entry.target} erledigt',
                   ),
+                ),
+                IconButton(
+                  tooltip: '${entry.title}: einmal erledigt',
+                  icon: const Icon(Icons.add_circle_outline),
+                  onPressed: controller.saving || done
+                      ? null
+                      : () => runMutation(
+                          context,
+                          controller,
+                          (r) => r.todos.changeCount(entry, 1),
+                        ),
+                ),
               ],
             ),
-            if (entry.frequency == TodoFrequency.weekly)
-              Wrap(
-                spacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  IconButton(
-                    tooltip: '${entry.title}: einmal rückgängig',
-                    icon: const Icon(Icons.remove_circle_outline),
-                    onPressed: controller.saving || entry.completed == 0
-                        ? null
-                        : () => runMutation(
-                            context,
-                            controller,
-                            (r) => r.todos.changeCount(entry, -1),
-                          ),
-                  ),
-                  Semantics(
-                    liveRegion: true,
-                    child: Text(
-                      '${entry.completed} von ${entry.target} erledigt',
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: '${entry.title}: einmal erledigt',
-                    icon: const Icon(Icons.add_circle_outline),
-                    onPressed: controller.saving || done
-                        ? null
-                        : () => runMutation(
-                            context,
-                            controller,
-                            (r) => r.todos.changeCount(entry, 1),
-                          ),
-                  ),
-                ],
-              ),
-            if (!template.active) const Text('Endet nach diesem Zeitraum.'),
-            if (template.active &&
-                (template.title != entry.title ||
-                    template.target != entry.target))
-              const Text('Änderung gilt ab dem nächsten Zeitraum.'),
-          ],
-        ),
+          if (!template.active) const Text('Endet nach diesem Zeitraum.'),
+          if (template.active &&
+              (template.title != entry.title ||
+                  template.target != entry.target))
+            const Text('Änderung gilt ab dem nächsten Zeitraum.'),
+        ],
       ),
     );
   }

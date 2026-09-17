@@ -62,7 +62,9 @@ class GoalList extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xffedf3ee),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
@@ -95,7 +97,14 @@ class GoalList extends StatelessWidget {
                     ),
                     if (controller.snapshot.progressFor(goal.id) != null) ...[
                       gap,
-                      ProgressSummary(controller.snapshot.progressFor(goal.id)),
+                      LinearProgressIndicator(
+                        value: controller.snapshot.progressFor(goal.id)! / 100,
+                        minHeight: 4,
+                        borderRadius: BorderRadius.circular(8),
+                        semanticsLabel: 'Zwischenzielfortschritt',
+                        semanticsValue:
+                            '${controller.snapshot.progressFor(goal.id)} %',
+                      ),
                     ],
                     if (goal.achieved || goal.dueDate != null) ...[
                       const SizedBox(height: 8),

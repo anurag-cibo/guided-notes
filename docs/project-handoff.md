@@ -1,5 +1,17 @@
 # Projektübergabe · 17.09.2026
 
+## Neuer Arbeitsstand: Einstellungen und Darstellung · 17.09.2026
+
+Auf den Folgeauftrag zur Vervollständigung anhand der Referenz wurden Einstellungen und #18 umgesetzt: Zahnrad in allen drei Tabs, System-/Hell-/Dunkelwahl mit dauerhafter Speicherung, Datensicherung, Dateninformationen, Lizenzen und bestätigtes atomisches Löschen aller Inhalte. Eigene Zielbilder (#19), Streak (#20), Einführung (#21) und mehrtägige Erprobung (#4) bleiben offen. Sprachwahl und Erinnerungen sind wie in #18 festgehalten nicht Teil dieser Umsetzung.
+
+Schema 3 ergänzt lokale Geräteeinstellungen; Migration von 1 und 2 erhält die bestehenden Inhalte. Backupformat bleibt 2 und enthält keine Geräteeinstellungen. Gemeinsame Farben liegen in `lib/theme/guide_theme.dart`; Einstellungen haben eigenes Repository, Controller und Screen. Zielkarten sind kompakter, Zieldetails haben einen Fortschrittsring, Todos zwei zusammenhängende Zeitraumkarten. Ein kleines Bergsymbol ersetzt das Flutter-App-Symbol. Die Gestaltung bleibt ein bearbeitbarer Zwischenstand; eigene Fotos aus der Referenz fehlen weiterhin.
+
+29 Tests und Flutter-Analyse bestanden; Android-Prüfung mit separater temporärer Datenbank für alle fünf Ansichten in beiden Darstellungen und Wiederöffnung erfolgreich. Zehn Screenshots unter `outputs/appearance-{light,dark}-{goals,detail,milestones,todos,settings}.png`; keine Vorschauziele im normalen Datenbestand. Der Screenshot-Test verwendet `flutter drive --keep-app-running`, damit die vorhandene App nicht deinstalliert wird. Details und Grenzen in `docs/validation.md`.
+
+Arbeitsbranch: `codex/settings-and-appearance`, aufbauend auf `feat/todos`; noch nicht nach `main` integriert. Die normale Debug-APK liegt unter `outputs/the-guide-debug.apk`, wurde erfolgreich gebaut und per `adb install -r` im Emulator installiert und gestartet. Issue #18 enthält den Umsetzungsstand und bleibt bis zur Integration offen.
+
+Die folgenden Abschnitte beschreiben frühere Arbeitsstände; neue Einstellungen ersetzen den bisherigen direkten Schild-Zugang zur Datensicherung.
+
 Diese Momentaufnahme hält die bisherige Arbeit und das Nutzerfeedback für weitere Chats fest. Sie ist keine zweite Aufgabenliste; aktueller Status und Akzeptanzkriterien stehen in den [GitHub Issues](https://github.com/anurag-cibo/guided-notes/issues).
 
 ## Neuer Arbeitsstand: Todos · 17.09.2026

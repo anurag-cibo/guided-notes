@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../theme/guide_theme.dart';
+
 import '../application/goals_controller.dart';
 import '../domain/models.dart';
 import 'common.dart';
@@ -91,13 +93,7 @@ class _MilestonesViewState extends State<MilestonesView> {
         rows.add((
           id: 'milestone-${milestone.id}',
           child: Card(
-            color: switch (milestone.status) {
-              MilestoneStatus.achieved ||
-              MilestoneStatus.onTrack => const Color(0xffeaf6ee),
-              MilestoneStatus.offTrack => const Color(0xfffff1df),
-              MilestoneStatus.onHold => const Color(0xfff0edf7),
-              MilestoneStatus.notStarted => const Color(0xffedf2f7),
-            },
+            color: milestoneSurface(context, milestone.status),
             shape: milestone.id == _focusMilestone
                 ? RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),

@@ -1,5 +1,11 @@
 # Speicherung und Migration
 
+## Schema 3: lokale Einstellungen · 17.09.2026
+
+`app_settings` speichert gerätebezogene Einstellungen als Schlüssel/Wert; `appearance` kennt `system`, `light` und `dark`. Fehlende oder unbekannte Werte ergeben Systemdarstellung. Migrationen von Schema 1 und 2 laufen schrittweise und ergänzen ausschließlich fehlende Tabellen; Ziele und Todos bleiben unverändert.
+
+Backupformat bleibt 2: Die Darstellungswahl ist eine Geräteeinstellung und gehört nicht zu den gesicherten Inhalten. Sie verhindert keinen Import in eine ansonsten leere App. „Alle Inhalte löschen“ entfernt Ziele, Zwischenziele, Todo-Vorlagen und historische Stände gemeinsam in einer Transaktion. Einstellungen und exportierte Dateien bleiben bestehen. Ein erzwungener Datenbankfehler prüft den vollständigen Rollback; ein weiterer Test prüft Wiederherstellung nach dem Löschen.
+
 ## Erweiterung auf Schema 2 und Backupformat 2 · 17.09.2026
 
 Schema 2 ergänzt `todo_templates` (ID, Titel, täglich/wöchentlich, Zielanzahl, aktiv) und `todo_entries` (Vorlagen-ID, Zeitraumdatum, damaliger Titel/Häufigkeit/Zielanzahl, Erledigungsanzahl). `(template_id, period)` ist eindeutig; Fremdschlüssel und CHECKs sichern Beziehungen, positive Ziele und Zählergrenzen. Beendete Vorlagen bleiben erhalten. Die Migration 1 → 2 legt ausschließlich diese Tabellen an; Ziele und Zwischenziele bleiben unverändert. Die folgenden Abschnitte zu Schema/Format 1 beschreiben die Ausgangsversion.

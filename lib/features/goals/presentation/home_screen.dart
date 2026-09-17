@@ -7,13 +7,19 @@ import '../../todos/domain/todo_models.dart';
 
 import '../application/goals_controller.dart';
 import 'common.dart';
-import 'backup_screen.dart';
+import '../../settings/application/settings_controller.dart';
+import '../../settings/presentation/settings_screen.dart';
 import 'goal_list.dart';
 import 'milestones_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.controller});
+  const HomeScreen({
+    super.key,
+    required this.controller,
+    required this.settings,
+  });
   final GoalsController controller;
+  final SettingsController settings;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -69,16 +75,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             title: Text(['The Guide', 'Zwischenziele', 'Todos'][_tab]),
             actions: [
               IconButton(
-                tooltip: 'Datensicherung',
-                icon: const Icon(Icons.shield_outlined),
-                onPressed: c.loading || c.error != null
-                    ? null
-                    : () => Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => BackupScreen(controller: c),
-                        ),
-                      ),
+                tooltip: 'Einstellungen',
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        SettingsScreen(goals: c, settings: widget.settings),
+                  ),
+                ),
               ),
             ],
           ),

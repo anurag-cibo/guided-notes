@@ -19,7 +19,13 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
+
+  Future<void> _createSettings() =>
+      customStatement('''CREATE TABLE app_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  )''');
 
   Future<void> _createTodos() async {
     await customStatement('''CREATE TABLE todo_templates (
@@ -83,15 +89,16 @@ class AppDatabase extends GeneratedDatabase {
         AND (SELECT count(*) FROM goals WHERE archived = 0) >= 5
         BEGIN SELECT RAISE(ABORT, 'active_goal_limit'); END''');
       await _createTodos();
+      await _createSettings();
     },
     onUpgrade: (_, from, to) async {
-      if (from == 1 && to == 2) {
-        await _createTodos();
-      } else {
+      if (from < 1 || from > 2 || to != 3) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
       }
+      if (from < 2) await _createTodos();
+      if (from < 3) await _createSettings();
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

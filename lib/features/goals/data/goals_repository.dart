@@ -12,6 +12,13 @@ class GoalsRepository {
   final DateTime Function() now;
   late final TodosRepository todos = TodosRepository(database, now);
 
+  Future<void> deleteAllContents() => database.transaction(() async {
+    await database.customStatement('DELETE FROM todo_entries');
+    await database.customStatement('DELETE FROM todo_templates');
+    await database.customStatement('DELETE FROM milestones');
+    await database.customStatement('DELETE FROM goals');
+  });
+
   Future<String> exportBackup() async => BackupCodec.encode(await load());
 
   /// Import only into an empty store; validation and writes are all-or-nothing.

@@ -47,7 +47,7 @@ class GoalDetail extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xffe8f1eb),
+                color: Theme.of(context).colorScheme.primaryContainer,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
@@ -61,7 +61,7 @@ class GoalDetail extends StatelessWidget {
                         ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   gap,
-                  ProgressSummary(controller.snapshot.progressFor(goalId)),
+                  GoalProgress(controller.snapshot.progressFor(goalId)),
                   if (goal.achieved || goal.archived) ...[
                     const SizedBox(height: 8),
                     Text(

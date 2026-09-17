@@ -84,6 +84,48 @@ class ProgressSummary extends StatelessWidget {
   );
 }
 
+class GoalProgress extends StatelessWidget {
+  const GoalProgress(this.progress, {super.key});
+  final int? progress;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(child: ProgressSummary(progress)),
+      if (progress != null) ...[
+        const SizedBox(width: 20),
+        ExcludeSemantics(
+          child: SizedBox.square(
+            dimension: 68,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox.expand(
+                  child: CircularProgressIndicator(
+                    value: progress! / 100,
+                    strokeWidth: 6,
+                    strokeCap: StrokeCap.round,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                  ),
+                ),
+                FittedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(
+                      '$progress %',
+                      style: Theme.of(context).textTheme.labelLarge,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ],
+  );
+}
+
 class DueDateField extends StatelessWidget {
   const DueDateField({super.key, required this.value, required this.onChanged});
   final DateTime? value;
