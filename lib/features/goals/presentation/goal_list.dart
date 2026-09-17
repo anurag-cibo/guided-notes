@@ -15,7 +15,7 @@ class GoalList extends StatelessWidget {
     final goals = controller.snapshot.goals
         .where((g) => g.archived == archived)
         .toList();
-    return ListView(
+    final list = ListView(
       padding: pagePadding,
       children: [
         if (!archived) ...[
@@ -135,21 +135,29 @@ class GoalList extends StatelessWidget {
               'Fünf Ziele im Fokus. Archiviere eines, um Platz für ein neues zu schaffen.',
             ),
           ),
-        if (!archived) ...[
-          gap,
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.inventory_2_outlined),
-            title: const Text('Archiv'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (_) => ArchiveScreen(controller: controller),
+      ],
+    );
+    if (archived) return list;
+    return Column(
+      children: [
+        Expanded(child: list),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+          child: Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              leading: const Icon(Icons.inventory_2_outlined),
+              title: const Text('Archiv'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => ArchiveScreen(controller: controller),
+                ),
               ),
             ),
           ),
-        ],
+        ),
       ],
     );
   }

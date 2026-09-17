@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../application/goals_controller.dart';
-import '../domain/models.dart';
 import 'common.dart';
 import 'goal_editor.dart';
+import 'goal_header.dart';
 import 'milestone_editor.dart';
 import 'milestones_screen.dart';
 
@@ -44,35 +44,9 @@ class GoalDetail extends StatelessWidget {
         body: ListView(
           padding: pagePadding,
           children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(goal.emoji, style: const TextStyle(fontSize: 44)),
-                  gap,
-                  Text(
-                    goal.title,
-                    style: Theme.of(context).textTheme.headlineMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
-                  ),
-                  gap,
-                  GoalProgress(controller.snapshot.progressFor(goalId)),
-                  if (goal.achieved || goal.archived) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      [
-                        if (goal.achieved) 'Ziel erreicht',
-                        if (goal.archived) 'Archiviert',
-                      ].join(' · '),
-                    ),
-                  ],
-                ],
-              ),
+            GoalHeader(
+              goal: goal,
+              progress: controller.snapshot.progressFor(goalId),
             ),
             gap,
             Text(
@@ -89,9 +63,6 @@ class GoalDetail extends StatelessWidget {
                       : goal.motivation,
                 ),
               ),
-            ),
-            Text(
-              'Frist: ${goal.dueDate == null ? 'Ohne Frist' : MaterialLocalizations.of(context).formatMediumDate(goal.dueDate!)}${goal.dueDate != null && !goal.achieved ? ' · ${deadlineLabel(goal.dueDate)}' : ''}',
             ),
             gap,
             Text(

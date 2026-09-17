@@ -4,7 +4,7 @@ import '../../goals/application/goals_controller.dart';
 import '../../goals/presentation/backup_screen.dart';
 import '../../goals/presentation/common.dart';
 import '../application/settings_controller.dart';
-import '../data/settings_repository.dart';
+import 'appearance_selector.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({
@@ -26,33 +26,7 @@ class SettingsScreen extends StatelessWidget {
           _heading(context, 'Darstellung'),
           const Text('Wähle, was sich für dich gut anfühlt.'),
           gap,
-          Card(
-            child: RadioGroup<AppAppearance>(
-              groupValue: settings.appearance,
-              onChanged: (value) {
-                if (value != null) settings.setAppearance(value);
-              },
-              child: Column(
-                children: [
-                  for (final mode in AppAppearance.values)
-                    RadioListTile<AppAppearance>(
-                      value: mode,
-                      enabled: !settings.loading && !settings.saving,
-                      title: Text(switch (mode) {
-                        AppAppearance.system => 'Wie das Gerät',
-                        AppAppearance.light => 'Hellmodus',
-                        AppAppearance.dark => 'Dunkelmodus',
-                      }),
-                      secondary: Icon(switch (mode) {
-                        AppAppearance.system => Icons.brightness_auto_outlined,
-                        AppAppearance.light => Icons.light_mode_outlined,
-                        AppAppearance.dark => Icons.dark_mode_outlined,
-                      }),
-                    ),
-                ],
-              ),
-            ),
-          ),
+          AppearanceSelector(settings: settings),
           if (settings.error != null) ...[
             Text(
               settings.error!,
@@ -66,14 +40,30 @@ class SettingsScreen extends StatelessWidget {
             ),
           ],
           gap,
-          _heading(context, 'Deine Daten'),
+          _heading(context, 'Allgemein'),
           Card(
             child: Column(
               children: [
+                const _SettingsStub(
+                  icon: Icons.language_outlined,
+                  title: 'Sprache',
+                  detail: 'Deutsch',
+                ),
+                const Divider(indent: 56),
+                const _SettingsStub(
+                  icon: Icons.notifications_outlined,
+                  title: 'Benachrichtigungen',
+                ),
+                const Divider(indent: 56),
+                const _SettingsStub(
+                  icon: Icons.alarm_outlined,
+                  title: 'Erinnerungen',
+                ),
+                const Divider(indent: 56),
                 ListTile(
                   leading: const Icon(Icons.shield_outlined),
-                  title: const Text('Datensicherung'),
-                  subtitle: const Text('Exportieren und wiederherstellen'),
+                  title: const Text('Daten exportieren'),
+                  subtitle: const Text('Datensicherung und Wiederherstellung'),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: goals.loading || goals.saving || goals.error != null
                       ? null
@@ -113,7 +103,10 @@ class SettingsScreen extends StatelessWidget {
                 const Divider(indent: 56),
                 ListTile(
                   leading: const Icon(Icons.privacy_tip_outlined),
-                  title: const Text('Daten und Privatsphäre'),
+                  title: const Text('Datenschutz'),
+                  subtitle: const Text(
+                    'Informationen zur lokalen Datenhaltung',
+                  ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => showDialog<void>(
                     context: context,
@@ -132,6 +125,11 @@ class SettingsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                ),
+                const Divider(indent: 56),
+                const _SettingsStub(
+                  icon: Icons.description_outlined,
+                  title: 'Impressum',
                 ),
                 const Divider(indent: 56),
                 ListTile(
@@ -197,4 +195,35 @@ class SettingsScreen extends StatelessWidget {
       );
     }
   }
+}
+
+class _SettingsStub extends StatelessWidget {
+  const _SettingsStub({required this.icon, required this.title, this.detail});
+  final IconData icon;
+  final String title;
+  final String? detail;
+  @override
+  Widget build(BuildContext context) => ListTile(
+    leading: Icon(icon),
+    title: Text(title),
+    subtitle: Text(
+      '${detail == null ? '' : '$detail · '}Platzhalter – noch nicht verfügbar',
+    ),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: () => showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: const Text(
+          'Dieser Bereich ist ein Platzhalter. Die Funktion ist noch nicht implementiert.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Verstanden'),
+          ),
+        ],
+      ),
+    ),
+  );
 }

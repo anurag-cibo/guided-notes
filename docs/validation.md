@@ -75,3 +75,7 @@ Das SDK ist lokal unter dem ignorierten `work/flutter` installiert. Der Release-
 ```
 
 `--keep-app-running` verhindert die standardmäßige Deinstallation durch `flutter drive`. Der Test verwendet ausschließlich seine temporäre Datenbank. Screenshots landen lokal in `outputs/appearance-*.png`. Der neue Gesamtlöschvorgang wurde nur gegen synthetische Testdaten geprüft, nie gegen den regulären App-Datenbestand. Native Dateidialoge wurden in diesem Schritt nicht erneut geprüft; der bestehende Backup-Widgettest bleibt erfolgreich.
+
+### Layoutanpassung nach Nutzerfeedback
+
+Die geänderten Ansichten mit zwei Darstellungskästen, markierten Einstellungs-Platzhaltern, festem Archiv und kompaktem Cover-Kopf wurden erneut im Android-Screenshot-Test geprüft. 29 Tests, Analyse und normaler Debug-Build erfolgreich. Die Widgetprüfungen verwenden jetzt den einzelnen Prozentwert im Ring; die Sichtbarkeit der Erreicht-Aktion wird vor dem Antippen explizit hergestellt.

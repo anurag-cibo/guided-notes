@@ -85,3 +85,9 @@ Der Auftrag, die App anhand der Referenz weiter zu vervollständigen, zieht #18 
 Das Zahnrad öffnet Einstellungen mit Darstellung, Datensicherung, Informationen zur lokalen Datenhaltung und Lizenzen. Nicht implementierte Sprachwahl, Benachrichtigungen und Erinnerungen erhalten keine funktionslosen Schalter. Alle Inhalte lassen sich nach ausdrücklicher Bestätigung atomar löschen; Darstellung und exportierte Dateien bleiben erhalten. Vorher wird auf eine Sicherung hingewiesen.
 
 Ziele behalten kompakte Emoji-Karten als einfache Alternative zu eigenen Bildern. Eigene Zielbilder (#19) bleiben offen: konsistente Dateiverwaltung, Android-Auswahl, Größenbegrenzung und Backup müssen zusammen umgesetzt werden. Streak (#20) und Einführung (#21) warten weiterhin auf Nutzungsfeedback. Die drei bestehenden Hauptbereiche bleiben erhalten, Einstellungen sind von jedem Tab erreichbar.
+
+### Konkretisierung der Referenzoberfläche · 17.09.2026
+
+Auf Nutzerwunsch stehen Hell- und Dunkelmodus als zwei gleich breite Kästen nebeneinander; Systemdarstellung bleibt darunter wählbar. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind ausdrücklich als „Platzhalter – noch nicht verfügbar“ sichtbar. Antippen erklärt den fehlenden Funktionsumfang; es werden keine Einstellungen vorgetäuscht. Das überschreibt die frühere Entscheidung gegen sichtbare Platzhalter.
+
+Im Ziele-Tab bleibt das Archiv fest über der Hauptnavigation, während die Ziele separat scrollen. Der Zielkopf hat ein flaches, dekoratives Landschaftscover als austauschbaren Hintergrund. Der Emoji steht im Kreis neben dem Titel. Unter dem Titel stehen Frist und Fortschrittskreis; der zusätzliche Fortschrittsbalken und die doppelte Fristangabe wurden entfernt. Eigene Coverauswahl bleibt offen.

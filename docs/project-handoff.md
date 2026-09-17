@@ -1,5 +1,9 @@
 # Projektübergabe · 17.09.2026
 
+## Nachtrag: konkrete Layoutwünsche · 17.09.2026
+
+Hell-/Dunkelwahl jetzt in zwei nebeneinanderliegenden Kästen; Systemwahl darunter. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf ausdrücklichen Nutzerwunsch als Platzhalter gekennzeichnet. Archiv im Ziele-Tab fest unten über der Navigation. Zielkopf mit flachem dekorativem Cover, Emoji-Kreis neben dem Titel sowie Frist neben dem einzigen Fortschrittskreis; kein zusätzlicher Balken. Cover und Darstellungswahl sind eigene Widgets (`goal_header.dart`, `appearance_selector.dart`). Die frühere Entscheidung gegen Platzhalter ist damit überholt.
+
 ## Neuer Arbeitsstand: Einstellungen und Darstellung · 17.09.2026
 
 Auf den Folgeauftrag zur Vervollständigung anhand der Referenz wurden Einstellungen und #18 umgesetzt: Zahnrad in allen drei Tabs, System-/Hell-/Dunkelwahl mit dauerhafter Speicherung, Datensicherung, Dateninformationen, Lizenzen und bestätigtes atomisches Löschen aller Inhalte. Eigene Zielbilder (#19), Streak (#20), Einführung (#21) und mehrtägige Erprobung (#4) bleiben offen. Sprachwahl und Erinnerungen sind wie in #18 festgehalten nicht Teil dieser Umsetzung.
