@@ -91,3 +91,9 @@ Ziele behalten kompakte Emoji-Karten als einfache Alternative zu eigenen Bildern
 Auf Nutzerwunsch stehen Hell- und Dunkelmodus als zwei gleich breite Kästen nebeneinander; Systemdarstellung bleibt darunter wählbar. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind ausdrücklich als „Platzhalter – noch nicht verfügbar“ sichtbar. Antippen erklärt den fehlenden Funktionsumfang; es werden keine Einstellungen vorgetäuscht. Das überschreibt die frühere Entscheidung gegen sichtbare Platzhalter.
 
 Im Ziele-Tab bleibt das Archiv fest über der Hauptnavigation, während die Ziele separat scrollen. Der Zielkopf hat ein flaches, dekoratives Landschaftscover als austauschbaren Hintergrund. Der Emoji steht im Kreis neben dem Titel. Unter dem Titel stehen Frist und Fortschrittskreis; der zusätzliche Fortschrittsbalken und die doppelte Fristangabe wurden entfernt. Eigene Coverauswahl bleibt offen.
+
+### Eigene Zielbilder und einzelnes Emoji · 17.09.2026
+
+Der Nutzer beauftragt #19 ausdrücklich: Bildauswahl oben im Ziel-Editor, ersetzbar und entfernbar, als Cover im Zielkopf. Verkleinerte lokale Kopien werden mit dem Ziel und im Backup gespeichert. Der dekorative Hintergrund bleibt der Fallback ohne Bild; es gibt keine verpflichtende Auswahl. Das Emoji-Feld steht links neben dem Titel und akzeptiert einen Unicode-Graphemcluster statt eines einzelnen Codepoints, sodass etwa Hautfarben und Flaggen zusammenbleiben. Alte gespeicherte Emoji-Texte werden bei Migration und Backup nicht verändert; beim Bearbeiten wird nur das erste sichtbare Zeichen angeboten.
+
+Das App-Icon zeigt nun die Silhouette eines meditierenden Mönchs mit angedeuteter Robe, als skalierbare Android-Vektorgrafik.

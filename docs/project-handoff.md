@@ -1,5 +1,13 @@
 # Projektübergabe · 17.09.2026
 
+## Neuer Stand: eigene Cover und Mönchs-Icon · 17.09.2026
+
+Der Nutzer hat eigene Hintergrundbilder ausdrücklich beauftragt (#19). Im Ziel-Editor oben auswählen, ersetzen oder entfernen; das Bild erscheint im Zielkopf. Vorher war nur ein dekoratives Cover vorhanden. Android normalisiert die lokale Kopie auf JPEG bis 1280 Pixel/256 KB, Originaldatei höchstens 20 MB. Schema 4 speichert Bildbytes direkt beim Ziel; Migration aus 1–3 ohne Datenverlust. Backupformat 3 sichert Cover mit, alte Formate 1/2 bleiben lesbar. Die Gesamtgrenze für Backups bleibt 10 MB.
+
+Emoji-Eingabe links neben dem Titel, höchstens ein sichtbares Zeichen einschließlich mehrteiliger Emojis und Flaggen. Der Editor markiert vorhandene Eingabe beim Antippen zum Ersetzen. Das Android-App-Icon zeigt eine meditierende Mönchssilhouette statt des Bergsymbols.
+
+32 Tests, Analyse und native Android-Bildauswahl mit temporärer Testdatenbank erfolgreich. Bild bleibt nach Wiederöffnung erhalten und kann im Editor entfernt werden. Screenshots unter `outputs/cover-editor.png` und `outputs/cover-detail.png`; sie verwenden absichtlich das Referenzbild als synthetische Testdatei. Keine Beispieldaten im normalen Bestand. Eigene Coverauswahl ist damit umgesetzt; ältere Abschnitte mit „Zielbilder offen“ sind überholt.
+
 ## Nachtrag: konkrete Layoutwünsche · 17.09.2026
 
 Hell-/Dunkelwahl jetzt in zwei nebeneinanderliegenden Kästen; Systemwahl darunter. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf ausdrücklichen Nutzerwunsch als Platzhalter gekennzeichnet. Archiv im Ziele-Tab fest unten über der Navigation. Zielkopf mit flachem dekorativem Cover, Emoji-Kreis neben dem Titel sowie Frist neben dem einzigen Fortschrittskreis; kein zusätzlicher Balken. Cover und Darstellungswahl sind eigene Widgets (`goal_header.dart`, `appearance_selector.dart`). Die frühere Entscheidung gegen Platzhalter ist damit überholt.

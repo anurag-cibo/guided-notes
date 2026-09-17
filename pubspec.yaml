@@ -12,6 +12,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   drift: ^2.35.0
+  characters: ^1.4.1
   path_provider: ^2.1.6
 
 dev_dependencies:

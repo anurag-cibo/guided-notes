@@ -45,7 +45,7 @@ void main() {
         await tester.tap(find.text('Ziel hinzufügen'));
         await tester.pumpAndSettle();
         await tester.enterText(
-          find.byType(TextFormField).first,
+          find.byKey(const ValueKey('goal-title')),
           'Android-Testziel',
         );
         await tester.enterText(

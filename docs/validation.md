@@ -79,3 +79,14 @@ Das SDK ist lokal unter dem ignorierten `work/flutter` installiert. Der Release-
 ### Layoutanpassung nach Nutzerfeedback
 
 Die geänderten Ansichten mit zwei Darstellungskästen, markierten Einstellungs-Platzhaltern, festem Archiv und kompaktem Cover-Kopf wurden erneut im Android-Screenshot-Test geprüft. 29 Tests, Analyse und normaler Debug-Build erfolgreich. Die Widgetprüfungen verwenden jetzt den einzelnen Prozentwert im Ring; die Sichtbarkeit der Erreicht-Aktion wird vor dem Antippen explizit hergestellt.
+
+## Zielbilder, Emoji-Feld und Icon · 17.09.2026
+
+32 Tests bestanden; darunter echte Migration 3 → 4, Bildbytes nach Datenbank-Neustart, Backup-Rundlauf mit Bild, Bildentfernung und endgültiges Löschen. Ungültige Bilddaten und mehrere Emoji-Zeichen werden ohne Änderung am bestehenden Ziel abgelehnt. Ein Widgettest prüft Bildauswahl-Abbruch, Auswahl, ein einzelnes sowie zusammengesetztes Emoji und Speichern. Analyse ohne Befunde.
+
+Android-Gerätetest `integration_test/cover_image_test.dart` erfolgreich: Android-Dateiauswahl geöffnet, die eigens bereitgestellte Referenzbildkopie gewählt, normalisierte Bildkopie gespeichert, Ziel und Emoji nach Wiederöffnung geprüft und Cover über den Editor entfernt. Separater temporärer Datenbestand; die normale App-Datenbank wurde nicht verwendet. Screenshots: `outputs/cover-editor.png`, `outputs/cover-detail.png`. Der Test benötigt eine Auswahl im nativen Dialog. Bilder von 20 MB, sämtliche EXIF-Orientierungen und Activity-Neuerzeugung wurden nicht separat als Gerätetest durchgespielt.
+
+```powershell
+.\tool\flutter.ps1 drive --driver integration_test/screenshot_driver.dart --target integration_test/cover_image_test.dart -d emulator-5554 --keep-app-running
+.\tool\flutter.ps1 build apk --debug
+```

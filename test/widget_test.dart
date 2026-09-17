@@ -177,7 +177,10 @@ void main() {
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(find.text('Bitte einen Titel eingeben.'), findsOneWidget);
-    await tester.enterText(find.byType(TextFormField).first, 'Balkon begrünen');
+    await tester.enterText(
+      find.byKey(const ValueKey('goal-title')),
+      'Balkon begrünen',
+    );
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Balkon begrünen'));

@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
+
+import 'cover_image.dart';
 
 import '../domain/models.dart';
 import '../../todos/domain/todo_models.dart';
@@ -10,7 +13,7 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 2,
+        'version': 3,
         'todoTemplates': [
           for (final t in snapshot.todoTemplates)
             {
@@ -42,6 +45,9 @@ class BackupCodec {
               'dueDate': date(g.dueDate),
               'achieved': g.achieved,
               'archived': g.archived,
+              'coverImage': g.coverImage == null
+                  ? null
+                  : base64Encode(g.coverImage!),
             },
         ],
         'milestones': [
@@ -67,7 +73,7 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          (root['version'] != 1 && root['version'] != 2)) {
+          ![1, 2, 3].contains(root['version'])) {
         throw const FormatException();
       }
       final goals = (root['goals'] as List).map((value) {
@@ -80,6 +86,7 @@ class BackupCodec {
           dueDate: _date(g['dueDate']),
           achieved: g['achieved'] as bool,
           archived: g['archived'] as bool,
+          coverImage: root['version'] == 3 ? _cover(g['coverImage']) : null,
         );
       }).toList();
       final ids = goals.map((g) => g.id).toSet();
@@ -112,7 +119,7 @@ class BackupCodec {
       }
       final templates = <TodoTemplate>[];
       final entries = <TodoEntry>[];
-      if (root['version'] == 2) {
+      if (root['version'] >= 2) {
         for (final value in root['todoTemplates'] as List) {
           final t = value as Map<String, dynamic>;
           final frequency = TodoFrequency.values.byName(
@@ -168,9 +175,22 @@ class BackupCodec {
       );
     } catch (_) {
       throw const RuleViolation(
-        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1 oder 2, höchstens 10 MB).',
+        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–3, höchstens 10 MB).',
       );
     }
+  }
+
+  static Uint8List? _cover(dynamic value) {
+    if (value == null) return null;
+    if (value is! String ||
+        value.length > (CoverImages.maxBytes * 4 / 3).ceil() + 4) {
+      throw const FormatException();
+    }
+    final bytes = base64Decode(value);
+    if (bytes.isEmpty || bytes.length > CoverImages.maxBytes) {
+      throw const FormatException();
+    }
+    return bytes;
   }
 
   static int _target(dynamic value, TodoFrequency frequency) {

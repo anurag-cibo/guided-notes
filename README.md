@@ -18,19 +18,25 @@ Ziel anlegen → Motivation festhalten → Zwischenziele hinzufügen → Fortsch
 
 Beispiele, genaue Status-/Zeitregeln und der reduzierte Screenflow stehen in [Produktentscheidungen](docs/product-decisions.md). Die [UI-Inspiration](docs/reference/ui-inspiration.png) bleibt eine Anregung und keine verbindliche Spezifikation.
 
-Eigene Zielbilder, Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kalenderintegration und Zusammenarbeit gehören nicht zum aktuellen Kern.
+Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kalenderintegration und Zusammenarbeit gehören nicht zum aktuellen Kern.
+
+## Hintergrundbild und Emoji
+
+Beim Anlegen oder Bearbeiten eines Ziels oben **Hintergrundbild auswählen** antippen. Android öffnet die Dateiauswahl; das Bild lässt sich ersetzen oder entfernen. Die App speichert eine lokale, verkleinerte Kopie (maximal 1280 Pixel an der längsten Seite und 256 KB); das Original bleibt unverändert. Eingabedateien dürfen höchstens 20 MB groß sein. Das Bild erscheint als Cover im Ziel und ist im Backup enthalten.
+
+Das Emoji-Feld links neben dem Titel erlaubt ein sichtbares Zeichen, auch zusammengesetzte Emojis oder Flaggen. Ohne Eingabe wird das Standardsymbol verwendet.
 
 ## Einstellungen und Darstellung
 
 Das Zahnrad in jedem Hauptbereich öffnet die Einstellungen. Die App folgt zunächst dem Gerät; Hell- und Dunkelmodus können dauerhaft gewählt werden. Beide Darstellungen umfassen Ziele, Zwischenziele, Todos, Formulare und Dialoge. Unter „Allgemein“ stehen Sicherung und bestätigtes Löschen aller Inhalte bereit. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf Wunsch als klar gekennzeichnete Platzhalter sichtbar. Dateninformationen und verwendete Lizenzen sind ebenfalls erreichbar.
 
-Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 3 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 4 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
 
 ## Daten sichern
 
 Über das Zahnrad **Einstellungen → Datensicherung** oben rechts lassen sich Ziele, Zwischenziele, Todo-Vorlagen, Tages-/Wochenstände und Archive als JSON-Datei exportieren. Android öffnet die Dateiauswahl für den Speicherort. Die Datei enthält auch Motivationstexte und ist unverschlüsselt; eine Kopie außerhalb des Geräts schützt vor Geräteverlust.
 
-**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 2, bis 10 MB. Alte Sicherungen mit Version 1 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
+**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 3, bis 10 MB. Alte Sicherungen mit Version 1 und 2 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
 
 ## Entwicklung starten
 

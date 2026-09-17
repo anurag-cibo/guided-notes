@@ -19,7 +19,7 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   Future<void> _createSettings() =>
       customStatement('''CREATE TABLE app_settings (
@@ -64,7 +64,8 @@ class AppDatabase extends GeneratedDatabase {
         motivation TEXT NOT NULL DEFAULT '',
         due_date TEXT,
         achieved INTEGER NOT NULL DEFAULT 0 CHECK(achieved IN (0, 1)),
-        archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0, 1))
+        archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0, 1)),
+        cover_image BLOB
       )''');
       await customStatement('''CREATE TABLE milestones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,13 +93,16 @@ class AppDatabase extends GeneratedDatabase {
       await _createSettings();
     },
     onUpgrade: (_, from, to) async {
-      if (from < 1 || from > 2 || to != 3) {
+      if (from < 1 || from > 3 || to != 4) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
       }
       if (from < 2) await _createTodos();
       if (from < 3) await _createSettings();
+      if (from < 4) {
+        await customStatement('ALTER TABLE goals ADD COLUMN cover_image BLOB');
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

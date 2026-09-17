@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../../todos/domain/todo_models.dart';
 
 enum MilestoneStatus {
@@ -20,6 +22,7 @@ class Goal {
     this.dueDate,
     this.achieved = false,
     this.archived = false,
+    this.coverImage,
   });
   final int id;
   final String title;
@@ -28,6 +31,7 @@ class Goal {
   final DateTime? dueDate;
   final bool achieved;
   final bool archived;
+  final Uint8List? coverImage;
 }
 
 class Milestone {

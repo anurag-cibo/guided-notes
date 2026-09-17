@@ -1,5 +1,13 @@
 # Speicherung und Migration
 
+## Schema 4 und Backupformat 3: Zielbilder · 17.09.2026
+
+Die optionale Spalte `goals.cover_image` enthält die Bildkopie als SQLite-BLOB. Damit sind Bild und Ziel gemeinsam transaktional gespeichert; keine ausgelagerten Dateien, dauerhaften URI-Berechtigungen oder verwaisten Bilder. Entfernen setzt die Spalte auf NULL, endgültiges Löschen entfernt sie zusammen mit dem Ziel. Migrationen aus Schema 1, 2 und 3 ergänzen die fehlenden Strukturen und erhalten bestehende Inhalte.
+
+Androids eigene Bildauswahl lädt Dateien bis 20 MB, prüft Abmessungen, dekodiert mit Sampling, berücksichtigt EXIF-Ausrichtung und speichert ein JPEG bis 1280 Pixel/256 KB. Das Original wird nicht verändert; die Kopie enthält keine ursprünglichen EXIF-Metadaten. Nicht lesbare oder zu große Bilder erzeugen eine Fehlermeldung. Abbruch ändert die Auswahl nicht; bei Activity-Ende wird ein wartender Aufruf beendet.
+
+Backupformat 3 enthält die Bildbytes als Base64 in `coverImage`. Versionen 1 und 2 bleiben lesbar und ergeben Ziele ohne Cover. Vor Import werden Bildgröße, Abmessungen und tatsächliche Dekodierbarkeit geprüft; ungültige Bilddaten verändern keine vorhandenen Inhalte. Die Gesamtgrenze bleibt 10 MB und wird beim Export erklärt, falls viele archivierte Bilder sie überschreiten. Die gerätebezogene Darstellungswahl bleibt außerhalb des Backups.
+
 ## Schema 3: lokale Einstellungen · 17.09.2026
 
 `app_settings` speichert gerätebezogene Einstellungen als Schlüssel/Wert; `appearance` kennt `system`, `light` und `dark`. Fehlende oder unbekannte Werte ergeben Systemdarstellung. Migrationen von Schema 1 und 2 laufen schrittweise und ergänzen ausschließlich fehlende Tabellen; Ziele und Todos bleiben unverändert.
