@@ -1,5 +1,11 @@
 # Speicherung und Migration
 
+## Schema 7 und Backupformat 6: Zeitkreis · 18.09.2026
+
+`goals.started_on` speichert das lokale Startdatum als YYYY-MM-DD. Neue Ziele erhalten es beim Erstellen. Migration aus Schema 1–6 ergänzt eine nullable Spalte; beim ersten Repository-Laden werden fehlende Werte einmalig mit dem aktuellen lokalen Datum gefüllt. Alte Backups ohne Startdatum erhalten es beim Import. Bearbeiten, Archivieren und Wiederherstellen ändern den Start nicht. Der Zeitkreis berechnet Kalendertage unabhängig von Sommerzeit, begrenzt die verstrichene Zeit auf 0–100 % und behandelt fehlende oder bereits verstrichene Fristen separat. Der Zwischenzielfortschritt bleibt unabhängig.
+
+Backupformat 6 erhält `startedOn`; Versionen 1–5 bleiben lesbar. Themes lassen sich atomar löschen: zuerst Referenzen aktiver und archivierter Ziele lösen, dann das eigene Theme löschen. Die gespeicherte Standardpalette und sämtliche Zielinhalte bleiben erhalten; bei Fehlern wird auch das Lösen der Referenzen zurückgerollt. Systempaletten liegen als feste Vorgaben außerhalb dieser Tabelle.
+
 ## Schema 6 und Backupformat 5: eigene Themes · 18.09.2026
 
 `goal_themes` speichert Name und vier opake sRGB-Farbwerte (Primär, Sekundär, Akzent, Flächenton). `goals.custom_theme_id` referenziert ein eigenes Theme; die bisherige Farbkennung bleibt als Standardauswahl erhalten. Migrationen aus Schema 1–5 erhalten Inhalte; vorhandene Ziele benötigen kein eigenes Theme. Palette und Darstellung sind getrennt, lesbare Hell-/Dunkelrollen werden zentral abgeleitet.

@@ -52,7 +52,7 @@ class GoalsRepository {
       }
       for (final g in snapshot.goals) {
         await database.customStatement(
-          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id) VALUES (?,?,?,?,?,?,?,?,?,?)',
+          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id,started_on) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
           [
             g.id,
             g.title,
@@ -64,6 +64,7 @@ class GoalsRepository {
             g.coverImage,
             g.color.name,
             g.customThemeId,
+            _encodeDate(g.startedOn ?? now()),
           ],
         );
       }
@@ -103,6 +104,11 @@ class GoalsRepository {
   }
 
   Future<GoalSnapshot> load() => database.transaction(() async {
+    // Older databases have no historical start date. Establish it once only.
+    await database.customStatement(
+      'UPDATE goals SET started_on = ? WHERE started_on IS NULL',
+      [_encodeDate(now())],
+    );
     await todos.ensureCurrentPeriods();
     final goals = await database
         .customSelect('SELECT * FROM goals ORDER BY id')
@@ -177,6 +183,17 @@ class GoalsRepository {
     return id;
   });
 
+  Future<void> deleteTheme(int id) => database.transaction(() async {
+    // Built-in palettes are enums, not rows: they cannot be deleted here.
+    await database.customStatement(
+      'UPDATE goals SET custom_theme_id = NULL WHERE custom_theme_id = ?',
+      [id],
+    );
+    await database.customStatement('DELETE FROM goal_themes WHERE id = ?', [
+      id,
+    ]);
+  });
+
   Future<void> saveGoal({
     int? id,
     required String title,
@@ -202,7 +219,7 @@ class GoalsRepository {
     if (id == null) {
       await _checkCapacity();
       await database.customStatement(
-        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id, started_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [
           name,
           symbol,
@@ -211,6 +228,7 @@ class GoalsRepository {
           coverImage,
           (color ?? GoalColor.forest).name,
           customThemeId,
+          _encodeDate(now()),
         ],
       );
     } else {
@@ -347,6 +365,7 @@ class GoalsRepository {
     emoji: row.read<String>('emoji'),
     motivation: row.read<String>('motivation'),
     dueDate: _date(row.readNullable<String>('due_date')),
+    startedOn: _date(row.readNullable<String>('started_on')),
     achieved: row.read<int>('achieved') == 1,
     archived: row.read<int>('archived') == 1,
     coverImage: row.readNullable<Uint8List>('cover_image'),

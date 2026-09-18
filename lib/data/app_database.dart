@@ -19,7 +19,7 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   Future<void> _createGoalThemes() =>
       customStatement('''CREATE TABLE goal_themes (
@@ -74,6 +74,7 @@ class AppDatabase extends GeneratedDatabase {
         emoji TEXT NOT NULL DEFAULT '◎',
         motivation TEXT NOT NULL DEFAULT '',
         due_date TEXT,
+        started_on TEXT,
         achieved INTEGER NOT NULL DEFAULT 0 CHECK(achieved IN (0, 1)),
         archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0, 1)),
         cover_image BLOB,
@@ -106,7 +107,7 @@ class AppDatabase extends GeneratedDatabase {
       await _createSettings();
     },
     onUpgrade: (_, from, to) async {
-      if (from < 1 || from > 5 || to != 6) {
+      if (from < 1 || from > 6 || to != 7) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
@@ -126,6 +127,9 @@ class AppDatabase extends GeneratedDatabase {
         await customStatement(
           'ALTER TABLE goals ADD COLUMN custom_theme_id INTEGER REFERENCES goal_themes(id)',
         );
+      }
+      if (from < 7) {
+        await customStatement('ALTER TABLE goals ADD COLUMN started_on TEXT');
       }
     },
     beforeOpen: (details) async {

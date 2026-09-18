@@ -99,6 +99,7 @@ class GoalDetail extends StatelessWidget {
               padding: pagePadding,
               children: [
                 GoalHeader(
+                  now: controller.repository.now(),
                   goal: goal,
                   progress: controller.snapshot.progressFor(goalId),
                 ),

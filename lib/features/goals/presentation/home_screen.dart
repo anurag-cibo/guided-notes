@@ -72,7 +72,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(['The Guide', 'Zwischenziele', 'Todos'][_tab]),
+            title: Text(
+              ['Schön, dass du da bist.', 'Zwischenziele', 'Todos'][_tab],
+            ),
             actions: [
               IconButton(
                 tooltip: 'Einstellungen',

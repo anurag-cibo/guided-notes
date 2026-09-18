@@ -31,7 +31,7 @@ class SettingsScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.palette_outlined),
-              title: const Text('Eigene Themes'),
+              title: const Text('Themes'),
               subtitle: const Text(
                 'Farben für deine Ziele erstellen und bearbeiten',
               ),

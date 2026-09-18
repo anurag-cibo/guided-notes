@@ -13,7 +13,7 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 5,
+        'version': 6,
         'customThemes': [
           for (final t in snapshot.customThemes)
             {
@@ -56,6 +56,7 @@ class BackupCodec {
               'customThemeId': g.customThemeId,
               'motivation': g.motivation,
               'dueDate': date(g.dueDate),
+              'startedOn': date(g.startedOn),
               'achieved': g.achieved,
               'archived': g.archived,
               'coverImage': g.coverImage == null
@@ -86,7 +87,7 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          ![1, 2, 3, 4, 5].contains(root['version'])) {
+          ![1, 2, 3, 4, 5, 6].contains(root['version'])) {
         throw const FormatException();
       }
       final themes = <CustomGoalTheme>[];
@@ -126,6 +127,7 @@ class BackupCodec {
           emoji: g['emoji'] as String,
           motivation: g['motivation'] as String,
           dueDate: _date(g['dueDate']),
+          startedOn: root['version'] >= 6 ? _date(g['startedOn']) : null,
           achieved: g['achieved'] as bool,
           archived: g['archived'] as bool,
           coverImage: root['version'] >= 3 ? _cover(g['coverImage']) : null,
@@ -221,7 +223,7 @@ class BackupCodec {
       );
     } catch (_) {
       throw const RuleViolation(
-        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–5, höchstens 10 MB).',
+        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–6, höchstens 10 MB).',
       );
     }
   }

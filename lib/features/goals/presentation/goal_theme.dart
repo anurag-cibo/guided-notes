@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../domain/models.dart';
+import 'common.dart';
 
 extension GoalPalette on GoalColor {
   ThemeColors get colors => switch (this) {
@@ -105,7 +106,7 @@ class GoalTheme extends StatelessWidget {
   }
 }
 
-class GoalColorSelector extends StatelessWidget {
+class GoalColorSelector extends StatefulWidget {
   const GoalColorSelector({
     super.key,
     required this.value,
@@ -123,44 +124,68 @@ class GoalColorSelector extends StatelessWidget {
   final VoidCallback? onCreate;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text('Farbthema', style: Theme.of(context).textTheme.titleMedium),
-      const SizedBox(height: 8),
-      Wrap(
-        spacing: 8,
-        runSpacing: 4,
-        children: [
-          for (final color in GoalColor.values)
-            ChoiceChip(
-              key: ValueKey('goal-color-${color.name}'),
-              label: Text(color.label),
-              avatar: CircleAvatar(backgroundColor: color.seed, radius: 8),
-              selected: customThemeId == null && value == color,
-              onSelected: onChanged == null ? null : (_) => onChanged!(color),
-            ),
-          for (final theme in customThemes)
-            ChoiceChip(
-              key: ValueKey('custom-theme-${theme.id}'),
-              label: Text(theme.name),
-              avatar: CircleAvatar(
-                backgroundColor: Color(theme.colors.primary),
-                radius: 8,
+  State<GoalColorSelector> createState() => _GoalColorSelectorState();
+}
+
+class _GoalColorSelectorState extends State<GoalColorSelector> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final value = widget.value;
+    final onChanged = widget.onChanged;
+    final customThemeId = widget.customThemeId;
+    final onCustomChanged = widget.onCustomChanged;
+    // A bounded preview always includes the selected theme.
+    final presets = _expanded
+        ? GoalColor.values
+        : GoalColor.values.where(
+            (c) => c.index < 3 || (customThemeId == null && c == value),
+          );
+    final customThemes = _expanded
+        ? widget.customThemes
+        : widget.customThemes.where((t) => t.id == customThemeId);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeading(
+          title: 'Farbthema',
+          addLabel: widget.onCreate == null ? null : 'Eigenes Theme erstellen',
+          onAdd: widget.onCreate,
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: [
+            for (final color in presets)
+              ChoiceChip(
+                key: ValueKey('goal-color-${color.name}'),
+                label: Text(color.label),
+                avatar: CircleAvatar(backgroundColor: color.seed, radius: 8),
+                selected: customThemeId == null && value == color,
+                onSelected: onChanged == null ? null : (_) => onChanged(color),
               ),
-              selected: customThemeId == theme.id,
-              onSelected: onCustomChanged == null
-                  ? null
-                  : (_) => onCustomChanged!(theme.id),
+            for (final theme in customThemes)
+              ChoiceChip(
+                key: ValueKey('custom-theme-${theme.id}'),
+                label: Text(theme.name),
+                avatar: CircleAvatar(
+                  backgroundColor: Color(theme.colors.primary),
+                  radius: 8,
+                ),
+                selected: customThemeId == theme.id,
+                onSelected: onCustomChanged == null
+                    ? null
+                    : (_) => onCustomChanged(theme.id),
+              ),
+            TextButton(
+              onPressed: () => setState(() => _expanded = !_expanded),
+              child: Text(_expanded ? 'Weniger anzeigen' : 'Mehr anzeigen'),
             ),
-          if (onCreate != null)
-            IconButton.filledTonal(
-              tooltip: 'Eigenes Theme erstellen',
-              onPressed: onCreate,
-              icon: const Icon(Icons.add, size: 20),
-            ),
-        ],
-      ),
-    ],
-  );
+          ],
+        ),
+      ],
+    );
+  }
 }

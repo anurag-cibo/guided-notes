@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 
 import '../domain/models.dart';
+import '../domain/goal_time.dart';
 import 'goal_cover.dart';
 
 /// Cover, title row and deadline remain independent of the goal's content.
 class GoalHeader extends StatelessWidget {
-  const GoalHeader({super.key, required this.goal, required this.progress});
+  const GoalHeader({
+    super.key,
+    required this.goal,
+    required this.progress,
+    this.now,
+  });
   final Goal goal;
   final int? progress;
+  final DateTime? now;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final time = GoalTime(goal, now ?? DateTime.now());
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -59,11 +67,11 @@ class GoalHeader extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (progress != null) ...[
+                  ...[
                     const SizedBox(width: 12),
                     Semantics(
-                      label: 'Zwischenzielfortschritt',
-                      value: '$progress %',
+                      label: 'Zeit bis zur Frist',
+                      value: time.label.replaceAll('\n', ' '),
                       child: ExcludeSemantics(
                         child: Container(
                           width: 60,
@@ -78,7 +86,7 @@ class GoalHeader extends StatelessWidget {
                             children: [
                               SizedBox.expand(
                                 child: CircularProgressIndicator(
-                                  value: progress! / 100,
+                                  value: time.elapsed,
                                   strokeWidth: 5,
                                   strokeCap: StrokeCap.round,
                                   backgroundColor:
@@ -89,7 +97,8 @@ class GoalHeader extends StatelessWidget {
                                 padding: const EdgeInsets.all(8),
                                 child: FittedBox(
                                   child: Text(
-                                    '$progress %',
+                                    time.label,
+                                    textAlign: TextAlign.center,
                                     style: theme.textTheme.labelMedium,
                                   ),
                                 ),
@@ -106,8 +115,24 @@ class GoalHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: LinearProgressIndicator(
+                value: (progress ?? 0) / 100,
+                minHeight: 6,
+                borderRadius: BorderRadius.circular(8),
+                semanticsLabel: 'Zwischenzielfortschritt',
+                semanticsValue: '${progress ?? 0} %',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text('${progress ?? 0} %', style: theme.textTheme.labelLarge),
+          ],
+        ),
+        const SizedBox(height: 12),
         Text(
-          'Frist: ${goal.dueDate == null ? 'Ohne Frist' : MaterialLocalizations.of(context).formatMediumDate(goal.dueDate!)}${goal.dueDate != null && !goal.achieved ? ' · ${deadlineLabel(goal.dueDate)}' : ''}',
+          'Frist: ${goal.dueDate == null ? 'Ohne Frist' : MaterialLocalizations.of(context).formatMediumDate(goal.dueDate!)}',
         ),
         if (progress == null) ...[
           const SizedBox(height: 6),

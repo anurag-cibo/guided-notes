@@ -67,9 +67,10 @@ void main() {
     () async {
       final dir = await Directory.systemTemp.createTemp('guide_color_');
       final file = File('${dir.path}/store.sqlite');
+      final fixedNow = DateTime(2026, 9, 18, 12);
       var db = AppDatabase(NativeDatabase(file));
       try {
-        var repo = GoalsRepository(db);
+        var repo = GoalsRepository(db, now: () => fixedNow);
         await repo.saveGoal(title: 'Vorhandenes Ziel', motivation: 'Bleibt');
         final id = (await repo.load()).goals.single.id;
         await repo.saveMilestone(goalId: id, title: 'Ein Schritt');
@@ -79,16 +80,17 @@ void main() {
         old.execute('ALTER TABLE goals DROP COLUMN color');
         old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
         old.execute('DROP TABLE goal_themes');
+        old.execute('ALTER TABLE goals DROP COLUMN started_on');
         old.execute('PRAGMA user_version = 4');
         old.close();
         db = AppDatabase(NativeDatabase(file));
-        repo = GoalsRepository(db);
+        repo = GoalsRepository(db, now: () => fixedNow);
         expect(await repo.exportBackup(), before);
         await repo.saveGoal(id: id, title: 'Ozean', color: GoalColor.ocean);
         await repo.setArchived(id, true);
         await db.close();
         db = AppDatabase(NativeDatabase(file));
-        repo = GoalsRepository(db);
+        repo = GoalsRepository(db, now: () => fixedNow);
         expect((await repo.load()).goals.single.color, GoalColor.ocean);
         await repo.saveGoal(id: id, title: 'Farbe bleibt');
         final backup = await repo.exportBackup();

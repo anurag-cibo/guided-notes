@@ -16,156 +16,148 @@ class GoalList extends StatelessWidget {
     final goals = controller.snapshot.goals
         .where((g) => g.archived == archived)
         .toList();
-    final list = ListView(
-      padding: pagePadding,
-      children: [
-        if (!archived) ...[
-          Text(
-            'Schön, dass du da bist.',
-            style: Theme.of(context).textTheme.headlineSmall
-                ?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          const Text('Kleine Schritte. Deine Richtung.'),
-          const SizedBox(height: 28),
-          SectionHeading(
-            title: 'Deine Ziele · ${goals.length} von 5',
-            addLabel: goals.length < 5 ? 'Ziel hinzufügen' : null,
-            onAdd: controller.saving
-                ? null
-                : () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => GoalEditor(controller: controller),
-                    ),
+    final children = <Widget>[
+      if (!archived) ...[
+        const Text('Kleine Schritte. Deine Richtung.'),
+        const SizedBox(height: 28),
+        SectionHeading(
+          title: 'Deine Ziele · ${goals.length} von 5',
+          addLabel: goals.length < 5 ? 'Ziel hinzufügen' : null,
+          onAdd: controller.saving
+              ? null
+              : () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => GoalEditor(controller: controller),
                   ),
-          ),
-          gap,
-        ],
-        if (goals.isEmpty)
-          EmptyMessage(
-            archived ? 'Keine archivierten Ziele' : 'Noch keine Ziele',
-            archived
-                ? 'Archivierte Ziele und ihre Zwischenziele bleiben hier erhalten.'
-                : 'Was möchtest du erreichen? Beginne mit einem Ziel.',
-          ),
-        for (final goal in goals)
-          GoalTheme(
-            color: goal.color,
-            colors: controller.snapshot.theme(goal.customThemeId)?.colors,
-            child: Builder(
-              builder: (context) => Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) =>
-                          GoalDetail(controller: controller, goalId: goal.id),
-                    ),
+                ),
+        ),
+        gap,
+      ],
+      if (goals.isEmpty)
+        EmptyMessage(
+          archived ? 'Keine archivierten Ziele' : 'Noch keine Ziele',
+          archived
+              ? 'Archivierte Ziele und ihre Zwischenziele bleiben hier erhalten.'
+              : 'Was möchtest du erreichen? Beginne mit einem Ziel.',
+        ),
+      for (final goal in goals)
+        GoalTheme(
+          color: goal.color,
+          colors: controller.snapshot.theme(goal.customThemeId)?.colors,
+          child: Builder(
+            builder: (context) => Card(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        GoalDetail(controller: controller, goalId: goal.id),
                   ),
-                  child: Padding(
-                    padding: pagePadding,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Text(
-                                goal.emoji,
-                                style: const TextStyle(fontSize: 28),
-                              ),
+                ),
+                child: Padding(
+                  padding: pagePadding,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    goal.title,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.w700),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    controller.snapshot.forGoal(goal.id).isEmpty
-                                        ? 'Noch keine Zwischenziele'
-                                        : '${controller.snapshot.forGoal(goal.id).where((m) => m.status == MilestoneStatus.achieved).length}/${controller.snapshot.forGoal(goal.id).length} Zwischenziele erreicht',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall,
-                                  ),
-                                ],
-                              ),
+                            child: Text(
+                              goal.emoji,
+                              style: const TextStyle(fontSize: 28),
                             ),
-                            const Icon(Icons.chevron_right),
-                          ],
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  goal.title,
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  controller.snapshot.forGoal(goal.id).isEmpty
+                                      ? 'Noch keine Zwischenziele'
+                                      : '${controller.snapshot.forGoal(goal.id).where((m) => m.status == MilestoneStatus.achieved).length}/${controller.snapshot.forGoal(goal.id).length} Zwischenziele erreicht',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right),
+                        ],
+                      ),
+                      if (controller.snapshot.progressFor(goal.id) != null) ...[
+                        gap,
+                        LinearProgressIndicator(
+                          value:
+                              controller.snapshot.progressFor(goal.id)! / 100,
+                          minHeight: 4,
+                          borderRadius: BorderRadius.circular(8),
+                          semanticsLabel: 'Zwischenzielfortschritt',
+                          semanticsValue:
+                              '${controller.snapshot.progressFor(goal.id)} %',
                         ),
-                        if (controller.snapshot.progressFor(goal.id) !=
-                            null) ...[
-                          gap,
-                          LinearProgressIndicator(
-                            value:
-                                controller.snapshot.progressFor(goal.id)! / 100,
-                            minHeight: 4,
-                            borderRadius: BorderRadius.circular(8),
-                            semanticsLabel: 'Zwischenzielfortschritt',
-                            semanticsValue:
-                                '${controller.snapshot.progressFor(goal.id)} %',
-                          ),
-                        ],
-                        if (goal.achieved || goal.dueDate != null) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            deadlineLabel(
-                              goal.dueDate,
-                              achieved: goal.achieved,
-                            ),
-                          ),
-                        ],
                       ],
-                    ),
+                      if (goal.achieved || goal.dueDate != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          deadlineLabel(goal.dueDate, achieved: goal.achieved),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-        if (!archived && goals.length == 5)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Text(
-              'Fünf Ziele im Fokus. Archiviere eines, um Platz für ein neues zu schaffen.',
-            ),
+        ),
+      if (!archived && goals.length == 5)
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 12),
+          child: Text(
+            'Fünf Ziele im Fokus. Archiviere eines, um Platz für ein neues zu schaffen.',
           ),
-      ],
-    );
-    if (archived) return list;
-    return Column(
-      children: [
-        Expanded(child: list),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-          child: Card(
-            margin: EdgeInsets.zero,
-            child: ListTile(
-              leading: const Icon(Icons.inventory_2_outlined),
-              title: const Text('Archiv'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => ArchiveScreen(controller: controller),
+        ),
+    ];
+    if (archived) return ListView(padding: pagePadding, children: children);
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: pagePadding,
+          sliver: SliverList.list(children: children),
+        ),
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+              child: Card(
+                margin: EdgeInsets.zero,
+                child: ListTile(
+                  leading: const Icon(Icons.inventory_2_outlined),
+                  title: const Text('Archiv'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => ArchiveScreen(controller: controller),
+                    ),
+                  ),
                 ),
               ),
             ),

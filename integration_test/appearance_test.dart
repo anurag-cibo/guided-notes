@@ -36,6 +36,7 @@ void main() {
         );
         await r.saveGoal(
           title: 'Gesundheit',
+          dueDate: DateTime.now().add(const Duration(days: 45)),
           emoji: '🌿',
           color: GoalColor.ocean,
           customThemeId: customThemeId,
@@ -124,7 +125,7 @@ void main() {
           await tester.tap(find.byTooltip('Einstellungen'));
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-settings');
-          await tester.tap(find.text('Eigene Themes'));
+          await tester.tap(find.text('Themes'));
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-themes');
           await tester.tap(find.text('Abend am Meer'));

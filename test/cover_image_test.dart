@@ -39,6 +39,7 @@ void main() {
         await db.close();
         final old = sqlite.sqlite3.open(file.path);
         old.execute('ALTER TABLE goals DROP COLUMN cover_image');
+        old.execute('ALTER TABLE goals DROP COLUMN started_on');
         old.execute('PRAGMA user_version = 3');
         old.execute('ALTER TABLE goals DROP COLUMN color');
         old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');

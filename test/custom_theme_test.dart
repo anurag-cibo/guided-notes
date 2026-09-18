@@ -79,19 +79,21 @@ void main() {
       'guide_custom_theme_',
     );
     final file = File('${directory.path}/store.sqlite');
+    final fixedNow = DateTime(2026, 9, 18, 12);
     var db = AppDatabase(NativeDatabase(file));
     try {
-      var repo = GoalsRepository(db);
+      var repo = GoalsRepository(db, now: () => fixedNow);
       await repo.saveGoal(title: 'Bestehend', color: GoalColor.ocean);
       final before = await repo.exportBackup();
       await db.close();
       final old = sqlite.sqlite3.open(file.path);
       old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
       old.execute('DROP TABLE goal_themes');
+      old.execute('ALTER TABLE goals DROP COLUMN started_on');
       old.execute('PRAGMA user_version = 5');
       old.close();
       db = AppDatabase(NativeDatabase(file));
-      repo = GoalsRepository(db);
+      repo = GoalsRepository(db, now: () => fixedNow);
       expect(await repo.exportBackup(), before);
       final goalId = (await repo.load()).goals.single.id;
       final themeId = await repo.saveTheme(
@@ -112,7 +114,7 @@ void main() {
       await repo.saveGoal(id: goalId, title: 'Referenz bleibt');
       await db.close();
       db = AppDatabase(NativeDatabase(file));
-      repo = GoalsRepository(db);
+      repo = GoalsRepository(db, now: () => fixedNow);
       final snapshot = await repo.load();
       expect(snapshot.customThemes.single.name, 'Abendrot');
       expect(
@@ -242,7 +244,7 @@ void main() {
         expect(controller.snapshot.goals.single.customThemeId, theme.id);
         await tester.tap(find.byTooltip('Einstellungen'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Eigene Themes'));
+        await tester.tap(find.text('Themes'));
         await tester.pumpAndSettle();
         expect(find.byType(CustomThemesScreen), findsOneWidget);
         await tester.tap(find.text('Mein Abend'));
