@@ -4,6 +4,7 @@ import '../../goals/application/goals_controller.dart';
 import '../../goals/presentation/common.dart';
 import '../domain/todo_models.dart';
 import 'milestone_picker.dart';
+import 'progress_increment_picker.dart';
 
 class TodoEditor extends StatefulWidget {
   const TodoEditor({
@@ -29,15 +30,13 @@ class _TodoEditorState extends State<TodoEditor> {
   late int? _milestoneId = widget.template?.milestoneId;
   late bool _trackProgress =
       _milestoneId != null && (widget.template?.progressIncrement ?? 0) > 0;
-  late final _increment = TextEditingController(
-    text:
-        '${(widget.template?.progressIncrement ?? 0) > 0 ? widget.template!.progressIncrement : 5}',
-  );
+  late int _increment = (widget.template?.progressIncrement ?? 0) > 0
+      ? widget.template!.progressIncrement
+      : 5;
   @override
   void dispose() {
     _title.dispose();
     _target.dispose();
-    _increment.dispose();
     super.dispose();
   }
 
@@ -52,7 +51,7 @@ class _TodoEditorState extends State<TodoEditor> {
         title: _title.text,
         milestoneId: _milestoneId,
         progressIncrement: _milestoneId != null && _trackProgress
-            ? int.parse(_increment.text.trim())
+            ? _increment
             : 0,
         frequency: widget.frequency,
         target: widget.frequency == TodoFrequency.daily
@@ -151,8 +150,8 @@ class _TodoEditorState extends State<TodoEditor> {
             ],
             Text(
               widget.frequency == TodoFrequency.daily
-                  ? 'Jeden Tag einmal. Ein neuer Tag beginnt um Mitternacht.'
-                  : 'Eine Woche geht von Montag bis Sonntag. Du kannst Erledigungen jederzeit in der laufenden Woche zurücknehmen.',
+                  ? '• Einmal täglich · neuer Tag um Mitternacht'
+                  : '• Montag–Sonntag\n• Erledigungen in der laufenden Woche rücknehmbar',
             ),
             gap,
             ListTile(
@@ -188,32 +187,21 @@ class _TodoEditorState extends State<TodoEditor> {
                     : (value) => setState(() => _trackProgress = value),
               ),
               if (_trackProgress) ...[
-                TextFormField(
+                ProgressIncrementPicker(
                   key: const ValueKey('todo-progress-increment'),
-                  controller: _increment,
-                  enabled: !_busy,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Pro Erledigung',
-                    suffixText: 'Prozentpunkte',
-                  ),
-                  validator: (value) {
-                    final amount = int.tryParse(value?.trim() ?? '');
-                    return amount == null || amount < 1 || amount > 100
-                        ? 'Bitte eine ganze Zahl von 1 bis 100 eingeben.'
-                        : null;
-                  },
+                  value: _increment,
+                  onChanged: _busy ? null : (value) => _increment = value,
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Jede Erledigung zählt, auch jede Wochen-Wiederholung. Maximal 100 %. Rückgängig nimmt den gutgeschriebenen Beitrag zurück.',
+                  '• Beitrag je Erledigung, auch bei Wochen-Wiederholungen\n• Fortschritt bis maximal 100 %\n• Rückgängig nimmt den Beitrag zurück',
                 ),
               ],
             ],
             if (widget.template != null) ...[
               gap,
               const Text(
-                'Titel und Wochenanzahl gelten ab dem nächsten Zeitraum. Zuordnung und Fortschrittsbeitrag gelten sofort für neue Erledigungen. Bisherige Beiträge bleiben erhalten.',
+                '• Titel und Anzahl: ab nächstem Zeitraum\n• Zuordnung und Beitrag: ab nächster Erledigung\n• Bisherige Beiträge bleiben erhalten',
               ),
             ],
             gap,

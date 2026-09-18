@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite;
 import 'package:guided_notes/app.dart';
@@ -302,20 +303,40 @@ void main() {
     );
     await tester.tap(find.byType(Switch));
     await tester.pumpAndSettle();
-    await tester.enterText(
-      find.byKey(const ValueKey('todo-progress-increment')),
-      '8',
+    await tester.ensureVisible(find.byType(CupertinoPicker));
+    await tester.drag(find.byType(CupertinoPicker), const Offset(0, -120));
+    await tester.pumpAndSettle();
+    final wheel = tester.widget<CupertinoPicker>(find.byType(CupertinoPicker));
+    expect(wheel.scrollController!.selectedItem, greaterThan(4));
+    wheel.scrollController!.animateToItem(
+      7,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
     );
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Speichern'));
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(c.snapshot.todoTemplates.single.milestoneId, milestoneId);
+    expect(c.snapshot.todoTemplates.single.progressIncrement, 8);
+    expect(find.text('+8 %'), findsOneWidget);
+    expect(find.textContaining('Gesundheit · Bewegen'), findsNothing);
     await tester.tap(find.byType(Checkbox));
     await tester.pumpAndSettle();
     expect(c.snapshot.milestones.single.progress, 98);
     await tester.tap(find.byType(Checkbox));
     await tester.pumpAndSettle();
     expect(c.snapshot.milestones.single.progress, 90);
+    await tester.tap(find.byTooltip('Spaziergang bearbeiten'));
+    await tester.pumpAndSettle();
+    expect(find.text('Gesundheit · Bewegen'), findsOneWidget);
+    expect(
+      tester
+          .widget<CupertinoPicker>(find.byType(CupertinoPicker))
+          .scrollController!
+          .selectedItem,
+      7,
+    );
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
     c.dispose();

@@ -122,3 +122,7 @@ Isolierter Android-Darstellungs-/Neustarttest bestanden, einschließlich verknü
 Release-Prüfung: Universelle signierte APK 0.2.0+2 gebaut (Android ab API 24, ARM64/ARMv7/x86_64). Signatur mit apksigner verifiziert. Auf einem separaten leeren AVD installiert, synthetisches Ziel angelegt und nach Prozessneustart wiedergefunden. Test-AVD danach beendet, normale App weiterhin geöffnet. Der private Release-Schlüssel und key.properties bleiben ignoriert.
 
 Review-Korrektur: Release-Schlüsselprüfung hängt direkt an Signier-/Packaging-Tasks. Gradle-Dry-Run bestätigt: lintRelease benötigt keine privaten Schlüssel; auch der Einstieg über assemble enthält die Schlüsselprüfung. Ausführung des Prüftasks mit fehlender sowie unvollständiger Konfiguration schlägt erwartungsgemäß fehl. Vollständige private Konfiguration anschließend wiederhergestellt. Flutter-Builds und Flutter-Tests nicht parallel ausführen: Beide können den generierten Android-Plugin-Registrant verändern.
+
+## Todo-Scrollrad und kompakte Liste · 19.09.2026
+
+54 Unit-/Widgettests bestanden. Scrollgesten, Speichern und Wiederöffnung des Beitrags, Fortschrittsbuchung und Rücknahme sowie Grenzen 1/100 bei doppelter Schriftgröße in Hell/Dunkel geprüft. Statische Analyse ohne Befunde; Formatprüfung und git diff --check erfolgreich. Isolierter Android-Darstellungs-/Neustarttest bestanden; Scrollrad und kompakte grüne Beitragsanzeige in beiden Darstellungen anhand der Screenshots geprüft. Keine Änderung an Schema oder Berechnung.

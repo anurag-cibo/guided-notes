@@ -22,7 +22,7 @@ Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kale
 
 ## Todos und Zwischenziel-Fortschritt
 
-Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenziel über eine durchsuchbare, nach Zielen gruppierte Auswahl zuordnen. Der zusätzliche Schalter **Fortschritt automatisch erhöhen** aktiviert einen Beitrag von 1–100 ganzen Prozentpunkten pro Erledigung. Bei Wochenaufgaben zählt jede einzelne Wiederholung. Ohne Schalter bleibt es bei der Zuordnung, ohne Zuordnung bleibt das Todo unabhängig.
+Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenziel über eine durchsuchbare, nach Zielen gruppierte Auswahl zuordnen. Der zusätzliche Schalter **Fortschritt automatisch erhöhen** aktiviert einen Beitrag von 1–100 ganzen Prozentpunkten pro Erledigung, auswählbar über ein Scrollrad. Bei Wochenaufgaben zählt jede einzelne Wiederholung. Ohne Schalter bleibt es bei der Zuordnung, ohne Zuordnung bleibt das Todo unabhängig. In der Liste steht nur der aktive Beitrag als grüne Zahl (z. B. **+5 %**); die Zuordnung ist im Aufgaben-Editor sichtbar.
 
 Der Zwischenzielfortschritt steigt höchstens auf 100 %. Rückgängig zieht nur den tatsächlich gutgeschriebenen Beitrag ab – auch nach Neustart, Backup oder einem Wechsel der Zuordnung. Beispiel: 97 % + 10 Prozentpunkte ergibt 100 %, Rückgängig wieder 97 %. Änderungen an Zuordnung und Beitrag gelten sofort für neue Erledigungen; alte Erledigungen werden nicht nachträglich gewertet. Titel und Wochenanzahl ändern sich weiterhin erst ab dem nächsten Zeitraum. Archivierte Ziele erhalten keine neuen Beiträge. Löschen eines Zwischenziels erhält die Todos und löst ihre Zuordnung.
 
