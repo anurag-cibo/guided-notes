@@ -14,9 +14,25 @@ val signingFile = rootProject.file("key.properties")
 val releaseKeys = Properties().apply {
     if (signingFile.exists()) signingFile.inputStream().use { load(it) }
 }
-if (!isDeviceTest && !signingFile.exists() &&
-    gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }) {
-    error("Für Release-Builds android/key.properties mit dem privaten Signaturschlüssel bereitstellen. Siehe README.")
+val releaseStore = releaseKeys.getProperty("storeFile")?.takeIf { it.isNotBlank() }
+    ?.let { rootProject.file(it) }
+val validateReleaseCredentials = tasks.register("validateReleaseCredentials") {
+    doLast {
+        check(signingFile.exists() &&
+            listOf("storeFile", "storePassword", "keyAlias", "keyPassword").all {
+                !releaseKeys.getProperty(it).isNullOrBlank()
+            } && releaseStore?.isFile == true) {
+            "Für Release-Artefakte eine vollständige android/key.properties mit gültigem privaten Signaturschlüssel bereitstellen. Siehe README."
+        }
+    }
+}
+// Attach to artifact tasks, including when reached through aggregate `assemble`.
+// Analysis tasks such as lintRelease remain usable without private credentials.
+tasks.configureEach {
+    if (!isDeviceTest && name in setOf(
+            "validateSigningRelease", "packageRelease", "packageReleaseBundle", "signReleaseBundle")) {
+        dependsOn(validateReleaseCredentials)
+    }
 }
 
 android {
@@ -45,20 +61,18 @@ android {
     }
 
     signingConfigs {
-        if (signingFile.exists()) {
-            create("release") {
-                storeFile = rootProject.file(releaseKeys.getProperty("storeFile"))
-                storePassword = releaseKeys.getProperty("storePassword")
-                keyAlias = releaseKeys.getProperty("keyAlias")
-                keyPassword = releaseKeys.getProperty("keyPassword")
-            }
+        create("release") {
+            storeFile = releaseStore
+            storePassword = releaseKeys.getProperty("storePassword")
+            keyAlias = releaseKeys.getProperty("keyAlias")
+            keyPassword = releaseKeys.getProperty("keyPassword")
         }
     }
 
     buildTypes {
         release {
             signingConfig = if (isDeviceTest) signingConfigs.getByName("debug")
-                else signingConfigs.findByName("release")
+                else signingConfigs.getByName("release")
         }
     }
 }
