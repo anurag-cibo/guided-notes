@@ -93,4 +93,3 @@ Architektur: `domain` für Modelle und Fachregeln, `data` für Datenbank und Rep
 Die abschließende [CI für PR #26](https://github.com/anurag-cibo/guided-notes/actions/runs/35159852006) ist grün. Der einzige Review-Befund (wartender Dateiaufruf bei Activity-Ende) wurde in `e6d756c` behoben und vom Review als erledigt bestätigt. Der gesonderte Gerätetest einer erzwungenen Activity-Neuerzeugung bleibt eine dokumentierte Testgrenze, kein behaupteter Nachweis.
 
 Der Test-Runner deinstalliert die App standardmäßig am Ende: Für die zweiphasige Persistenzprüfung ist `--no-uninstall` nötig. Tests nur mit Testdaten ausführen; sie erzeugen und entfernen ihr synthetisches Ziel. Vollständige Befehle und Grenzen des Nachweises: [README](../README.md) und [Validierung](validation.md).
-
