@@ -60,7 +60,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Spazieren gehen: einmal erledigt'));
       await tester.pumpAndSettle();
-      expect(find.text('1 von 3 erledigt'), findsOneWidget);
+      expect(find.text('1 von 3'), findsOneWidget);
       final backup = await controller.repository.exportBackup();
       await tester.pumpWidget(const SizedBox());
       controller.dispose();
@@ -80,7 +80,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Spazieren gehen: einmal rückgängig'));
       await tester.pumpAndSettle();
-      expect(find.text('0 von 3 erledigt'), findsOneWidget);
+      expect(find.text('0 von 3'), findsOneWidget);
       expect(tester.takeException(), isNull);
     } finally {
       await tester.pumpWidget(const SizedBox());

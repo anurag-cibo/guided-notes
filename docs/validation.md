@@ -126,3 +126,7 @@ Review-Korrektur: Release-Schlüsselprüfung hängt direkt an Signier-/Packaging
 ## Todo-Scrollrad und kompakte Liste · 19.09.2026
 
 54 Unit-/Widgettests bestanden. Scrollgesten, Speichern und Wiederöffnung des Beitrags, Fortschrittsbuchung und Rücknahme sowie Grenzen 1/100 bei doppelter Schriftgröße in Hell/Dunkel geprüft. Statische Analyse ohne Befunde; Formatprüfung und git diff --check erfolgreich. Isolierter Android-Darstellungs-/Neustarttest bestanden; Scrollrad und kompakte grüne Beitragsanzeige in beiden Darstellungen anhand der Screenshots geprüft. Keine Änderung an Schema oder Berechnung.
+
+## Kompakte Todo-Zeiträume · 19.09.2026
+
+Datum ohne Wochentag und Jahr neben der Zeitraumüberschrift, kleiner gesetzt. Wochen mit gleichem Monat kürzen den wiederholten Monat (z. B. 14.–20.9.). Bei großer Schrift darf die Kopfzeile umbrechen; der Plus-Button bleibt erreichbar. Wochenaufgaben zeigen einen Fortschrittsbalken zwischen Minus/Plus mit der Anzahl darüber. Bestehende Widgettests prüfen Datumsposition, Balkenwerte beim Erledigen/Rückgängigmachen und große Schrift. 54 Unit-/Widgettests und Analyse erfolgreich. Version 0.2.2+4; keine Änderungen an Speicherung oder Berechnung.
