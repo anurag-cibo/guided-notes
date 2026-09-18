@@ -15,65 +15,94 @@ class GoalHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GoalCover(image: goal.coverImage),
-        const SizedBox(height: 12),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        Stack(
           children: [
-            Container(
-              width: 60,
-              height: 60,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                shape: BoxShape.circle,
-                border: Border.all(color: theme.colorScheme.surface, width: 3),
-              ),
-              child: Text(goal.emoji, style: const TextStyle(fontSize: 30)),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                goal.title,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            if (progress != null) ...[
-              const SizedBox(width: 12),
-              Semantics(
-                label: 'Zwischenzielfortschritt',
-                value: '$progress %',
-                child: ExcludeSemantics(
-                  child: SizedBox.square(
-                    dimension: 60,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox.expand(
-                          child: CircularProgressIndicator(
-                            value: progress! / 100,
-                            strokeWidth: 5,
-                            strokeCap: StrokeCap.round,
-                            backgroundColor: theme.colorScheme.primaryContainer,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: FittedBox(
-                            child: Text(
-                              '$progress %',
-                              style: theme.textTheme.labelMedium,
-                            ),
-                          ),
-                        ),
-                      ],
+            GoalCover(image: goal.coverImage, height: 112),
+            Padding(
+              padding: const EdgeInsets.only(top: 82, left: 8, right: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: theme.colorScheme.surface,
+                        width: 3,
+                      ),
+                    ),
+                    child: Text(
+                      goal.emoji,
+                      style: const TextStyle(fontSize: 30),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.scaffoldBackgroundColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        goal.title,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (progress != null) ...[
+                    const SizedBox(width: 12),
+                    Semantics(
+                      label: 'Zwischenzielfortschritt',
+                      value: '$progress %',
+                      child: ExcludeSemantics(
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: theme.scaffoldBackgroundColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox.expand(
+                                child: CircularProgressIndicator(
+                                  value: progress! / 100,
+                                  strokeWidth: 5,
+                                  strokeCap: StrokeCap.round,
+                                  backgroundColor:
+                                      theme.colorScheme.primaryContainer,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: FittedBox(
+                                  child: Text(
+                                    '$progress %',
+                                    style: theme.textTheme.labelMedium,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ],
+            ),
           ],
         ),
         const SizedBox(height: 16),

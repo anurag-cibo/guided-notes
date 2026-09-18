@@ -28,6 +28,7 @@ void main() {
         await r.saveGoal(
           title: 'Gesundheit',
           emoji: '🌿',
+          color: GoalColor.ocean,
           motivation: 'Mehr Energie. Mehr Lebensqualität. Ich möchte mich in meinem Körper wohlfühlen.',
         );
         final id = (await r.load()).goals.single.id;
@@ -44,9 +45,21 @@ void main() {
           status: MilestoneStatus.offTrack,
         );
         await r.saveMilestone(goalId: id, title: 'Erholsam schlafen');
-        await r.saveGoal(title: 'Beruf & Karriere', emoji: '💻');
-        await r.saveGoal(title: 'Finanzen', emoji: '💰');
-        await r.saveGoal(title: 'Beziehungen', emoji: '❤️');
+        await r.saveGoal(
+          title: 'Beruf & Karriere',
+          emoji: '💻',
+          color: GoalColor.lavender,
+        );
+        await r.saveGoal(
+          title: 'Finanzen',
+          emoji: '💰',
+          color: GoalColor.amber,
+        );
+        await r.saveGoal(
+          title: 'Beziehungen',
+          emoji: '❤️',
+          color: GoalColor.rose,
+        );
         await r.todos.save(
           title: 'Wasser trinken',
           frequency: TodoFrequency.daily,
@@ -82,6 +95,14 @@ void main() {
           await tester.tap(find.text('Gesundheit'));
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-detail');
+          await tester.scrollUntilVisible(find.text('Ziel archivieren'), 200);
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot('appearance-$mode-actions');
+          await tester.tap(find.byTooltip('Ziel bearbeiten'));
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot('appearance-$mode-editor');
+          await tester.tap(find.byType(BackButton));
+          await tester.pumpAndSettle();
           await tester.tap(find.byType(BackButton));
           await tester.pumpAndSettle();
           await tester.tap(find.text('Zwischenziele').last);

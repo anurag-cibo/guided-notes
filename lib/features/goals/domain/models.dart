@@ -13,6 +13,17 @@ enum MilestoneStatus {
   final String label;
 }
 
+enum GoalColor {
+  forest('Wald'),
+  ocean('Ozean'),
+  lavender('Lavendel'),
+  rose('Rose'),
+  amber('Sonne');
+
+  const GoalColor(this.label);
+  final String label;
+}
+
 class Goal {
   const Goal({
     required this.id,
@@ -23,6 +34,7 @@ class Goal {
     this.achieved = false,
     this.archived = false,
     this.coverImage,
+    this.color = GoalColor.forest,
   });
   final int id;
   final String title;
@@ -32,6 +44,7 @@ class Goal {
   final bool achieved;
   final bool archived;
   final Uint8List? coverImage;
+  final GoalColor color;
 }
 
 class Milestone {

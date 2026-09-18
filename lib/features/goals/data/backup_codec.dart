@@ -13,7 +13,7 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 3,
+        'version': 4,
         'todoTemplates': [
           for (final t in snapshot.todoTemplates)
             {
@@ -41,6 +41,7 @@ class BackupCodec {
               'id': g.id,
               'title': g.title,
               'emoji': g.emoji,
+              'color': g.color.name,
               'motivation': g.motivation,
               'dueDate': date(g.dueDate),
               'achieved': g.achieved,
@@ -73,7 +74,7 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          ![1, 2, 3].contains(root['version'])) {
+          ![1, 2, 3, 4].contains(root['version'])) {
         throw const FormatException();
       }
       final goals = (root['goals'] as List).map((value) {
@@ -86,7 +87,10 @@ class BackupCodec {
           dueDate: _date(g['dueDate']),
           achieved: g['achieved'] as bool,
           archived: g['archived'] as bool,
-          coverImage: root['version'] == 3 ? _cover(g['coverImage']) : null,
+          coverImage: root['version'] >= 3 ? _cover(g['coverImage']) : null,
+          color: root['version'] >= 4
+              ? GoalColor.values.byName(g['color'] as String)
+              : GoalColor.forest,
         );
       }).toList();
       final ids = goals.map((g) => g.id).toSet();
@@ -175,7 +179,7 @@ class BackupCodec {
       );
     } catch (_) {
       throw const RuleViolation(
-        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–3, höchstens 10 MB).',
+        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–4, höchstens 10 MB).',
       );
     }
   }

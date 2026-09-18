@@ -1,5 +1,10 @@
 # Projektübergabe · 18.09.2026
 
+## Zielthemen und kompakter Zielkopf · 18.09.2026
+
+PR #28 hat Todos, Einstellungen und Zielbilder nach main integriert; Issues #13–19 sind geschlossen. Der Folgeauftrag #29 ergänzt fünf Farbthemen pro Ziel mit sofortiger Vorschau im Editor, Speicherung in Schema 5 und Backupformat 4. Alte Daten und Backups bleiben lesbar. Emoji, Titel und Fortschrittskreis überlappen das Cover; Archivieren und Erreicht-Schalter stehen in einer Zeile, ohne Untertitel. Branch: codex/goal-themes. Der aktuelle Integrationsstatus steht in GitHub.
+
+
 ## Aktueller Abschlussstand · 18.09.2026
 
 Der Nutzer hat die Veröffentlichung und den Abschluss der bisher nur lokalen Arbeit beauftragt. Todos (#13–17), Darstellungswahl (#18), eigene Zielcover (#19) und die nachfolgenden Layoutänderungen werden gemeinsam integriert. Emoji-Kreis und Fortschrittskreis stehen jetzt gleich groß links und rechts neben dem Zieltitel; die Frist steht darunter. Die folgenden Abschnitte dokumentieren historische Zwischenstände; Aussagen zu noch nicht integrierter Arbeit sind anhand des aktuellen GitHub-PR-Status zu lesen.

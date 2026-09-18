@@ -52,14 +52,18 @@ void main() {
         find.byType(TextFormField).last,
         'Neue Motivation',
       );
-      await tester.ensureVisible(find.text('Speichern'));
+      await tester.scrollUntilVisible(
+        find.text('Speichern'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Speichern'));
       await tester.pumpAndSettle();
       expect(find.text('Neue Motivation'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('Ziel erreicht'), 250);
-      await tester.ensureVisible(find.byType(SwitchListTile));
+      await tester.ensureVisible(find.byKey(const ValueKey('goal-achieved')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.byKey(const ValueKey('goal-achieved')));
       await tester.pumpAndSettle();
       expect(controller.snapshot.goal(id)!.achieved, isTrue);
       expect(controller.snapshot.goal(id)!.archived, isFalse);
@@ -174,12 +178,27 @@ void main() {
     expect(find.text('Noch keine Ziele'), findsOneWidget);
     await tester.tap(find.text('Ziel hinzufügen'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Speichern'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(find.text('Bitte einen Titel eingeben.'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('goal-title')),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.enterText(
       find.byKey(const ValueKey('goal-title')),
       'Balkon begrünen',
+    );
+    await tester.scrollUntilVisible(
+      find.text('Speichern'),
+      200,
+      scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
@@ -191,7 +210,11 @@ void main() {
       find.byType(TextFormField).first,
       'Pflanzen auswählen',
     );
-    await tester.ensureVisible(find.text('Speichern'));
+    await tester.scrollUntilVisible(
+      find.text('Speichern'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Pflanzen auswählen'));
@@ -203,7 +226,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Erreicht').last);
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Speichern'));
+    await tester.scrollUntilVisible(
+      find.text('Speichern'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Erreicht · 100 %'), findsOneWidget);
