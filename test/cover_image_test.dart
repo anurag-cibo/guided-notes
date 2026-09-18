@@ -14,6 +14,8 @@ import 'package:guided_notes/features/goals/data/cover_image.dart';
 import 'package:guided_notes/features/goals/data/goals_repository.dart';
 import 'package:guided_notes/features/goals/domain/models.dart';
 
+import 'fixtures/legacy_todos.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Uint8List picture;
@@ -39,6 +41,7 @@ void main() {
         await db.close();
         final old = sqlite.sqlite3.open(file.path);
         old.execute('ALTER TABLE goals DROP COLUMN cover_image');
+        removeTodoLinks(old);
         old.execute('ALTER TABLE goals DROP COLUMN started_on');
         old.execute('PRAGMA user_version = 3');
         old.execute('ALTER TABLE goals DROP COLUMN color');

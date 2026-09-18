@@ -85,6 +85,8 @@ void main() {
           title: 'Sport',
           frequency: TodoFrequency.weekly,
           target: 3,
+          milestoneId: (await r.load()).milestones.first.id,
+          progressIncrement: 5,
         );
         await SettingsRepository(database).saveAppearance(AppAppearance.light);
         await controller.load();
@@ -122,6 +124,23 @@ void main() {
           await tester.tap(find.text('Todos').last);
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-todos');
+          await tester.ensureVisible(find.byTooltip('Sport: einmal erledigt'));
+          await tester.tap(find.byTooltip('Sport: einmal erledigt'));
+          await tester.pumpAndSettle();
+          expect(controller.snapshot.milestones.first.progress, 65);
+          await tester.tap(find.byTooltip('Sport: einmal rückgängig'));
+          await tester.pumpAndSettle();
+          expect(controller.snapshot.milestones.first.progress, 60);
+          await tester.tap(find.byTooltip('Sport bearbeiten'));
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot('appearance-$mode-todo-editor');
+          await tester.tap(find.byKey(const ValueKey('todo-milestone')));
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot('appearance-$mode-todo-links');
+          await tester.tap(find.text('Regelmäßig bewegen'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byType(BackButton));
+          await tester.pumpAndSettle();
           await tester.tap(find.byTooltip('Einstellungen'));
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-settings');

@@ -77,11 +77,14 @@ class GoalSnapshot {
     Iterable<TodoTemplate> todoTemplates = const [],
     Iterable<TodoEntry> todoEntries = const [],
     Iterable<CustomGoalTheme> customThemes = const [],
+    Iterable<TodoProgressCredit> todoCredits = const [],
   }) : goals = List.unmodifiable(goals),
        milestones = List.unmodifiable(milestones),
        todoTemplates = List.unmodifiable(todoTemplates),
        todoEntries = List.unmodifiable(todoEntries),
-       customThemes = List.unmodifiable(customThemes);
+       customThemes = List.unmodifiable(customThemes),
+       todoCredits = List.unmodifiable(todoCredits);
+  final List<TodoProgressCredit> todoCredits;
   final List<CustomGoalTheme> customThemes;
   CustomGoalTheme? theme(int? id) =>
       customThemes.where((t) => t.id == id).firstOrNull;

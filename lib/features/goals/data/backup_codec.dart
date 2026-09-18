@@ -13,7 +13,18 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 6,
+        'version': 7,
+        'todoCredits': [
+          for (final c in snapshot.todoCredits)
+            {
+              'templateId': c.templateId,
+              'period': c.period,
+              'ordinal': c.ordinal,
+              'milestoneId': c.milestoneId,
+              'amount': c.amount,
+              'previousStatus': c.previousStatus,
+            },
+        ],
         'customThemes': [
           for (final t in snapshot.customThemes)
             {
@@ -33,6 +44,8 @@ class BackupCodec {
               'frequency': t.frequency.name,
               'target': t.target,
               'active': t.active,
+              'milestoneId': t.milestoneId,
+              'progressIncrement': t.progressIncrement,
             },
         ],
         'todoEntries': [
@@ -44,6 +57,8 @@ class BackupCodec {
               'frequency': e.frequency.name,
               'target': e.target,
               'completed': e.completed,
+              'milestoneId': e.milestoneId,
+              'progressIncrement': e.progressIncrement,
             },
         ],
         'goals': [
@@ -87,7 +102,7 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          ![1, 2, 3, 4, 5, 6].contains(root['version'])) {
+          ![1, 2, 3, 4, 5, 6, 7].contains(root['version'])) {
         throw const FormatException();
       }
       final themes = <CustomGoalTheme>[];
@@ -166,6 +181,14 @@ class BackupCodec {
       }
       final templates = <TodoTemplate>[];
       final entries = <TodoEntry>[];
+      final milestoneIds = milestones.map((m) => m.id).toSet();
+      int? linkId(Map<String, dynamic> value) {
+        if (root['version'] < 7 || value['milestoneId'] == null) return null;
+        final id = _id(value['milestoneId']);
+        if (!milestoneIds.contains(id)) throw const FormatException();
+        return id;
+      }
+
       if (root['version'] >= 2) {
         for (final value in root['todoTemplates'] as List) {
           final t = value as Map<String, dynamic>;
@@ -179,6 +202,10 @@ class BackupCodec {
               frequency: frequency,
               target: _target(t['target'], frequency),
               active: t['active'] as bool,
+              milestoneId: linkId(t),
+              progressIncrement: root['version'] >= 7
+                  ? _percent(t['progressIncrement'])
+                  : 0,
             ),
           );
         }
@@ -210,6 +237,41 @@ class BackupCodec {
               frequency: frequency,
               target: target,
               completed: completed,
+              milestoneId: linkId(e),
+              progressIncrement: root['version'] >= 7
+                  ? _percent(e['progressIncrement'])
+                  : 0,
+            ),
+          );
+        }
+      }
+      final credits = <TodoProgressCredit>[];
+      if (root['version'] >= 7) {
+        final keys = <String>{};
+        final byPeriod = {
+          for (final e in entries) '${e.templateId}/${e.period}': e,
+        };
+        for (final value in root['todoCredits'] as List) {
+          final c = value as Map<String, dynamic>;
+          final id = _id(c['templateId']);
+          final period = date(_date(c['period']));
+          final ordinal = _id(c['ordinal']);
+          final entry = byPeriod['$id/$period'];
+          if (entry == null ||
+              ordinal > entry.completed ||
+              !keys.add('$id/$period/$ordinal')) {
+            throw const FormatException();
+          }
+          credits.add(
+            TodoProgressCredit(
+              templateId: id,
+              period: period!,
+              ordinal: ordinal,
+              milestoneId: linkId(c),
+              amount: _percent(c['amount']),
+              previousStatus: MilestoneStatus.values
+                  .byName(c['previousStatus'] as String)
+                  .name,
             ),
           );
         }
@@ -220,10 +282,11 @@ class BackupCodec {
         todoTemplates: templates,
         todoEntries: entries,
         customThemes: themes,
+        todoCredits: credits,
       );
     } catch (_) {
       throw const RuleViolation(
-        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–6, höchstens 10 MB).',
+        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–7, höchstens 10 MB).',
       );
     }
   }
@@ -246,6 +309,13 @@ class BackupCodec {
         value < 1 ||
         value > 999 ||
         (frequency == TodoFrequency.daily && value != 1)) {
+      throw const FormatException();
+    }
+    return value;
+  }
+
+  static int _percent(dynamic value) {
+    if (value is! int || value < 0 || value > 100) {
       throw const FormatException();
     }
     return value;

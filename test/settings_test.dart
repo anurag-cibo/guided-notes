@@ -12,6 +12,8 @@ import 'package:guided_notes/features/settings/application/settings_controller.d
 import 'package:guided_notes/features/settings/data/settings_repository.dart';
 import 'package:guided_notes/features/todos/domain/todo_models.dart';
 
+import 'fixtures/legacy_todos.dart';
+
 void main() {
   test(
     'v2 migration preserves all content; appearance survives database reopen',
@@ -39,6 +41,7 @@ void main() {
         legacy.execute('ALTER TABLE goals DROP COLUMN color');
         legacy.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
         legacy.execute('DROP TABLE goal_themes');
+        removeTodoLinks(legacy);
         legacy.execute('ALTER TABLE goals DROP COLUMN started_on');
         legacy.execute('PRAGMA user_version = 2');
         legacy.close();

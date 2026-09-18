@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -8,6 +10,14 @@ plugins {
 // Android package, so even the tool's reinstall fallback cannot erase app data.
 val entrypoint = project.findProperty("target")?.toString()?.replace('\\', '/') ?: "lib/main.dart"
 val isDeviceTest = entrypoint.split('/').contains("integration_test")
+val signingFile = rootProject.file("key.properties")
+val releaseKeys = Properties().apply {
+    if (signingFile.exists()) signingFile.inputStream().use { load(it) }
+}
+if (!isDeviceTest && !signingFile.exists() &&
+    gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }) {
+    error("Für Release-Builds android/key.properties mit dem privaten Signaturschlüssel bereitstellen. Siehe README.")
+}
 
 android {
     namespace = "de.anurag.guided_notes"
@@ -34,11 +44,21 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (signingFile.exists()) {
+            create("release") {
+                storeFile = rootProject.file(releaseKeys.getProperty("storeFile"))
+                storePassword = releaseKeys.getProperty("storePassword")
+                keyAlias = releaseKeys.getProperty("keyAlias")
+                keyPassword = releaseKeys.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (isDeviceTest) signingConfigs.getByName("debug")
+                else signingConfigs.findByName("release")
         }
     }
 }

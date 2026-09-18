@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'goal_theme.dart';
 
@@ -52,6 +53,7 @@ class _MilestonesViewState extends State<MilestonesView> {
   late int? _focusMilestone = widget.focusMilestoneId;
   int _jump = 0;
   final _center = GlobalKey();
+  bool _showSelector = true;
   @override
   Widget build(BuildContext context) {
     final snapshot = widget.controller.snapshot;
@@ -175,58 +177,89 @@ class _MilestonesViewState extends State<MilestonesView> {
     return Column(
       children: [
         if (goals.length > 1)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-            child: DropdownButtonFormField<int>(
-              key: ValueKey('selector-$_jump'),
-              isExpanded: true,
-              initialValue: goals.any((g) => g.id == _focusGoal)
-                  ? _focusGoal
-                  : null,
-              decoration: const InputDecoration(labelText: 'Zu Ziel springen'),
-              items: goals
-                  .map(
-                    (g) => DropdownMenuItem(
-                      value: g.id,
-                      child: Text(
-                        '${g.emoji} ${g.title}',
-                        overflow: TextOverflow.ellipsis,
+          AnimatedSize(
+            duration: const Duration(milliseconds: 180),
+            alignment: Alignment.topCenter,
+            child: ClipRect(
+              child: Align(
+                heightFactor: _showSelector ? 1 : 0,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 380),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(32, 4, 32, 0),
+                    child: DropdownButtonFormField<int>(
+                      key: ValueKey('selector-$_jump'),
+                      isExpanded: true,
+                      initialValue: goals.any((g) => g.id == _focusGoal)
+                          ? _focusGoal
+                          : null,
+                      decoration: const InputDecoration(
+                        labelText: 'Zu Ziel springen',
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                       ),
+                      items: goals
+                          .map(
+                            (g) => DropdownMenuItem(
+                              value: g.id,
+                              child: Text(
+                                '${g.emoji} ${g.title}',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (id) => setState(() {
+                        _focusGoal = id;
+                        _focusMilestone = null;
+                        _jump++;
+                        _showSelector = true;
+                      }),
                     ),
-                  )
-                  .toList(),
-              onChanged: (id) => setState(() {
-                _focusGoal = id;
-                _focusMilestone = null;
-                _jump++;
-              }),
+                  ),
+                ),
+              ),
             ),
           ),
         Expanded(
-          child: CustomScrollView(
-            key: ValueKey('scroll-$_jump'),
-            center: _center,
-            slivers: [
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) => rows[split - i - 1].child,
-                    childCount: split,
+          child: NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.depth != 0 ||
+                  notification.direction == ScrollDirection.idle) {
+                return false;
+              }
+              final show = notification.direction == ScrollDirection.forward;
+              if (show != _showSelector) setState(() => _showSelector = show);
+              return false;
+            },
+            child: CustomScrollView(
+              key: ValueKey('scroll-$_jump'),
+              center: _center,
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) => rows[split - i - 1].child,
+                      childCount: split,
+                    ),
                   ),
                 ),
-              ),
-              SliverPadding(
-                key: _center,
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) => rows[split + i].child,
-                    childCount: rows.length - split,
+                SliverPadding(
+                  key: _center,
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) => rows[split + i].child,
+                      childCount: rows.length - split,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

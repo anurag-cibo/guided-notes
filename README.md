@@ -20,6 +20,14 @@ Beispiele, genaue Status-/Zeitregeln und der reduzierte Screenflow stehen in [Pr
 
 Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kalenderintegration und Zusammenarbeit gehören nicht zum aktuellen Kern.
 
+## Todos und Zwischenziel-Fortschritt
+
+Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenziel über eine durchsuchbare, nach Zielen gruppierte Auswahl zuordnen. Der zusätzliche Schalter **Fortschritt automatisch erhöhen** aktiviert einen Beitrag von 1–100 ganzen Prozentpunkten pro Erledigung. Bei Wochenaufgaben zählt jede einzelne Wiederholung. Ohne Schalter bleibt es bei der Zuordnung, ohne Zuordnung bleibt das Todo unabhängig.
+
+Der Zwischenzielfortschritt steigt höchstens auf 100 %. Rückgängig zieht nur den tatsächlich gutgeschriebenen Beitrag ab – auch nach Neustart, Backup oder einem Wechsel der Zuordnung. Beispiel: 97 % + 10 Prozentpunkte ergibt 100 %, Rückgängig wieder 97 %. Änderungen an Zuordnung und Beitrag gelten sofort für neue Erledigungen; alte Erledigungen werden nicht nachträglich gewertet. Titel und Wochenanzahl ändern sich weiterhin erst ab dem nächsten Zeitraum. Archivierte Ziele erhalten keine neuen Beiträge. Löschen eines Zwischenziels erhält die Todos und löst ihre Zuordnung.
+
+„Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die kompaktere Zielauswahl im Zwischenziele-Tab blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
+
 ## Hintergrundbild und Emoji
 
 Beim Anlegen oder Bearbeiten eines Ziels oben **Hintergrundbild auswählen** antippen. Android öffnet die Dateiauswahl; das Bild lässt sich ersetzen oder entfernen. Die App speichert eine lokale, verkleinerte Kopie (maximal 1280 Pixel an der längsten Seite und 256 KB); das Original bleibt unverändert. Eingabedateien dürfen höchstens 20 MB groß sein. Das Bild erscheint als Cover im Ziel und ist im Backup enthalten.
@@ -40,13 +48,24 @@ Die zentralen Farbrollen stehen in `ThemeColors`, Vorgaben und Ableitung für He
 
 Das Zahnrad in jedem Hauptbereich öffnet die Einstellungen. Die App folgt zunächst dem Gerät; Hell- und Dunkelmodus können dauerhaft gewählt werden. Beide Darstellungen umfassen Ziele, Zwischenziele, Todos, Formulare und Dialoge. Unter „Allgemein“ stehen Sicherung und bestätigtes Löschen aller Inhalte bereit. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf Wunsch als klar gekennzeichnete Platzhalter sichtbar. Dateninformationen und verwendete Lizenzen sind ebenfalls erreichbar.
 
-Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 7 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 8 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
 
 ## Daten sichern
 
 Über das Zahnrad **Einstellungen → Datensicherung** oben rechts lassen sich Ziele, Zwischenziele, Todo-Vorlagen, Tages-/Wochenstände und Archive als JSON-Datei exportieren. Android öffnet die Dateiauswahl für den Speicherort. Die Datei enthält auch Motivationstexte und ist unverschlüsselt; eine Kopie außerhalb des Geräts schützt vor Geräteverlust.
 
-**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 6, bis 10 MB. Alte Sicherungen mit Version 1 bis 5 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
+**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 7, bis 10 MB. Alte Sicherungen mit Version 1 bis 6 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
+
+## APK fürs Handy
+
+Installierbare APKs stehen unter [GitHub Releases](https://github.com/anurag-cibo/guided-notes/releases). Die universelle APK am Android-Handy herunterladen, öffnen und gegebenenfalls die Installation für den Browser oder Dateimanager erlauben. Bei einem privaten Repository ist eine GitHub-Anmeldung mit Zugriff nötig. Die App enthält keine Demodaten; vorhandene Daten lassen sich per Datensicherung übertragen.
+
+Release-Builds benötigen den dauerhaft verwendeten privaten Signaturschlüssel und `android/key.properties` mit `storeFile`, `storePassword`, `keyAlias` und `keyPassword`. Beides ist von Git ausgeschlossen. Der Schlüssel liegt auf diesem Rechner unter `work/release-signing/the-guide-release.jks`; Schlüssel und Properties geschützt sichern und bei Aufräumarbeiten erhalten. Spätere Handy-Updates müssen denselben Schlüssel und eine höhere Buildnummer verwenden. Der normale Emulator nutzt weiterhin die separate Debug-Signatur; dort nur Debug-Updates installieren. Ohne Release-Schlüssel bricht ein normaler Release-Build ab, statt unbemerkt eine Debug-Signatur zu verwenden.
+
+```powershell
+.\tool\flutter.ps1 build apk --release
+# build/app/outputs/flutter-apk/app-release.apk – nicht nach ABI aufteilen.
+```
 
 ## Entwicklung starten
 

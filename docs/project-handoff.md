@@ -1,5 +1,11 @@
 # Projektübergabe · 18.09.2026
 
+## Todo-Verknüpfung und Handy-APK · #35
+
+PR #34 ist auf main integriert. Folgeauftrag #35 ergänzt optionale Todo-Zuordnung, gesondertes Fortschritts-Tracking und 1–100 Prozentpunkte pro Erledigung. Nutzerbestätigt: jede Wochen-Wiederholung zählt, Rücknahme zieht den tatsächlichen Beitrag ab. Schema 8, Backupformat 7; Einzelbeiträge sichern Undo auch nach Wechsel, 100-%-Deckelung und Neustart. Todo-Editor und suchbare Zwischenzielauswahl sind eigene Dateien, Beitragsbuchung liegt in `todo_progress.dart`. Todo-Historie scrollt mit, Zielauswahl blendet je Scrollrichtung aus/ein. Aktueller Integrationsstatus: GitHub #35.
+
+Version 0.2.0+2 bereitet eine universelle Handy-APK vor. Dauerhaften Release-Schlüssel unter `work/release-signing/` und die ignorierte `android/key.properties` unbedingt erhalten und privat sichern; nicht veröffentlichen. Emulator weiter mit Debug-Signatur aktualisieren, Gerätetests mit separatem Paket. Vor dem Update wurde der aktuelle normale Datenbestand unter `outputs/before-todo-links.tar` gesichert. Keine Demodaten ersetzen oder zurücksetzen.
+
 ## Zeitkreis und Theme-Verwaltung · 18.09.2026
 
 PR #32 ist integriert. Folgeauftrag #33 entfernt den Appnamen aus der Begrüßungszeile, lässt das Archiv am Ende der Zielliste mitscrollen und verkleinert Plus-Ringe ohne gefüllten Hintergrund. Im Zielkopf ersetzt ein Zeitkreis den Fortschrittskreis; Fortschritt steht als Balken darunter. Schema 7/Backupformat 6 ergänzen ein dauerhaftes Startdatum. Ältere Ziele starten bei der ersten Verwendung dieser Version. Themes sind unter „Themes“ verwaltbar und eigene Themes nach Bestätigung löschbar; Systempaletten bleiben geschützt. Die Auswahl im Ziel-Editor ist begrenzt, mit „Mehr anzeigen“ und Plus in der Überschrift. Aktueller Integrationsstatus: GitHub #33.

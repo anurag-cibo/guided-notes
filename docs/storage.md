@@ -1,5 +1,13 @@
 # Speicherung und Migration
 
+## Schema 8 und Backupformat 7: Todo-Verknüpfungen
+
+`todo_templates` und `todo_entries` ergänzen `milestone_id` (optional, ON DELETE SET NULL) und `progress_increment` (0–100, 0 deaktiviert Tracking). Neue Zeiträume übernehmen die Vorlage. Eine Änderung der Zuordnung aktualisiert auch den aktuellen Zeitraum, ohne bisherige Erledigungen nachträglich zu buchen.
+
+`todo_progress_credits` speichert pro Vorlage, Zeitraum und Erledigungsnummer das damals zugeordnete Zwischenziel, den tatsächlich gutgeschriebenen Betrag sowie den vorherigen Status. Zähler, Zwischenziel und Beitrag ändern sich in derselben Transaktion. Rücknahme entfernt den letzten Beitrag dieses Todos; Begrenzung bei 100 %, geänderte Zuordnungen und gelöschte Zwischenziele bleiben dadurch nachvollziehbar. Nullbeiträge werden ebenfalls gespeichert. Vor Schema 8 vorhandene Erledigungen haben keine Beiträge und verändern bei Rücknahme keinen Fortschritt. Löschen eines Zwischenziels nullt seine Referenzen, Löschen eines Todo-Zeitraums entfernt seine Beiträge per Cascade.
+
+Backupformat 7 enthält Zuordnungen, Beitragskonfiguration und Beitragszeilen. Import prüft Referenzen, Wertebereiche, eindeutige Erledigungsnummern und deren Zugehörigkeit zu erledigten Todo-Einträgen. Die gespeicherten Zwischenzielstände werden übernommen, Beiträge nicht erneut ausgeführt. Formate 1–6 erhalten unabhängige Todos ohne Beiträge. Migrationen aus Schema 1–7 bewahren alle bestehenden Inhalte.
+
 ## Schema 7 und Backupformat 6: Zeitkreis · 18.09.2026
 
 `goals.started_on` speichert das lokale Startdatum als YYYY-MM-DD. Neue Ziele erhalten es beim Erstellen. Migration aus Schema 1–6 ergänzt eine nullable Spalte; beim ersten Repository-Laden werden fehlende Werte einmalig mit dem aktuellen lokalen Datum gefüllt. Alte Backups ohne Startdatum erhalten es beim Import. Bearbeiten, Archivieren und Wiederherstellen ändern den Start nicht. Der Zeitkreis berechnet Kalendertage unabhängig von Sommerzeit, begrenzt die verstrichene Zeit auf 0–100 % und behandelt fehlende oder bereits verstrichene Fristen separat. Der Zwischenzielfortschritt bleibt unabhängig.
