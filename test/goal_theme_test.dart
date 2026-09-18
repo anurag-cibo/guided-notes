@@ -79,6 +79,7 @@ void main() {
         old.execute('ALTER TABLE goals DROP COLUMN color');
         old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
         old.execute('DROP TABLE goal_themes');
+        old.execute('ALTER TABLE goals DROP COLUMN started_on');
         old.execute('PRAGMA user_version = 4');
         old.close();
         db = AppDatabase(NativeDatabase(file));

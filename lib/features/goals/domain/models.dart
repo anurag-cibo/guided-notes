@@ -33,6 +33,7 @@ class Goal {
     this.emoji = '◎',
     this.motivation = '',
     this.dueDate,
+    this.startedOn,
     this.achieved = false,
     this.archived = false,
     this.coverImage,
@@ -44,6 +45,7 @@ class Goal {
   final String emoji;
   final String motivation;
   final DateTime? dueDate;
+  final DateTime? startedOn;
   final bool achieved;
   final bool archived;
   final Uint8List? coverImage;

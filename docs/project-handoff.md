@@ -1,5 +1,11 @@
 # Projektübergabe · 18.09.2026
 
+## Zeitkreis und Theme-Verwaltung · 18.09.2026
+
+PR #32 ist integriert. Folgeauftrag #33 entfernt den Appnamen aus der Begrüßungszeile, lässt das Archiv am Ende der Zielliste mitscrollen und verkleinert Plus-Ringe ohne gefüllten Hintergrund. Im Zielkopf ersetzt ein Zeitkreis den Fortschrittskreis; Fortschritt steht als Balken darunter. Schema 7/Backupformat 6 ergänzen ein dauerhaftes Startdatum. Ältere Ziele starten bei der ersten Verwendung dieser Version. Themes sind unter „Themes“ verwaltbar und eigene Themes nach Bestätigung löschbar; Systempaletten bleiben geschützt. Die Auswahl im Ziel-Editor ist begrenzt, mit „Mehr anzeigen“ und Plus in der Überschrift. Aktueller Integrationsstatus: GitHub #33.
+
+Die normale Emulator-App enthält auf ausdrücklichen Nutzerwunsch vier aktive Demoziele, ein archiviertes Ziel, Zwischenziele, Todos und zwei eigene Themes. Vor diesem Update wurde ihre private Datenbank lokal unter `outputs/before-time-ring.tar` gesichert. Diesen Bestand erhalten, Gerätetests weiterhin ausschließlich mit dem separaten Testpaket ausführen.
+
 ## Kompakte Aktionen und eigene Themes · 18.09.2026
 
 PR #30 hat die ersten Zielfarben integriert. Folgeauftrag #31 setzt die Plus-Aktionen in die Überschriften, Zielaktionen und Todo-Historie an den unteren Bildschirmrand und erweitert Themes um vier zentrale Farbrollen. Eigene Themes sind in Einstellungen/Darstellung und per Shortcut im Ziel-Editor erstellbar/bearbeitbar. Schema 6, Backupformat 5; frühere Daten und Backups bleiben unterstützt. Aktueller Branch: codex/compact-actions-custom-themes; Integrationsstatus in GitHub.

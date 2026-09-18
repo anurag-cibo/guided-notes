@@ -15,14 +15,26 @@ class AddCircleButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   @override
-  Widget build(BuildContext context) => IconButton.filledTonal(
+  Widget build(BuildContext context) => IconButton(
     tooltip: label,
     onPressed: onPressed,
     style: IconButton.styleFrom(
       shape: const CircleBorder(),
-      minimumSize: const Size(40, 40),
+      minimumSize: const Size(48, 48),
     ),
-    icon: const Icon(Icons.add, size: 20),
+    icon: Container(
+      width: 30,
+      height: 30,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: onPressed == null
+              ? Theme.of(context).disabledColor
+              : Theme.of(context).colorScheme.primary,
+        ),
+      ),
+      child: const Icon(Icons.add, size: 18),
+    ),
   );
 }
 

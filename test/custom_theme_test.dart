@@ -88,6 +88,7 @@ void main() {
       final old = sqlite.sqlite3.open(file.path);
       old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
       old.execute('DROP TABLE goal_themes');
+      old.execute('ALTER TABLE goals DROP COLUMN started_on');
       old.execute('PRAGMA user_version = 5');
       old.close();
       db = AppDatabase(NativeDatabase(file));
@@ -242,7 +243,7 @@ void main() {
         expect(controller.snapshot.goals.single.customThemeId, theme.id);
         await tester.tap(find.byTooltip('Einstellungen'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Eigene Themes'));
+        await tester.tap(find.text('Themes'));
         await tester.pumpAndSettle();
         expect(find.byType(CustomThemesScreen), findsOneWidget);
         await tester.tap(find.text('Mein Abend'));

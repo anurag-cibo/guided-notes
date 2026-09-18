@@ -11,7 +11,7 @@ class CustomThemesScreen extends StatelessWidget {
   final GoalsController controller;
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Eigene Themes')),
+    appBar: AppBar(title: const Text('Themes')),
     body: ListenableBuilder(
       listenable: controller,
       builder: (context, _) => ListView(
@@ -49,7 +49,28 @@ class CustomThemesScreen extends StatelessWidget {
                   ),
                   title: Text(theme.name),
                   subtitle: const Text('Farben und Name bearbeiten'),
-                  trailing: const Icon(Icons.edit_outlined),
+                  trailing: IconButton(
+                    tooltip: '${theme.name} löschen',
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: controller.saving
+                        ? null
+                        : () async {
+                            final count = controller.snapshot.goals
+                                .where((g) => g.customThemeId == theme.id)
+                                .length;
+                            final confirmed = await confirmDeletion(
+                              context,
+                              'Theme „${theme.name}“ löschen?${count == 0 ? '' : ' $count zugeordnete Ziele verwenden danach wieder ihre Standardpalette. Ihre Inhalte bleiben erhalten.'}',
+                            );
+                            if (confirmed && context.mounted) {
+                              await runMutation(
+                                context,
+                                controller,
+                                (r) => r.deleteTheme(theme.id),
+                              );
+                            }
+                          },
+                  ),
                   onTap: controller.saving
                       ? null
                       : () => Navigator.push(
@@ -62,6 +83,18 @@ class CustomThemesScreen extends StatelessWidget {
                           ),
                         ),
                 ),
+              ),
+            ),
+          gap,
+          const SectionHeading(title: 'Systemthemes'),
+          const Text('Diese Standardpaletten bleiben als Basis erhalten.'),
+          for (final color in GoalColor.values)
+            Card(
+              child: ListTile(
+                leading: CircleAvatar(backgroundColor: color.seed),
+                title: Text(color.label),
+                subtitle: const Text('Systemtheme'),
+                trailing: const Icon(Icons.lock_outline),
               ),
             ),
         ],

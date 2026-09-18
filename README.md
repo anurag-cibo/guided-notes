@@ -30,7 +30,9 @@ Das Emoji-Feld links neben dem Titel erlaubt ein sichtbares Zeichen, auch zusamm
 
 Beim Anlegen oder Bearbeiten eines Ziels unter **Farbthema** Wald, Ozean, Lavendel, Rose oder Sonne wählen. Die Vorschau reagiert sofort; gespeichert wird mit dem Ziel. Das Thema färbt Zielkarten, Cover-Fallback, Detailflächen, Schaltflächen und Fortschrittskreis passend zu Hell- oder Dunkelmodus. Eigene Fotos bleiben unverändert. Bestehende Ziele erhalten Wald; die Auswahl ist auch im Backup enthalten.
 
-Eigene Themes lassen sich unter **Einstellungen → Darstellung → Eigene Themes** erstellen und bearbeiten. Das kleine Plus neben der Theme-Auswahl im Ziel-Editor öffnet denselben Editor und übernimmt das neue Theme; übrige Eingaben bleiben erhalten. Primärfarbe, Sekundärfarbe, Akzentfarbe und Flächenton werden über Farbfelder oder Hex-Werte gewählt. Änderungen an einem eigenen Theme gelten für alle zugeordneten Ziele. Eigene Themes sind im Backup enthalten und werden bei „Alle Inhalte löschen“ mit entfernt.
+Unter **Einstellungen → Darstellung → Themes** lassen sich eigene Themes erstellen, bearbeiten und nach Bestätigung löschen. Beim Löschen wechseln zugeordnete Ziele auf ihre gespeicherte Standardpalette zurück; Inhalte bleiben erhalten. Die fünf Systemthemes sind geschützt. Das Plus rechts in „Farbthema“ im Ziel-Editor öffnet den Theme-Editor und übernimmt das neue Theme; übrige Eingaben bleiben erhalten. „Mehr anzeigen“ erweitert die begrenzte Auswahl, das gewählte Theme bleibt immer sichtbar. Primärfarbe, Sekundärfarbe, Akzentfarbe und Flächenton werden über Farbfelder oder Hex-Werte gewählt. Änderungen an einem eigenen Theme gelten für alle zugeordneten Ziele. Eigene Themes sind im Backup enthalten und werden bei „Alle Inhalte löschen“ mit entfernt.
+
+Der Kreis rechts vom Zieltitel zeigt die verstrichene Zeit seit dem Anlegen bis zur Frist und innen die verbleibenden Kalendertage. Ohne Frist bleibt er neutral; fällige und überfällige Ziele werden entsprechend beschriftet. Bei älteren Zielen startet die Messung beim ersten Laden der neuen Version, da vorher kein Startdatum gespeichert wurde. Änderungen am Ziel behalten diesen Start bei. Darunter zeigt ein Balken mit Prozentwert den Zwischenzielfortschritt. Das Archiv steht bei kurzen Ziellisten unten und scrollt bei langen Listen hinter den Zielen mit.
 
 Die zentralen Farbrollen stehen in `ThemeColors`, Vorgaben und Ableitung für Hell/Dunkel in `goal_theme.dart`. Karten von Zielen und Zwischenzielen verwenden dieselbe sanfte Flächentönung. Die Statusbezeichnung bleibt unabhängig vom Zieltheme sichtbar. Kleine Plus-Kreise sitzen in den Überschriften; Zielaktionen und Todo-Historie bleiben am unteren Bildschirmrand.
 
@@ -38,13 +40,13 @@ Die zentralen Farbrollen stehen in `ThemeColors`, Vorgaben und Ableitung für He
 
 Das Zahnrad in jedem Hauptbereich öffnet die Einstellungen. Die App folgt zunächst dem Gerät; Hell- und Dunkelmodus können dauerhaft gewählt werden. Beide Darstellungen umfassen Ziele, Zwischenziele, Todos, Formulare und Dialoge. Unter „Allgemein“ stehen Sicherung und bestätigtes Löschen aller Inhalte bereit. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf Wunsch als klar gekennzeichnete Platzhalter sichtbar. Dateninformationen und verwendete Lizenzen sind ebenfalls erreichbar.
 
-Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 6 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 7 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
 
 ## Daten sichern
 
 Über das Zahnrad **Einstellungen → Datensicherung** oben rechts lassen sich Ziele, Zwischenziele, Todo-Vorlagen, Tages-/Wochenstände und Archive als JSON-Datei exportieren. Android öffnet die Dateiauswahl für den Speicherort. Die Datei enthält auch Motivationstexte und ist unverschlüsselt; eine Kopie außerhalb des Geräts schützt vor Geräteverlust.
 
-**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 5, bis 10 MB. Alte Sicherungen mit Version 1 bis 4 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
+**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 6, bis 10 MB. Alte Sicherungen mit Version 1 bis 5 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
 
 ## Entwicklung starten
 
