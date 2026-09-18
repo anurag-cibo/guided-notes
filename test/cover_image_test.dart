@@ -40,6 +40,7 @@ void main() {
         final old = sqlite.sqlite3.open(file.path);
         old.execute('ALTER TABLE goals DROP COLUMN cover_image');
         old.execute('PRAGMA user_version = 3');
+        old.execute('ALTER TABLE goals DROP COLUMN color');
         old.close();
         db = AppDatabase(NativeDatabase(file));
         var repo = GoalsRepository(db);
@@ -168,7 +169,11 @@ void main() {
         find.byKey(const ValueKey('goal-title')),
         'Ruhe finden',
       );
-      await tester.ensureVisible(find.text('Speichern'));
+      await tester.scrollUntilVisible(
+        find.text('Speichern'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.runAsync(() async {
         await tester.tap(find.text('Speichern'));
         await Future<void>.delayed(const Duration(milliseconds: 100));

@@ -90,3 +90,8 @@ Android-Gerätetest `integration_test/cover_image_test.dart` erfolgreich: Androi
 .\tool\flutter.ps1 drive --driver integration_test/screenshot_driver.dart --target integration_test/cover_image_test.dart -d emulator-5554 --keep-app-running
 .\tool\flutter.ps1 build apk --debug
 ```
+## Zielthemen und kompakte Details · 18.09.2026
+
+34 Unit-/Widgettests erfolgreich; anschließend zusätzlicher Test für 320 Pixel Breite und doppelte Schriftgröße in Hell und Dunkel bestanden (insgesamt nun 35 Tests). Die neuen Prüfungen decken Migration 4 → 5 mit erhaltenen Inhalten, Farbe nach vollständigem Datei-Neustart, Archiv und Backup-Rundlauf, Import der Formate 1–3 mit Standardfarbe sowie Ablehnung unbekannter Farbwerte ab. Widgetprüfung: Auswahl und Wiederöffnung im Editor, tatsächliche Überlappung des Titels mit dem Cover und gemeinsame Zeile für Archivieren/Erreicht. Analyse ohne Befunde.
+
+Android-Darstellungstest mit separater temporärer Datenbank erfolgreich: verschiedenfarbige Zielkarten sowie Details, Aktionszeile und Editor in Hell und Dunkel. Wiederöffnung erhält die Farbwerte. Screenshots unter outputs/appearance-{light,dark}-{goals,detail,actions,editor}.png visuell geprüft. Die anfängliche Screenshot-Testblockade wurde durch einen fehlenden Pump nach dem Scrollen verursacht und im Test behoben. Reguläre App-Daten bleiben unverändert; anschließend wird wieder die normale APK gebaut und per Update installiert.

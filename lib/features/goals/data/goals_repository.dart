@@ -38,7 +38,7 @@ class GoalsRepository {
       }
       for (final g in snapshot.goals) {
         await database.customStatement(
-          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image) VALUES (?,?,?,?,?,?,?,?)',
+          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color) VALUES (?,?,?,?,?,?,?,?,?)',
           [
             g.id,
             g.title,
@@ -48,6 +48,7 @@ class GoalsRepository {
             g.achieved ? 1 : 0,
             g.archived ? 1 : 0,
             g.coverImage,
+            g.color.name,
           ],
         );
       }
@@ -119,6 +120,7 @@ class GoalsRepository {
     DateTime? dueDate,
     Uint8List? coverImage,
     bool removeCoverImage = false,
+    GoalColor? color,
   }) => database.transaction(() async {
     final name = requiredTitle(title);
     final symbol = emoji.trim().isEmpty ? '◎' : emoji.trim();
@@ -129,11 +131,18 @@ class GoalsRepository {
     if (id == null) {
       await _checkCapacity();
       await database.customStatement(
-        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image) VALUES (?, ?, ?, ?, ?)',
-        [name, symbol, motivation.trim(), _encodeDate(dueDate), coverImage],
+        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color) VALUES (?, ?, ?, ?, ?, ?)',
+        [
+          name,
+          symbol,
+          motivation.trim(),
+          _encodeDate(dueDate),
+          coverImage,
+          (color ?? GoalColor.forest).name,
+        ],
       );
     } else {
-      await _requireGoal(id);
+      final existing = await _requireGoal(id);
       if (coverImage != null || removeCoverImage) {
         await database.customStatement(
           'UPDATE goals SET cover_image = ? WHERE id = ?',
@@ -141,8 +150,15 @@ class GoalsRepository {
         );
       }
       await database.customStatement(
-        'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ? WHERE id = ?',
-        [name, symbol, motivation.trim(), _encodeDate(dueDate), id],
+        'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ?, color = ? WHERE id = ?',
+        [
+          name,
+          symbol,
+          motivation.trim(),
+          _encodeDate(dueDate),
+          (color ?? existing.color).name,
+          id,
+        ],
       );
     }
   });
@@ -261,6 +277,11 @@ class GoalsRepository {
     achieved: row.read<int>('achieved') == 1,
     archived: row.read<int>('archived') == 1,
     coverImage: row.readNullable<Uint8List>('cover_image'),
+    color:
+        GoalColor.values
+            .where((c) => c.name == row.read<String>('color'))
+            .firstOrNull ??
+        GoalColor.forest,
   );
   static String? _encodeDate(DateTime? date) => date == null
       ? null

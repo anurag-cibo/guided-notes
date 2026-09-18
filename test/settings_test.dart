@@ -35,6 +35,7 @@ void main() {
         final legacy = sqlite.sqlite3.open(file.path);
         legacy.execute('DROP TABLE app_settings');
         legacy.execute('ALTER TABLE goals DROP COLUMN cover_image');
+        legacy.execute('ALTER TABLE goals DROP COLUMN color');
         legacy.execute('PRAGMA user_version = 2');
         legacy.close();
         db = AppDatabase(NativeDatabase(file));
