@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
@@ -8,6 +10,30 @@ plugins {
 // Android package, so even the tool's reinstall fallback cannot erase app data.
 val entrypoint = project.findProperty("target")?.toString()?.replace('\\', '/') ?: "lib/main.dart"
 val isDeviceTest = entrypoint.split('/').contains("integration_test")
+val signingFile = rootProject.file("key.properties")
+val releaseKeys = Properties().apply {
+    if (signingFile.exists()) signingFile.inputStream().use { load(it) }
+}
+val releaseStore = releaseKeys.getProperty("storeFile")?.takeIf { it.isNotBlank() }
+    ?.let { rootProject.file(it) }
+val validateReleaseCredentials = tasks.register("validateReleaseCredentials") {
+    doLast {
+        check(signingFile.exists() &&
+            listOf("storeFile", "storePassword", "keyAlias", "keyPassword").all {
+                !releaseKeys.getProperty(it).isNullOrBlank()
+            } && releaseStore?.isFile == true) {
+            "Für Release-Artefakte eine vollständige android/key.properties mit gültigem privaten Signaturschlüssel bereitstellen. Siehe README."
+        }
+    }
+}
+// Attach to artifact tasks, including when reached through aggregate `assemble`.
+// Analysis tasks such as lintRelease remain usable without private credentials.
+tasks.configureEach {
+    if (!isDeviceTest && name in setOf(
+            "validateSigningRelease", "packageRelease", "packageReleaseBundle", "signReleaseBundle")) {
+        dependsOn(validateReleaseCredentials)
+    }
+}
 
 android {
     namespace = "de.anurag.guided_notes"
@@ -34,11 +60,19 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = releaseStore
+            storePassword = releaseKeys.getProperty("storePassword")
+            keyAlias = releaseKeys.getProperty("keyAlias")
+            keyPassword = releaseKeys.getProperty("keyPassword")
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (isDeviceTest) signingConfigs.getByName("debug")
+                else signingConfigs.getByName("release")
         }
     }
 }

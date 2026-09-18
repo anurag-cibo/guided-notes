@@ -16,6 +16,8 @@ import 'package:guided_notes/features/goals/presentation/goal_header.dart';
 import 'package:guided_notes/features/goals/presentation/goal_theme.dart';
 import 'package:guided_notes/features/settings/presentation/custom_themes_screen.dart';
 
+import 'fixtures/legacy_todos.dart';
+
 void main() {
   test('time circle uses calendar days and handles absent, overdue and moved deadlines', () {
     final goal = Goal(
@@ -57,6 +59,7 @@ void main() {
         await repo.saveGoal(title: 'Bestehend', motivation: 'Bleibt');
         await db.close();
         final old = sqlite.sqlite3.open(file.path);
+        removeTodoLinks(old);
         old.execute('ALTER TABLE goals DROP COLUMN started_on');
         old.execute('PRAGMA user_version = 6');
         old.close();

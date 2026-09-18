@@ -19,7 +19,28 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
+
+  Future<void> _addTodoLinks() async {
+    for (final table in ['todo_templates', 'todo_entries']) {
+      await customStatement(
+        'ALTER TABLE $table ADD COLUMN milestone_id INTEGER REFERENCES milestones(id) ON DELETE SET NULL',
+      );
+      await customStatement(
+        'ALTER TABLE $table ADD COLUMN progress_increment INTEGER NOT NULL DEFAULT 0 CHECK(progress_increment BETWEEN 0 AND 100)',
+      );
+    }
+    await customStatement('''CREATE TABLE todo_progress_credits (
+      template_id INTEGER NOT NULL,
+      period TEXT NOT NULL,
+      ordinal INTEGER NOT NULL CHECK(ordinal BETWEEN 1 AND 999),
+      milestone_id INTEGER REFERENCES milestones(id) ON DELETE SET NULL,
+      amount INTEGER NOT NULL CHECK(amount BETWEEN 0 AND 100),
+      previous_status TEXT NOT NULL CHECK(previous_status IN ('notStarted','onTrack','offTrack','onHold','achieved')),
+      PRIMARY KEY(template_id, period, ordinal),
+      FOREIGN KEY(template_id, period) REFERENCES todo_entries(template_id, period) ON DELETE CASCADE
+    )''');
+  }
 
   Future<void> _createGoalThemes() =>
       customStatement('''CREATE TABLE goal_themes (
@@ -104,10 +125,11 @@ class AppDatabase extends GeneratedDatabase {
         AND (SELECT count(*) FROM goals WHERE archived = 0) >= 5
         BEGIN SELECT RAISE(ABORT, 'active_goal_limit'); END''');
       await _createTodos();
+      await _addTodoLinks();
       await _createSettings();
     },
     onUpgrade: (_, from, to) async {
-      if (from < 1 || from > 6 || to != 7) {
+      if (from < 1 || from > 7 || to != 8) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
@@ -131,6 +153,7 @@ class AppDatabase extends GeneratedDatabase {
       if (from < 7) {
         await customStatement('ALTER TABLE goals ADD COLUMN started_on TEXT');
       }
+      if (from < 8) await _addTodoLinks();
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

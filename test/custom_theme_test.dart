@@ -14,9 +14,11 @@ import 'package:guided_notes/features/goals/presentation/goal_theme.dart';
 import 'package:guided_notes/features/settings/presentation/custom_themes_screen.dart';
 import 'package:guided_notes/features/todos/domain/todo_models.dart';
 
+import 'fixtures/legacy_todos.dart';
+
 void main() {
   testWidgets(
-    'detail actions and todo history stay fixed while their contents scroll',
+    'detail actions stay fixed while todo history scrolls after contents',
     (tester) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;
@@ -61,11 +63,13 @@ void main() {
         await tester.tap(find.text('Todos').last);
         await tester.pumpAndSettle();
         final history = find.text('Vergangene Zeiträume');
-        final historyRect = tester.getRect(history);
-        expect(history.hitTestable(), findsOneWidget);
-        await tester.drag(find.byType(ListView), const Offset(0, -600));
+        expect(history.hitTestable(), findsNothing);
+        await tester.scrollUntilVisible(history, 500);
         await tester.pumpAndSettle();
-        expect(tester.getRect(history), historyRect);
+        expect(history.hitTestable(), findsOneWidget);
+        await tester.drag(find.byType(CustomScrollView), const Offset(0, 600));
+        await tester.pumpAndSettle();
+        expect(history.hitTestable(), findsNothing);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox());
       } finally {
@@ -89,6 +93,7 @@ void main() {
       final old = sqlite.sqlite3.open(file.path);
       old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
       old.execute('DROP TABLE goal_themes');
+      removeTodoLinks(old);
       old.execute('ALTER TABLE goals DROP COLUMN started_on');
       old.execute('PRAGMA user_version = 5');
       old.close();

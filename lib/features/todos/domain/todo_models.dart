@@ -25,12 +25,16 @@ class TodoTemplate {
     required this.frequency,
     required this.target,
     required this.active,
+    this.milestoneId,
+    this.progressIncrement = 0,
   });
   final int id;
   final String title;
   final TodoFrequency frequency;
   final int target;
   final bool active;
+  final int? milestoneId;
+  final int progressIncrement;
 }
 
 /// A period owns its title and target, independent of later template edits.
@@ -42,6 +46,8 @@ class TodoEntry {
     required this.frequency,
     required this.target,
     required this.completed,
+    this.milestoneId,
+    this.progressIncrement = 0,
   });
   final int templateId;
   final String period;
@@ -49,5 +55,25 @@ class TodoEntry {
   final TodoFrequency frequency;
   final int target;
   final int completed;
+  final int? milestoneId;
+  final int progressIncrement;
   bool isCurrent(DateTime now) => period == periodStart(frequency, now);
+}
+
+/// Actual contribution of a single completion, used for exact undo after edits.
+class TodoProgressCredit {
+  const TodoProgressCredit({
+    required this.templateId,
+    required this.period,
+    required this.ordinal,
+    required this.milestoneId,
+    required this.amount,
+    required this.previousStatus,
+  });
+  final int templateId;
+  final String period;
+  final int ordinal;
+  final int? milestoneId;
+  final int amount;
+  final String previousStatus;
 }

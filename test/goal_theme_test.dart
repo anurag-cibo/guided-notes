@@ -16,6 +16,8 @@ import 'package:guided_notes/features/goals/presentation/goal_header.dart';
 import 'package:guided_notes/features/goals/presentation/goal_detail.dart';
 import 'package:guided_notes/theme/guide_theme.dart';
 
+import 'fixtures/legacy_todos.dart';
+
 void main() {
   testWidgets(
     'compact details fit a narrow screen with large text in both appearances',
@@ -80,6 +82,7 @@ void main() {
         old.execute('ALTER TABLE goals DROP COLUMN color');
         old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
         old.execute('DROP TABLE goal_themes');
+        removeTodoLinks(old);
         old.execute('ALTER TABLE goals DROP COLUMN started_on');
         old.execute('PRAGMA user_version = 4');
         old.close();

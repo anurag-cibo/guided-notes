@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../goals/application/goals_controller.dart';
 import '../../goals/presentation/common.dart';
 import '../domain/todo_models.dart';
+import 'todo_editor.dart';
+export 'todo_editor.dart';
 
 class TodosView extends StatelessWidget {
   const TodosView({super.key, required this.controller});
@@ -11,11 +13,11 @@ class TodosView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = controller.repository.now();
-    return Column(
-      children: [
-        Expanded(
-          child: ListView(
-            padding: pagePadding,
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: pagePadding,
+          sliver: SliverList.list(
             children: [
               Text(
                 'Kleine Schritte, jeden Tag.',
@@ -72,18 +74,24 @@ class TodosView extends StatelessWidget {
             ],
           ),
         ),
-        BottomPanel(
-          child: Card(
-            margin: EdgeInsets.zero,
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              leading: const Icon(Icons.history),
-              title: const Text('Vergangene Zeiträume'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => TodoHistoryScreen(controller: controller),
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: BottomPanel(
+              child: Card(
+                margin: EdgeInsets.zero,
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  leading: const Icon(Icons.history),
+                  title: const Text('Vergangene Zeiträume'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => TodoHistoryScreen(controller: controller),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -126,6 +134,12 @@ class _TodoCard extends StatelessWidget {
       (t) => t.id == entry.templateId,
     );
     final done = entry.completed == entry.target;
+    final milestone = controller.snapshot.milestones
+        .where((m) => m.id == entry.milestoneId)
+        .firstOrNull;
+    final goal = milestone == null
+        ? null
+        : controller.snapshot.goal(milestone.goalId);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Column(
@@ -214,6 +228,18 @@ class _TodoCard extends StatelessWidget {
                 ),
               ],
             ),
+          if (milestone != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                '${goal!.title} · ${milestone.title}${entry.progressIncrement == 0
+                    ? ''
+                    : goal.archived
+                    ? ' · Fortschritt pausiert (archiviert)'
+                    : ' · +${entry.progressIncrement} Prozentpunkte je Erledigung'}',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
           if (!template.active) const Text('Endet nach diesem Zeitraum.'),
           if (template.active &&
               (template.title != entry.title ||
@@ -223,168 +249,6 @@ class _TodoCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class TodoEditor extends StatefulWidget {
-  const TodoEditor({
-    super.key,
-    required this.controller,
-    required this.frequency,
-    this.template,
-  });
-  final GoalsController controller;
-  final TodoFrequency frequency;
-  final TodoTemplate? template;
-  @override
-  State<TodoEditor> createState() => _TodoEditorState();
-}
-
-class _TodoEditorState extends State<TodoEditor> {
-  final _form = GlobalKey<FormState>();
-  late final _title = TextEditingController(text: widget.template?.title ?? '');
-  late final _target = TextEditingController(
-    text: '${widget.template?.target ?? 3}',
-  );
-  bool _busy = false;
-  @override
-  void dispose() {
-    _title.dispose();
-    _target.dispose();
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    if (!_form.currentState!.validate()) return;
-    setState(() => _busy = true);
-    final saved = await runMutation(
-      context,
-      widget.controller,
-      (r) => r.todos.save(
-        id: widget.template?.id,
-        title: _title.text,
-        frequency: widget.frequency,
-        target: widget.frequency == TodoFrequency.daily
-            ? 1
-            : int.parse(_target.text.trim()),
-      ),
-    );
-    if (!mounted) return;
-    if (saved) {
-      Navigator.pop(context);
-    } else {
-      setState(() => _busy = false);
-    }
-  }
-
-  Future<void> _stop() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Aufgabe beenden?'),
-        content: const Text(
-          'Ab dem nächsten Zeitraum erscheint diese Aufgabe nicht mehr. Der aktuelle Stand und die Historie bleiben erhalten.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Abbrechen'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Beenden'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-    setState(() => _busy = true);
-    final saved = await runMutation(
-      context,
-      widget.controller,
-      (r) => r.todos.stop(widget.template!.id),
-    );
-    if (!mounted) return;
-    if (saved) {
-      Navigator.pop(context);
-    } else {
-      setState(() => _busy = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => PopScope(
-    canPop: !_busy,
-    child: Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.template != null
-              ? 'Aufgabe bearbeiten'
-              : widget.frequency == TodoFrequency.daily
-              ? 'Neue Tagesaufgabe'
-              : 'Neue Wochenaufgabe',
-        ),
-      ),
-      body: Form(
-        key: _form,
-        child: ListView(
-          padding: pagePadding,
-          children: [
-            TextFormField(
-              controller: _title,
-              enabled: !_busy,
-              autofocus: widget.template == null,
-              decoration: const InputDecoration(labelText: 'Aufgabe'),
-              textCapitalization: TextCapitalization.sentences,
-              validator: (value) => value == null || value.trim().isEmpty
-                  ? 'Bitte eine Aufgabe eingeben.'
-                  : null,
-            ),
-            gap,
-            if (widget.frequency == TodoFrequency.weekly) ...[
-              TextFormField(
-                controller: _target,
-                enabled: !_busy,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Wie oft pro Woche?',
-                ),
-                validator: (value) {
-                  final count = int.tryParse(value?.trim() ?? '');
-                  return count == null || count < 1 || count > 999
-                      ? 'Bitte eine Zahl von 1 bis 999 eingeben.'
-                      : null;
-                },
-              ),
-              gap,
-            ],
-            Text(
-              widget.frequency == TodoFrequency.daily
-                  ? 'Jeden Tag einmal. Ein neuer Tag beginnt um Mitternacht.'
-                  : 'Eine Woche geht von Montag bis Sonntag. Du kannst Erledigungen jederzeit in der laufenden Woche zurücknehmen.',
-            ),
-            if (widget.template != null) ...[
-              gap,
-              const Text(
-                'Änderungen gelten ab dem nächsten Zeitraum. Der aktuelle Stand bleibt erhalten.',
-              ),
-            ],
-            gap,
-            FilledButton(
-              onPressed: _busy ? null : _save,
-              child: const Text('Speichern'),
-            ),
-            if (widget.template != null) ...[
-              gap,
-              TextButton(
-                onPressed: _busy ? null : _stop,
-                child: const Text('Aufgabe beenden'),
-              ),
-            ],
-          ],
-        ),
-      ),
-    ),
-  );
 }
 
 class TodoHistoryScreen extends StatelessWidget {

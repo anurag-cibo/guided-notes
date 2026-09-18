@@ -83,13 +83,21 @@ class GoalsRepository {
       }
       for (final t in snapshot.todoTemplates) {
         await database.customStatement(
-          'INSERT INTO todo_templates(id,title,frequency,target,active) VALUES(?,?,?,?,?)',
-          [t.id, t.title, t.frequency.name, t.target, t.active ? 1 : 0],
+          'INSERT INTO todo_templates(id,title,frequency,target,active,milestone_id,progress_increment) VALUES(?,?,?,?,?,?,?)',
+          [
+            t.id,
+            t.title,
+            t.frequency.name,
+            t.target,
+            t.active ? 1 : 0,
+            t.milestoneId,
+            t.progressIncrement,
+          ],
         );
       }
       for (final e in snapshot.todoEntries) {
         await database.customStatement(
-          'INSERT INTO todo_entries(template_id,period,title,frequency,target,completed) VALUES(?,?,?,?,?,?)',
+          'INSERT INTO todo_entries(template_id,period,title,frequency,target,completed,milestone_id,progress_increment) VALUES(?,?,?,?,?,?,?,?)',
           [
             e.templateId,
             e.period,
@@ -97,6 +105,21 @@ class GoalsRepository {
             e.frequency.name,
             e.target,
             e.completed,
+            e.milestoneId,
+            e.progressIncrement,
+          ],
+        );
+      }
+      for (final c in snapshot.todoCredits) {
+        await database.customStatement(
+          'INSERT INTO todo_progress_credits(template_id,period,ordinal,milestone_id,amount,previous_status) VALUES(?,?,?,?,?,?)',
+          [
+            c.templateId,
+            c.period,
+            c.ordinal,
+            c.milestoneId,
+            c.amount,
+            c.previousStatus,
           ],
         );
       }
@@ -130,6 +153,7 @@ class GoalsRepository {
       ),
       todoTemplates: await todos.templates(),
       todoEntries: await todos.entries(),
+      todoCredits: await todos.progress.load(),
       customThemes: await _loadThemes(),
     );
   });

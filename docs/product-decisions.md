@@ -65,6 +65,8 @@ Die technische Basis verwendet Flutter-Navigator und Listenable/ChangeNotifier. 
 
 ## Todos: Tages- und Wochenaufgaben
 
+**Erweiterung #35:** Todos dürfen optional einem Zwischenziel zugeordnet werden. Tracking ist ein getrennter Schalter mit 1–100 ganzen Prozentpunkten je Erledigung, auch je einzelner Wochen-Wiederholung (vom Nutzer bestätigt). Rücknahme zieht den tatsächlichen Beitrag ab, höchstens bis 0; die Erhöhung ist bei 100 gedeckelt. Zuordnungs-/Beitragsänderungen gelten sofort nur für neue Erledigungen. Bei einer Rücknahme nach Zuordnungswechsel wird das ursprünglich betroffene Zwischenziel korrigiert. Manuelle Fortschrittsänderungen bleiben möglich; spätere Rücknahmen ziehen den vorher gebuchten Beitrag vom dann aktuellen Stand ab. Pausiert/Außer Plan bleiben bei Fortschritt unter 100 erhalten; 100 setzt Erreicht, Rücknahme unter 100 stellt den vorherigen Status soweit konsistent wieder her. Der separate Ziel-erreicht-Schalter bleibt unabhängig. Archivierte Ziele erhalten keine neuen Beiträge, bestehende Beiträge bleiben rücknehmbar. Löschen löst Zuordnungen und erhält Todo-Stände. Frühere Aussagen zur vollständigen Unabhängigkeit sind damit ergänzt, die Verknüpfung bleibt optional.
+
 Am 17.09.2026 ausdrücklich als nächster Schritt beauftragt: ein Todos-Tab mit Tages- und Wochenaufgaben (#13–#17). Damit wird die bisherige Zurückstellung der Routinen aufgehoben; Nutzererprobung #4 bleibt offen. Die folgenden kleinen Produktentscheidungen konkretisieren den ersten Stand und können nach Nutzung angepasst werden.
 
 - Dritter Hauptbereich **Todos**, unabhängig von Zielen und deren Fortschritt. Android-Zurück führt von diesem Tab zuerst zu Ziele.
