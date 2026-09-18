@@ -114,7 +114,7 @@ class SettingsScreen extends StatelessWidget {
                       title: const Text('Deine Daten bleiben bei dir'),
                       content: const SingleChildScrollView(
                         child: Text(
-                          'Die App speichert Ziele, Motivation und Todos lokal auf diesem Gerät. Sie benötigt kein Konto und enthält keine Analyse- oder Werbedienste.\n\nExportierte Sicherungen sind unverschlüsselt. Bewahre sie an einem geschützten Ort außerhalb des Geräts auf. Dateien, die du exportiert hast, werden beim Löschen der App-Inhalte nicht entfernt.',
+                          'Die App speichert Ziele, Zielbilder, Motivation und Todos lokal auf diesem Gerät. Sie benötigt kein Konto und enthält keine Analyse- oder Werbedienste.\n\nExportierte Sicherungen sind unverschlüsselt und enthalten auch deine Zielbilder. Bewahre sie an einem geschützten Ort außerhalb des Geräts auf. Dateien, die du exportiert hast, werden beim Löschen der App-Inhalte nicht entfernt.',
                         ),
                       ),
                       actions: [

@@ -20,7 +20,7 @@ Schema 2 ergänzt `todo_templates` (ID, Titel, täglich/wöchentlich, Zielanzahl
 
 Beim Laden entstehen mit `INSERT OR IGNORE` nur aktuelle Zeiträume aktiver Vorlagen. Historische Zeilen werden nicht aus geänderten Vorlagen rekonstruiert. Anlegen, Bearbeiten, Beenden und Zählen erfolgen in Transaktionen. Die Kalenderregeln stehen in den [Produktentscheidungen](product-decisions.md#todos-tages--und-wochenaufgaben).
 
-Backupformat 2 ergänzt `todoTemplates` und `todoEntries`; Format 1 wird weiterhin gelesen und enthält keine Todos. Import prüft zusätzlich eindeutige Vorlagen/Zeiträume, Tages- bzw. Montagsschlüssel, übereinstimmende Häufigkeiten, Zielanzahlen (1–999; täglich genau 1) und Erledigungsgrenzen. Schon ein vorhandener Todo-Datensatz verhindert einen Import. Alle Inhalte werden gemeinsam in einer Transaktion importiert. Neu erzeugte Sicherungen benötigen eine App mit Unterstützung für Format 2.
+Backupformat 2 ergänzt `todoTemplates` und `todoEntries`; Format 1 wird weiterhin gelesen und enthält keine Todos. Import prüft zusätzlich eindeutige Vorlagen/Zeiträume, Tages- bzw. Montagsschlüssel, übereinstimmende Häufigkeiten, Zielanzahlen (1–999; täglich genau 1) und Erledigungsgrenzen. Schon ein vorhandener Todo-Datensatz verhindert einen Import. Alle Inhalte werden gemeinsam in einer Transaktion importiert. Neu erzeugte Sicherungen benötigen eine App mit Unterstützung für Format 3.
 
 Tests verwenden eine echte Schema-1-SQLite-Datei aus `test/fixtures/schema_v1.sql`, prüfen Migration mit archiviertem Ziel und Zwischenziel sowie vollständiges Schließen/Wiederöffnen mit Todos. Zusätzlich geprüft: Kalendergrenzen, ausgelassene Zeiträume, Uhr-Rückstellung, Vorlagenänderungen, Rückgängig, Zählergrenzen und Backup inklusive Rollback bei Schreibfehlern.
 
