@@ -30,3 +30,4 @@ Thumbs.db
 .flutter-plugins-dependencies
 /build/
 /coverage/
+/android/.kotlin/

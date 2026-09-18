@@ -62,3 +62,38 @@ Zwischenziele                   Archiv
 - Material-Elemente mit mindestens 48 dp Touch-Fläche, flexible statt fester Texthöhen, scrollende Formulare und große Schrift. Fortschritt wird einmal pro Kontext beschriftet; Frist ist eine Textzeile statt einer zweiten Prozentanzeige. Statusinformationen bleiben ohne Farben verständlich.
 
 Die technische Basis verwendet Flutter-Navigator und Listenable/ChangeNotifier. Ein State- oder Routing-Paket hat für diesen begrenzten Ablauf keinen konkreten Nutzen. Speicherung, Fachmodell und Widgets werden getrennt, damit spätere Gestaltung keine Datenmigration erfordert.
+
+## Todos: Tages- und Wochenaufgaben
+
+Am 17.09.2026 ausdrücklich als nächster Schritt beauftragt: ein Todos-Tab mit Tages- und Wochenaufgaben (#13–#17). Damit wird die bisherige Zurückstellung der Routinen aufgehoben; Nutzererprobung #4 bleibt offen. Die folgenden kleinen Produktentscheidungen konkretisieren den ersten Stand und können nach Nutzung angepasst werden.
+
+- Dritter Hauptbereich **Todos**, unabhängig von Zielen und deren Fortschritt. Android-Zurück führt von diesem Tab zuerst zu Ziele.
+- Tagesaufgaben einmal abhaken oder rückgängig machen. Wochenaufgaben haben eine positive Zielanzahl von 1 bis 999; Plus/Minus zeigt beispielsweise „2 von 3 erledigt“. Überzählige Erledigungen sind nicht möglich.
+- Tagesbeginn ist lokale Mitternacht; Wochen laufen Montag bis Sonntag. Kalenderdaten statt 24-Stunden-Dauern verhindern Verschiebungen durch Sommerzeit. Beispiel: Sonntag, 20.09.2026 → Montag, 21.09.2026 erzeugt neue Tages- und Wochenstände.
+- Die lokale Gerätezeit gilt auch nach Zeitzonen- oder Uhrzeitänderung. Bei Rückkehr zu einem schon gespeicherten Zeitraum wird dessen Stand wiederverwendet. Es gibt keine vertrauenswürdige externe Uhr und keine Rekonstruktion tatsächlicher Aktivitätszeitpunkte.
+- Aktuelle Stände entstehen beim Laden/Starten, Wiederaufnehmen nach Datumswechsel und spätestens 15 Sekunden nach einem Datumswechsel in der geöffneten App. Kein Hintergrunddienst. Mehrfaches Öffnen erzeugt keine Duplikate.
+- Ausgelassene Zeiträume ohne App-Nutzung werden nicht nachträglich angelegt. Vorhandene Stände bleiben erhalten; Erledigungen werden niemals erfunden. Eine neue Vorlage erscheint sofort im aktuellen Zeitraum.
+- Titel, Häufigkeit und Zielanzahl werden pro Zeitraum eingefroren. Bearbeitung ändert Titel/Zielanzahl ab dem nächsten neu angelegten Zeitraum; täglich/wöchentlich bleibt für eine Vorlage fest. Zum Wechsel eine neue Aufgabe anlegen und die bisherige beenden.
+- **Aufgabe beenden** verlangt Bestätigung und stoppt künftige Wiederholungen. Der aktuelle Zeitraum bleibt abhakbar; seine Karte erklärt das Ende. Vorlage und alte Ergebnisse bleiben für Historie und Backup erhalten. Kein endgültiges Löschen von Historie in diesem Schritt.
+- Am Ende des Tabs liegt **Vergangene Zeiträume**: eine nur lesbare Liste mit Zeitraum, damaligem Titel und Erledigungsstand. Bei zurückgestellter Gerätezeit können dort auch bereits gespeicherte spätere Daten erscheinen.
+- Drei getrennte Bereiche im Code: Todo-Fachmodell, Datenzugriff und Oberfläche. Bestehende SQLite-Verbindung, Änderungssteuerung und Backup werden mitgenutzt.
+
+## Einstellungen und Gestaltung · 17.09.2026
+
+Der Auftrag, die App anhand der Referenz weiter zu vervollständigen, zieht #18 vor die noch offene mehrtägige Erprobung aus #4. Systemdarstellung ist der Ausgangspunkt; Hell- und Dunkelmodus lassen sich ausdrücklich wählen. Die Auswahl wird lokal gespeichert, wirkt unmittelbar auf alle Screens und bleibt nach Neustart erhalten. Farben und Komponenten sind zentral austauschbar; Status behält zusätzlich seine Textbeschriftung.
+
+Das Zahnrad öffnet Einstellungen mit Darstellung, Datensicherung, Informationen zur lokalen Datenhaltung und Lizenzen. Nicht implementierte Sprachwahl, Benachrichtigungen und Erinnerungen erhalten keine funktionslosen Schalter. Alle Inhalte lassen sich nach ausdrücklicher Bestätigung atomar löschen; Darstellung und exportierte Dateien bleiben erhalten. Vorher wird auf eine Sicherung hingewiesen.
+
+Ziele behalten kompakte Emoji-Karten als einfache Alternative zu eigenen Bildern. Eigene Zielbilder (#19) bleiben offen: konsistente Dateiverwaltung, Android-Auswahl, Größenbegrenzung und Backup müssen zusammen umgesetzt werden. Streak (#20) und Einführung (#21) warten weiterhin auf Nutzungsfeedback. Die drei bestehenden Hauptbereiche bleiben erhalten, Einstellungen sind von jedem Tab erreichbar.
+
+### Konkretisierung der Referenzoberfläche · 17.09.2026
+
+Auf Nutzerwunsch stehen Hell- und Dunkelmodus als zwei gleich breite Kästen nebeneinander; Systemdarstellung bleibt darunter wählbar. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind ausdrücklich als „Platzhalter – noch nicht verfügbar“ sichtbar. Antippen erklärt den fehlenden Funktionsumfang; es werden keine Einstellungen vorgetäuscht. Das überschreibt die frühere Entscheidung gegen sichtbare Platzhalter.
+
+Im Ziele-Tab bleibt das Archiv fest über der Hauptnavigation, während die Ziele separat scrollen. Der Zielkopf hat ein flaches, dekoratives Landschaftscover als austauschbaren Hintergrund. Der Emoji steht im Kreis neben dem Titel. Unter dem Titel stehen Frist und Fortschrittskreis; der zusätzliche Fortschrittsbalken und die doppelte Fristangabe wurden entfernt. Eigene Coverauswahl bleibt offen.
+
+### Eigene Zielbilder und einzelnes Emoji · 17.09.2026
+
+Der Nutzer beauftragt #19 ausdrücklich: Bildauswahl oben im Ziel-Editor, ersetzbar und entfernbar, als Cover im Zielkopf. Verkleinerte lokale Kopien werden mit dem Ziel und im Backup gespeichert. Der dekorative Hintergrund bleibt der Fallback ohne Bild; es gibt keine verpflichtende Auswahl. Das Emoji-Feld steht links neben dem Titel und akzeptiert einen Unicode-Graphemcluster statt eines einzelnen Codepoints, sodass etwa Hautfarben und Flaggen zusammenbleiben. Alte gespeicherte Emoji-Texte werden bei Migration und Backup nicht verändert; beim Bearbeiten wird nur das erste sichtbare Zeichen angeboten.
+
+Das App-Icon zeigt nun die Silhouette eines meditierenden Mönchs mit angedeuteter Robe, als skalierbare Android-Vektorgrafik.

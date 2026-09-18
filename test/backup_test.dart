@@ -96,7 +96,7 @@ void main() {
       variants.add(jsonEncode(data));
     }
 
-    variant((d) => d['version'] = 2);
+    variant((d) => d['version'] = 4);
     variant((d) => d['version'] = 1.0);
     variant((d) => d['goals'][0]['dueDate'] = '2027-02-30');
     variant((d) => d['goals'][0]['title'] = '  ');

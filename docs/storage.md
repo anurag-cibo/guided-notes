@@ -1,5 +1,29 @@
 # Speicherung und Migration
 
+## Schema 4 und Backupformat 3: Zielbilder · 17.09.2026
+
+Die optionale Spalte `goals.cover_image` enthält die Bildkopie als SQLite-BLOB. Damit sind Bild und Ziel gemeinsam transaktional gespeichert; keine ausgelagerten Dateien, dauerhaften URI-Berechtigungen oder verwaisten Bilder. Entfernen setzt die Spalte auf NULL, endgültiges Löschen entfernt sie zusammen mit dem Ziel. Migrationen aus Schema 1, 2 und 3 ergänzen die fehlenden Strukturen und erhalten bestehende Inhalte.
+
+Androids eigene Bildauswahl lädt Dateien bis 20 MB, prüft Abmessungen, dekodiert mit Sampling, berücksichtigt EXIF-Ausrichtung und speichert ein JPEG bis 1280 Pixel/256 KB. Das Original wird nicht verändert; die Kopie enthält keine ursprünglichen EXIF-Metadaten. Nicht lesbare oder zu große Bilder erzeugen eine Fehlermeldung. Abbruch ändert die Auswahl nicht; bei Activity-Ende wird ein wartender Aufruf beendet.
+
+Backupformat 3 enthält die Bildbytes als Base64 in `coverImage`. Versionen 1 und 2 bleiben lesbar und ergeben Ziele ohne Cover. Vor Import werden Bildgröße, Abmessungen und tatsächliche Dekodierbarkeit geprüft; ungültige Bilddaten verändern keine vorhandenen Inhalte. Die Gesamtgrenze bleibt 10 MB und wird beim Export erklärt, falls viele archivierte Bilder sie überschreiten. Die gerätebezogene Darstellungswahl bleibt außerhalb des Backups.
+
+## Schema 3: lokale Einstellungen · 17.09.2026
+
+`app_settings` speichert gerätebezogene Einstellungen als Schlüssel/Wert; `appearance` kennt `system`, `light` und `dark`. Fehlende oder unbekannte Werte ergeben Systemdarstellung. Migrationen von Schema 1 und 2 laufen schrittweise und ergänzen ausschließlich fehlende Tabellen; Ziele und Todos bleiben unverändert.
+
+Backupformat bleibt 2: Die Darstellungswahl ist eine Geräteeinstellung und gehört nicht zu den gesicherten Inhalten. Sie verhindert keinen Import in eine ansonsten leere App. „Alle Inhalte löschen“ entfernt Ziele, Zwischenziele, Todo-Vorlagen und historische Stände gemeinsam in einer Transaktion. Einstellungen und exportierte Dateien bleiben bestehen. Ein erzwungener Datenbankfehler prüft den vollständigen Rollback; ein weiterer Test prüft Wiederherstellung nach dem Löschen.
+
+## Erweiterung auf Schema 2 und Backupformat 2 · 17.09.2026
+
+Schema 2 ergänzt `todo_templates` (ID, Titel, täglich/wöchentlich, Zielanzahl, aktiv) und `todo_entries` (Vorlagen-ID, Zeitraumdatum, damaliger Titel/Häufigkeit/Zielanzahl, Erledigungsanzahl). `(template_id, period)` ist eindeutig; Fremdschlüssel und CHECKs sichern Beziehungen, positive Ziele und Zählergrenzen. Beendete Vorlagen bleiben erhalten. Die Migration 1 → 2 legt ausschließlich diese Tabellen an; Ziele und Zwischenziele bleiben unverändert. Die folgenden Abschnitte zu Schema/Format 1 beschreiben die Ausgangsversion.
+
+Beim Laden entstehen mit `INSERT OR IGNORE` nur aktuelle Zeiträume aktiver Vorlagen. Historische Zeilen werden nicht aus geänderten Vorlagen rekonstruiert. Anlegen, Bearbeiten, Beenden und Zählen erfolgen in Transaktionen. Die Kalenderregeln stehen in den [Produktentscheidungen](product-decisions.md#todos-tages--und-wochenaufgaben).
+
+Backupformat 2 ergänzt `todoTemplates` und `todoEntries`; Format 1 wird weiterhin gelesen und enthält keine Todos. Import prüft zusätzlich eindeutige Vorlagen/Zeiträume, Tages- bzw. Montagsschlüssel, übereinstimmende Häufigkeiten, Zielanzahlen (1–999; täglich genau 1) und Erledigungsgrenzen. Schon ein vorhandener Todo-Datensatz verhindert einen Import. Alle Inhalte werden gemeinsam in einer Transaktion importiert. Neu erzeugte Sicherungen benötigen eine App mit Unterstützung für Format 3.
+
+Tests verwenden eine echte Schema-1-SQLite-Datei aus `test/fixtures/schema_v1.sql`, prüfen Migration mit archiviertem Ziel und Zwischenziel sowie vollständiges Schließen/Wiederöffnen mit Todos. Zusätzlich geprüft: Kalendergrenzen, ausgelassene Zeiträume, Uhr-Rückstellung, Vorlagenänderungen, Rückgängig, Zählergrenzen und Backup inklusive Rollback bei Schreibfehlern.
+
 ## Schema 1
 
 `goals`: stabile automatisch vergebene Integer-ID, Titel, Emoji, Motivation, optionale Frist als `YYYY-MM-DD`, bewusster Zielerfolg und Archivflag. `milestones`: stabile ID, Fremdschlüssel zum Ziel, Titel, Fortschritt, Status und optionale Frist. Kein vorsorgliches Sync-Feld, keine Routinen- oder Ereignistabelle. Anlagereihenfolge entspricht der ID-Reihenfolge; IDs werden nicht wiederverwendet.

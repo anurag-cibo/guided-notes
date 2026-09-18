@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+
+import '../../todos/domain/todo_models.dart';
+
 enum MilestoneStatus {
   notStarted('Noch nicht begonnen'),
   onTrack('Im Plan'),
@@ -18,6 +22,7 @@ class Goal {
     this.dueDate,
     this.achieved = false,
     this.archived = false,
+    this.coverImage,
   });
   final int id;
   final String title;
@@ -26,6 +31,7 @@ class Goal {
   final DateTime? dueDate;
   final bool achieved;
   final bool archived;
+  final Uint8List? coverImage;
 }
 
 class Milestone {
@@ -46,11 +52,24 @@ class Milestone {
 }
 
 class GoalSnapshot {
-  GoalSnapshot(Iterable<Goal> goals, Iterable<Milestone> milestones)
-    : goals = List.unmodifiable(goals),
-      milestones = List.unmodifiable(milestones);
+  GoalSnapshot(
+    Iterable<Goal> goals,
+    Iterable<Milestone> milestones, {
+    Iterable<TodoTemplate> todoTemplates = const [],
+    Iterable<TodoEntry> todoEntries = const [],
+  }) : goals = List.unmodifiable(goals),
+       milestones = List.unmodifiable(milestones),
+       todoTemplates = List.unmodifiable(todoTemplates),
+       todoEntries = List.unmodifiable(todoEntries);
   final List<Goal> goals;
   final List<Milestone> milestones;
+  final List<TodoTemplate> todoTemplates;
+  final List<TodoEntry> todoEntries;
+  bool get isEmpty =>
+      goals.isEmpty &&
+      milestones.isEmpty &&
+      todoTemplates.isEmpty &&
+      todoEntries.isEmpty;
   List<Goal> get activeGoals => goals.where((g) => !g.archived).toList();
   List<Milestone> forGoal(int id) =>
       milestones.where((m) => m.goalId == id).toList();

@@ -18,7 +18,7 @@ class GoalsController extends ChangeNotifier {
     try {
       snapshot = await repository.load();
     } catch (_) {
-      error = 'Die gespeicherten Ziele konnten nicht geladen werden. Bitte erneut versuchen.';
+      error = 'Die gespeicherten Inhalte konnten nicht geladen werden. Bitte erneut versuchen.';
     } finally {
       loading = false;
       notifyListeners();

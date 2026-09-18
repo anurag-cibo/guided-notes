@@ -1,6 +1,42 @@
-# Projektübergabe · 17.09.2026
+# Projektübergabe · 18.09.2026
+
+## Aktueller Abschlussstand · 18.09.2026
+
+Der Nutzer hat die Veröffentlichung und den Abschluss der bisher nur lokalen Arbeit beauftragt. Todos (#13–17), Darstellungswahl (#18), eigene Zielcover (#19) und die nachfolgenden Layoutänderungen werden gemeinsam integriert. Emoji-Kreis und Fortschrittskreis stehen jetzt gleich groß links und rechts neben dem Zieltitel; die Frist steht darunter. Die folgenden Abschnitte dokumentieren historische Zwischenstände; Aussagen zu noch nicht integrierter Arbeit sind anhand des aktuellen GitHub-PR-Status zu lesen.
+
+Abschlussprüfung: alle 32 Unit-/Widgettests und Formatprüfung erfolgreich. Analyse und normaler Android-Debug-Build wurden nach der letzten Codeänderung erfolgreich ausgeführt; die normale APK ist ohne Löschen der App-Daten im Emulator installiert. Native Todo-, Darstellungs- und Bildauswahltests sind in der Validierung dokumentiert. Mehrtägige Nutzung (#4), Streak-Bewertung (#20) und Prüfung des Erklärungsbedarfs (#21) bleiben offen. Sprache, Benachrichtigungen, Erinnerungen und Impressum bleiben ausdrücklich gekennzeichnete Platzhalter.
+
+## Neuer Stand: eigene Cover und Mönchs-Icon · 17.09.2026
+
+Der Nutzer hat eigene Hintergrundbilder ausdrücklich beauftragt (#19). Im Ziel-Editor oben auswählen, ersetzen oder entfernen; das Bild erscheint im Zielkopf. Vorher war nur ein dekoratives Cover vorhanden. Android normalisiert die lokale Kopie auf JPEG bis 1280 Pixel/256 KB, Originaldatei höchstens 20 MB. Schema 4 speichert Bildbytes direkt beim Ziel; Migration aus 1–3 ohne Datenverlust. Backupformat 3 sichert Cover mit, alte Formate 1/2 bleiben lesbar. Die Gesamtgrenze für Backups bleibt 10 MB.
+
+Emoji-Eingabe links neben dem Titel, höchstens ein sichtbares Zeichen einschließlich mehrteiliger Emojis und Flaggen. Der Editor markiert vorhandene Eingabe beim Antippen zum Ersetzen. Das Android-App-Icon zeigt eine meditierende Mönchssilhouette statt des Bergsymbols.
+
+32 Tests, Analyse und native Android-Bildauswahl mit temporärer Testdatenbank erfolgreich. Bild bleibt nach Wiederöffnung erhalten und kann im Editor entfernt werden. Screenshots unter `outputs/cover-editor.png` und `outputs/cover-detail.png`; sie verwenden absichtlich das Referenzbild als synthetische Testdatei. Keine Beispieldaten im normalen Bestand. Eigene Coverauswahl ist damit umgesetzt; ältere Abschnitte mit „Zielbilder offen“ sind überholt.
+
+## Nachtrag: konkrete Layoutwünsche · 17.09.2026
+
+Hell-/Dunkelwahl jetzt in zwei nebeneinanderliegenden Kästen; Systemwahl darunter. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf ausdrücklichen Nutzerwunsch als Platzhalter gekennzeichnet. Archiv im Ziele-Tab fest unten über der Navigation. Zielkopf mit flachem dekorativem Cover, Emoji-Kreis neben dem Titel sowie Frist neben dem einzigen Fortschrittskreis; kein zusätzlicher Balken. Cover und Darstellungswahl sind eigene Widgets (`goal_header.dart`, `appearance_selector.dart`). Die frühere Entscheidung gegen Platzhalter ist damit überholt.
+
+## Neuer Arbeitsstand: Einstellungen und Darstellung · 17.09.2026
+
+Auf den Folgeauftrag zur Vervollständigung anhand der Referenz wurden Einstellungen und #18 umgesetzt: Zahnrad in allen drei Tabs, System-/Hell-/Dunkelwahl mit dauerhafter Speicherung, Datensicherung, Dateninformationen, Lizenzen und bestätigtes atomisches Löschen aller Inhalte. Eigene Zielbilder (#19), Streak (#20), Einführung (#21) und mehrtägige Erprobung (#4) bleiben offen. Sprachwahl und Erinnerungen sind wie in #18 festgehalten nicht Teil dieser Umsetzung.
+
+Schema 3 ergänzt lokale Geräteeinstellungen; Migration von 1 und 2 erhält die bestehenden Inhalte. Backupformat bleibt 2 und enthält keine Geräteeinstellungen. Gemeinsame Farben liegen in `lib/theme/guide_theme.dart`; Einstellungen haben eigenes Repository, Controller und Screen. Zielkarten sind kompakter, Zieldetails haben einen Fortschrittsring, Todos zwei zusammenhängende Zeitraumkarten. Ein kleines Bergsymbol ersetzt das Flutter-App-Symbol. Die Gestaltung bleibt ein bearbeitbarer Zwischenstand; eigene Fotos aus der Referenz fehlen weiterhin.
+
+29 Tests und Flutter-Analyse bestanden; Android-Prüfung mit separater temporärer Datenbank für alle fünf Ansichten in beiden Darstellungen und Wiederöffnung erfolgreich. Zehn Screenshots unter `outputs/appearance-{light,dark}-{goals,detail,milestones,todos,settings}.png`; keine Vorschauziele im normalen Datenbestand. Der Screenshot-Test verwendet `flutter drive --keep-app-running`, damit die vorhandene App nicht deinstalliert wird. Details und Grenzen in `docs/validation.md`.
+
+Arbeitsbranch: `codex/settings-and-appearance`, aufbauend auf `feat/todos`; noch nicht nach `main` integriert. Die normale Debug-APK liegt unter `outputs/the-guide-debug.apk`, wurde erfolgreich gebaut und per `adb install -r` im Emulator installiert und gestartet. Issue #18 enthält den Umsetzungsstand und bleibt bis zur Integration offen.
+
+Die folgenden Abschnitte beschreiben frühere Arbeitsstände; neue Einstellungen ersetzen den bisherigen direkten Schild-Zugang zur Datensicherung.
 
 Diese Momentaufnahme hält die bisherige Arbeit und das Nutzerfeedback für weitere Chats fest. Sie ist keine zweite Aufgabenliste; aktueller Status und Akzeptanzkriterien stehen in den [GitHub Issues](https://github.com/anurag-cibo/guided-notes/issues).
+
+## Neuer Arbeitsstand: Todos · 17.09.2026
+
+Auf ausdrücklichen Folgeauftrag wurde auf dem lokalen Branch `feat/todos` der dritte Tab **Todos** mit Tages- und Wochenaufgaben umgesetzt (#13–#17). Noch nicht nach `main` zusammengeführt. Enthalten: Anlegen, tägliches Abhaken/Rückgängig, Wochenziel und Plus/Minus, Bearbeiten für den nächsten Zeitraum, bestätigtes Beenden und eine nur lesbare Historie. Unabhängig von Zielen; lokale Kalendertage, Wochenbeginn Montag, keine erfundenen Stände ausgelassener Zeiträume. Vollständige Regeln in [Produktentscheidungen](product-decisions.md#todos-tages--und-wochenaufgaben).
+
+Schema 2 migriert bestehende Ziele unverändert und speichert Vorlagen getrennt von Zeitraum-Snapshots. Backupformat 2 enthält Todos und Historie; Format 1 bleibt lesbar. Flutter-Analyse ohne Befunde, 25 Tests sowie Android-Todos-Gerätetest bestanden; Debug-APK gebaut und als Update im Emulator gestartet. Der Gerätetest verwendet eine separate temporäre Datenbank und wurde mit `--no-uninstall` ausgeführt. #4 bleibt weiterhin für Nutzererprobung offen. Der folgende Übergabetext beschreibt den vorherigen, bereits integrierten Stand.
 
 ## Ergebnis und Rückmeldung
 

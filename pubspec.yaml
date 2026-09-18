@@ -12,6 +12,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   drift: ^2.35.0
+  characters: ^1.4.1
   path_provider: ^2.1.6
 
 dev_dependencies:
@@ -20,6 +21,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  sqlite3: ^3.5.2
 
 flutter:
   uses-material-design: true

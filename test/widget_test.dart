@@ -57,6 +57,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Neue Motivation'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('Ziel erreicht'), 250);
+      await tester.ensureVisible(find.byType(SwitchListTile));
+      await tester.pumpAndSettle();
       await tester.tap(find.byType(SwitchListTile));
       await tester.pumpAndSettle();
       expect(controller.snapshot.goal(id)!.achieved, isTrue);
@@ -175,7 +177,10 @@ void main() {
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(find.text('Bitte einen Titel eingeben.'), findsOneWidget);
-    await tester.enterText(find.byType(TextFormField).first, 'Balkon begrünen');
+    await tester.enterText(
+      find.byKey(const ValueKey('goal-title')),
+      'Balkon begrünen',
+    );
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Balkon begrünen'));
@@ -204,7 +209,7 @@ void main() {
     expect(find.textContaining('Erreicht · 100 %'), findsOneWidget);
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(find.text('Zwischenzielfortschritt: 100 %'), findsOneWidget);
+    expect(find.text('100 %'), findsOneWidget);
     expect(controller.snapshot.goals.single.achieved, isFalse);
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();

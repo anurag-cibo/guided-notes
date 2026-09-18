@@ -35,7 +35,7 @@ class _BackupScreenState extends State<BackupScreen> {
           builder: (context) => AlertDialog(
             title: const Text('Sicherung wiederherstellen?'),
             content: Text(
-              '${preview.goals.length} Ziele (davon ${preview.goals.where((g) => g.archived).length} archiviert) und ${preview.milestones.length} Zwischenziele werden übernommen.',
+              '${preview.goals.length} Ziele (davon ${preview.goals.where((g) => g.archived).length} archiviert), ${preview.milestones.length} Zwischenziele, ${preview.todoTemplates.length} Todo-Vorlagen und ${preview.todoEntries.length} Tages-/Wochenstände werden übernommen.',
             ),
             actions: [
               TextButton(
@@ -91,7 +91,7 @@ class _BackupScreenState extends State<BackupScreen> {
           ),
           gap,
           const Text(
-            'Sichere Ziele, Motivation, Zwischenziele und Archiv in einer Datei. Du wählst selbst den Speicherort. Die Datei ist unverschlüsselt.',
+            'Sichere Ziele, Motivation, Zwischenziele, Todos und Archive in einer Datei. Du wählst selbst den Speicherort. Die Datei ist unverschlüsselt.',
           ),
           gap,
           FilledButton.icon(
@@ -106,11 +106,11 @@ class _BackupScreenState extends State<BackupScreen> {
           ),
           gap,
           const Text(
-            'Der Import ist nur in einer leeren App möglich, zum Beispiel auf einem neuen Gerät. Vorhandene Ziele und archivierte Inhalte werden nicht überschrieben oder zusammengeführt.',
+            'Der Import ist nur in einer leeren App möglich, zum Beispiel auf einem neuen Gerät. Vorhandene Ziele, Todos und archivierte Inhalte werden nicht überschrieben oder zusammengeführt.',
           ),
           gap,
           OutlinedButton.icon(
-            onPressed: _busy || widget.controller.snapshot.goals.isNotEmpty
+            onPressed: _busy || !widget.controller.snapshot.isEmpty
                 ? null
                 : () => _run(true),
             icon: const Icon(Icons.file_download_outlined),

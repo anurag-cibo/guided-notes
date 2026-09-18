@@ -9,11 +9,13 @@ import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
 
 class MainActivity : FlutterActivity() {
+    private var images: CoverImagePicker? = null
     private var pending: MethodChannel.Result? = null
     private var contents: String? = null
     private val limit = 10 * 1024 * 1024
 
     override fun onDestroy() {
+        images?.dispose()
         // Resolve the Dart call before Flutter detaches/destroys the engine.
         // A recreated activity must never leave the old screen waiting forever.
         val result = pending
@@ -25,6 +27,7 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        images = CoverImagePicker(this, flutterEngine.dartExecutor.binaryMessenger)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "de.anurag.guided_notes/backup")
             .setMethodCallHandler { call, result ->
                 if (call.method != "save" && call.method != "open") {
@@ -58,6 +61,7 @@ class MainActivity : FlutterActivity() {
     @Deprecated("Activity result bridge for Flutter")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        images?.onActivityResult(requestCode, resultCode, data)
         if (requestCode != 4101 && requestCode != 4102) return
         val result = pending ?: return
         val text = contents

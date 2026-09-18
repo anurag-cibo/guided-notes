@@ -59,31 +59,6 @@ class EmptyMessage extends StatelessWidget {
   );
 }
 
-class ProgressSummary extends StatelessWidget {
-  const ProgressSummary(this.progress, {super.key});
-  final int? progress;
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        progress == null
-            ? 'Noch keine Zwischenziele'
-            : 'Zwischenzielfortschritt: $progress %',
-      ),
-      if (progress != null) ...[
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: progress! / 100,
-          minHeight: 6,
-          borderRadius: BorderRadius.circular(8),
-          semanticsLabel: 'Zwischenzielfortschritt',
-        ),
-      ],
-    ],
-  );
-}
-
 class DueDateField extends StatelessWidget {
   const DueDateField({super.key, required this.value, required this.onChanged});
   final DateTime? value;

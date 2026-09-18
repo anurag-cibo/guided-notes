@@ -1,20 +1,65 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
+import '../../todos/presentation/todos_view.dart';
+import '../../todos/domain/todo_models.dart';
 
 import '../application/goals_controller.dart';
 import 'common.dart';
-import 'backup_screen.dart';
+import '../../settings/application/settings_controller.dart';
+import '../../settings/presentation/settings_screen.dart';
 import 'goal_list.dart';
 import 'milestones_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.controller});
+  const HomeScreen({
+    super.key,
+    required this.controller,
+    required this.settings,
+  });
   final GoalsController controller;
+  final SettingsController settings;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _tab = 0;
+  Timer? _timer;
+  late String _day;
+  @override
+  void initState() {
+    super.initState();
+    _day = calendarDate(widget.controller.repository.now());
+    WidgetsBinding.instance.addObserver(this);
+    _timer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => _refreshPeriod(),
+    );
+  }
+
+  void _refreshPeriod() {
+    final day = calendarDate(widget.controller.repository.now());
+    if (day == _day || widget.controller.loading || widget.controller.saving) {
+      return;
+    }
+    _day = day;
+    widget.controller.load();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _refreshPeriod();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: widget.controller,
@@ -27,19 +72,18 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(_tab == 0 ? 'The Guide' : 'Zwischenziele'),
+            title: Text(['The Guide', 'Zwischenziele', 'Todos'][_tab]),
             actions: [
               IconButton(
-                tooltip: 'Datensicherung',
-                icon: const Icon(Icons.shield_outlined),
-                onPressed: c.loading || c.error != null
-                    ? null
-                    : () => Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (_) => BackupScreen(controller: c),
-                        ),
-                      ),
+                tooltip: 'Einstellungen',
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        SettingsScreen(goals: c, settings: widget.settings),
+                  ),
+                ),
               ),
             ],
           ),
@@ -59,7 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               : _tab == 0
               ? GoalList(controller: c)
-              : MilestonesView(controller: c),
+              : _tab == 1
+              ? MilestonesView(controller: c)
+              : TodosView(controller: c),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _tab,
             onDestinationSelected: (index) => setState(() => _tab = index),
@@ -72,6 +118,11 @@ class _HomeScreenState extends State<HomeScreen> {
               NavigationDestination(
                 icon: Icon(Icons.checklist),
                 label: 'Zwischenziele',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.check_box_outlined),
+                selectedIcon: Icon(Icons.check_box),
+                label: 'Todos',
               ),
             ],
           ),

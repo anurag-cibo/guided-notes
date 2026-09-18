@@ -1,28 +1,44 @@
 import 'package:drift/drift.dart';
+import 'package:characters/characters.dart';
 
 import '../../../data/app_database.dart';
 import '../domain/models.dart';
 import 'backup_codec.dart';
+import 'cover_image.dart';
+import '../../todos/data/todos_repository.dart';
 
 class GoalsRepository {
-  GoalsRepository(this.database);
+  GoalsRepository(this.database, {DateTime Function()? now})
+    : now = now ?? DateTime.now;
   final AppDatabase database;
+  final DateTime Function() now;
+  late final TodosRepository todos = TodosRepository(database, now);
+
+  Future<void> deleteAllContents() => database.transaction(() async {
+    await database.customStatement('DELETE FROM todo_entries');
+    await database.customStatement('DELETE FROM todo_templates');
+    await database.customStatement('DELETE FROM milestones');
+    await database.customStatement('DELETE FROM goals');
+  });
 
   Future<String> exportBackup() async => BackupCodec.encode(await load());
 
   /// Import only into an empty store; validation and writes are all-or-nothing.
   Future<void> importBackup(String source) async {
     final snapshot = BackupCodec.decode(source);
+    for (final goal in snapshot.goals) {
+      if (goal.coverImage != null) await CoverImages.validate(goal.coverImage!);
+    }
     await database.transaction(() async {
       final current = await load();
-      if (current.goals.isNotEmpty || current.milestones.isNotEmpty) {
+      if (!current.isEmpty) {
         throw const RuleViolation(
-          'Wiederherstellen ist nur in einer leeren App möglich. Vorhandene Ziele und das Archiv bleiben unverändert.',
+          'Wiederherstellen ist nur in einer leeren App möglich. Vorhandene Ziele, Todos und Archive bleiben unverändert.',
         );
       }
       for (final g in snapshot.goals) {
         await database.customStatement(
-          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived) VALUES (?,?,?,?,?,?,?)',
+          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image) VALUES (?,?,?,?,?,?,?,?)',
           [
             g.id,
             g.title,
@@ -31,6 +47,7 @@ class GoalsRepository {
             BackupCodec.date(g.dueDate),
             g.achieved ? 1 : 0,
             g.archived ? 1 : 0,
+            g.coverImage,
           ],
         );
       }
@@ -47,10 +64,30 @@ class GoalsRepository {
           ],
         );
       }
+      for (final t in snapshot.todoTemplates) {
+        await database.customStatement(
+          'INSERT INTO todo_templates(id,title,frequency,target,active) VALUES(?,?,?,?,?)',
+          [t.id, t.title, t.frequency.name, t.target, t.active ? 1 : 0],
+        );
+      }
+      for (final e in snapshot.todoEntries) {
+        await database.customStatement(
+          'INSERT INTO todo_entries(template_id,period,title,frequency,target,completed) VALUES(?,?,?,?,?,?)',
+          [
+            e.templateId,
+            e.period,
+            e.title,
+            e.frequency.name,
+            e.target,
+            e.completed,
+          ],
+        );
+      }
     });
   }
 
   Future<GoalSnapshot> load() => database.transaction(() async {
+    await todos.ensureCurrentPeriods();
     final goals = await database
         .customSelect('SELECT * FROM goals ORDER BY id')
         .get();
@@ -69,6 +106,8 @@ class GoalsRepository {
           dueDate: _date(r.readNullable<String>('due_date')),
         ),
       ),
+      todoTemplates: await todos.templates(),
+      todoEntries: await todos.entries(),
     );
   });
 
@@ -78,17 +117,29 @@ class GoalsRepository {
     String emoji = '◎',
     String motivation = '',
     DateTime? dueDate,
+    Uint8List? coverImage,
+    bool removeCoverImage = false,
   }) => database.transaction(() async {
     final name = requiredTitle(title);
     final symbol = emoji.trim().isEmpty ? '◎' : emoji.trim();
+    if (symbol.characters.length > 1) {
+      throw const RuleViolation('Bitte nur ein Emoji oder Zeichen verwenden.');
+    }
+    if (coverImage != null) await CoverImages.validate(coverImage);
     if (id == null) {
       await _checkCapacity();
       await database.customStatement(
-        'INSERT INTO goals(title, emoji, motivation, due_date) VALUES (?, ?, ?, ?)',
-        [name, symbol, motivation.trim(), _encodeDate(dueDate)],
+        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image) VALUES (?, ?, ?, ?, ?)',
+        [name, symbol, motivation.trim(), _encodeDate(dueDate), coverImage],
       );
     } else {
       await _requireGoal(id);
+      if (coverImage != null || removeCoverImage) {
+        await database.customStatement(
+          'UPDATE goals SET cover_image = ? WHERE id = ?',
+          [coverImage, id],
+        );
+      }
       await database.customStatement(
         'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ? WHERE id = ?',
         [name, symbol, motivation.trim(), _encodeDate(dueDate), id],
@@ -209,6 +260,7 @@ class GoalsRepository {
     dueDate: _date(row.readNullable<String>('due_date')),
     achieved: row.read<int>('achieved') == 1,
     archived: row.read<int>('archived') == 1,
+    coverImage: row.readNullable<Uint8List>('cover_image'),
   );
   static String? _encodeDate(DateTime? date) => date == null
       ? null

@@ -33,7 +33,7 @@ void main() {
         expect(controller.snapshot.progressFor(goal.id), 100);
         await tester.tap(find.text('Android-Testziel'));
         await tester.pumpAndSettle();
-        expect(find.text('Zwischenzielfortschritt: 100 %'), findsOneWidget);
+        expect(find.text('100 %'), findsOneWidget);
         // Remove only this test's synthetic data, after proving persistence.
         await controller.repository.setArchived(goal.id, true);
         await controller.repository.deleteGoal(goal.id);
@@ -45,7 +45,7 @@ void main() {
         await tester.tap(find.text('Ziel hinzufügen'));
         await tester.pumpAndSettle();
         await tester.enterText(
-          find.byType(TextFormField).first,
+          find.byKey(const ValueKey('goal-title')),
           'Android-Testziel',
         );
         await tester.enterText(
@@ -75,7 +75,7 @@ void main() {
         await tester.ensureVisible(find.text('Speichern'));
         await tester.tap(find.text('Speichern'));
         await tester.pumpAndSettle();
-        expect(find.text('Zwischenzielfortschritt: 100 %'), findsOneWidget);
+        expect(find.text('100 %'), findsOneWidget);
         await tester.tap(find.text('App auf Android starten'));
         await tester.pumpAndSettle();
         expect(find.textContaining('Erreicht · 100 %'), findsOneWidget);

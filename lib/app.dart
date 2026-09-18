@@ -3,58 +3,50 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'features/goals/application/goals_controller.dart';
 import 'features/goals/presentation/home_screen.dart';
+import 'features/settings/application/settings_controller.dart';
+import 'features/settings/data/settings_repository.dart';
+import 'theme/guide_theme.dart';
 
-class GuideApp extends StatelessWidget {
+class GuideApp extends StatefulWidget {
   const GuideApp({super.key, required this.controller});
   final GoalsController controller;
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: 'The Guide',
-    debugShowCheckedModeBanner: false,
-    locale: const Locale('de'),
-    supportedLocales: const [Locale('de')],
-    localizationsDelegates: GlobalMaterialLocalizations.delegates,
-    theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff187c68))
-          .copyWith(
-            primary: const Color(0xff187c68),
-            onSurface: const Color(0xff20364a),
-            surface: const Color(0xfffffdfa),
-          ),
-      scaffoldBackgroundColor: const Color(0xfffaf8f5),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xfffaf8f5),
-        foregroundColor: Color(0xff20364a),
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-      ),
-      navigationBarTheme: const NavigationBarThemeData(
-        backgroundColor: Color(0xfffffdfa),
-        indicatorColor: Color(0xffdceee7),
-      ),
-      inputDecorationTheme: const InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-        ),
-      ),
-      cardTheme: const CardThemeData(
-        margin: EdgeInsets.only(bottom: 12),
-        elevation: 0,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          side: BorderSide(color: Color(0xffe5e8e6)),
-        ),
-      ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(minimumSize: const Size(48, 48)),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(minimumSize: const Size(48, 48)),
-      ),
+  State<GuideApp> createState() => _GuideAppState();
+}
+
+class _GuideAppState extends State<GuideApp> {
+  late final settings = SettingsController(
+    SettingsRepository(widget.controller.repository.database),
+  );
+  @override
+  void initState() {
+    super.initState();
+    settings.load();
+  }
+
+  @override
+  void dispose() {
+    settings.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: settings,
+    builder: (context, _) => MaterialApp(
+      title: 'The Guide',
+      debugShowCheckedModeBanner: false,
+      locale: const Locale('de'),
+      supportedLocales: const [Locale('de')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      theme: guideTheme(Brightness.light),
+      darkTheme: guideTheme(Brightness.dark),
+      themeMode: switch (settings.appearance) {
+        AppAppearance.system => ThemeMode.system,
+        AppAppearance.light => ThemeMode.light,
+        AppAppearance.dark => ThemeMode.dark,
+      },
+      home: HomeScreen(controller: widget.controller, settings: settings),
     ),
-    home: HomeScreen(controller: controller),
   );
 }

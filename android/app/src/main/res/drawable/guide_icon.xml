@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#187C68" android:pathData="M0,0h108v108h-108z" />
+    <!-- Shaved head and a quiet, cross-legged silhouette. -->
+    <path android:fillColor="#F5F2E8" android:pathData="M54,23a8,8 0,1 0,0 16a8,8 0,1 0,0 -16M49,41Q43,42 40,50L35,61L28,64Q23,66 26,70Q28,73 34,70L43,65L45,57L45,66Q33,64 25,72Q20,78 29,82Q39,86 54,80Q69,86 79,82Q88,78 83,72Q75,64 63,66L63,57L65,65L74,70Q80,73 82,70Q85,66 80,64L73,61L68,50Q65,42 59,41Z" />
+    <!-- A single fold suggests the monk's robe, hands rest in the lap. -->
+    <path android:fillColor="@android:color/transparent" android:strokeColor="#187C68"
+        android:strokeWidth="2.2" android:strokeLineCap="round"
+        android:pathData="M59,44Q48,52 47,62M45,69Q54,73 63,69" />
+</vector>
