@@ -1,4 +1,10 @@
-# Projektübergabe · 17.09.2026
+# Projektübergabe · 18.09.2026
+
+## Aktueller Abschlussstand · 18.09.2026
+
+Der Nutzer hat die Veröffentlichung und den Abschluss der bisher nur lokalen Arbeit beauftragt. Todos (#13–17), Darstellungswahl (#18), eigene Zielcover (#19) und die nachfolgenden Layoutänderungen werden gemeinsam integriert. Emoji-Kreis und Fortschrittskreis stehen jetzt gleich groß links und rechts neben dem Zieltitel; die Frist steht darunter. Die folgenden Abschnitte dokumentieren historische Zwischenstände; Aussagen zu noch nicht integrierter Arbeit sind anhand des aktuellen GitHub-PR-Status zu lesen.
+
+Abschlussprüfung: alle 32 Unit-/Widgettests und Formatprüfung erfolgreich. Analyse und normaler Android-Debug-Build wurden nach der letzten Codeänderung erfolgreich ausgeführt; die normale APK ist ohne Löschen der App-Daten im Emulator installiert. Native Todo-, Darstellungs- und Bildauswahltests sind in der Validierung dokumentiert. Mehrtägige Nutzung (#4), Streak-Bewertung (#20) und Prüfung des Erklärungsbedarfs (#21) bleiben offen. Sprache, Benachrichtigungen, Erinnerungen und Impressum bleiben ausdrücklich gekennzeichnete Platzhalter.
 
 ## Neuer Stand: eigene Cover und Mönchs-Icon · 17.09.2026
 
@@ -87,3 +93,4 @@ Architektur: `domain` für Modelle und Fachregeln, `data` für Datenbank und Rep
 Die abschließende [CI für PR #26](https://github.com/anurag-cibo/guided-notes/actions/runs/35159852006) ist grün. Der einzige Review-Befund (wartender Dateiaufruf bei Activity-Ende) wurde in `e6d756c` behoben und vom Review als erledigt bestätigt. Der gesonderte Gerätetest einer erzwungenen Activity-Neuerzeugung bleibt eine dokumentierte Testgrenze, kein behaupteter Nachweis.
 
 Der Test-Runner deinstalliert die App standardmäßig am Ende: Für die zweiphasige Persistenzprüfung ist `--no-uninstall` nötig. Tests nur mit Testdaten ausführen; sie erzeugen und entfernen ihr synthetisches Ziel. Vollständige Befehle und Grenzen des Nachweises: [README](../README.md) und [Validierung](validation.md).
+
