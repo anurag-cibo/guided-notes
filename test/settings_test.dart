@@ -20,9 +20,10 @@ void main() {
         'guide_settings_',
       );
       final file = File('${directory.path}/store.sqlite');
+      final fixedNow = DateTime(2026, 9, 18, 12);
       var db = AppDatabase(NativeDatabase(file));
       try {
-        final goals = GoalsRepository(db);
+        final goals = GoalsRepository(db, now: () => fixedNow);
         await goals.saveGoal(title: 'Bleibt erhalten');
         await goals.todos.save(
           title: 'Lesen',
@@ -44,13 +45,19 @@ void main() {
         db = AppDatabase(NativeDatabase(file));
         var settings = SettingsRepository(db);
         expect(await settings.loadAppearance(), AppAppearance.system);
-        expect(await GoalsRepository(db).exportBackup(), before);
+        expect(
+          await GoalsRepository(db, now: () => fixedNow).exportBackup(),
+          before,
+        );
         await settings.saveAppearance(AppAppearance.dark);
         await db.close();
         db = AppDatabase(NativeDatabase(file));
         settings = SettingsRepository(db);
         expect(await settings.loadAppearance(), AppAppearance.dark);
-        expect(await GoalsRepository(db).exportBackup(), before);
+        expect(
+          await GoalsRepository(db, now: () => fixedNow).exportBackup(),
+          before,
+        );
         await db.customStatement("UPDATE app_settings SET value='future-mode'");
         expect(await settings.loadAppearance(), AppAppearance.system);
       } finally {

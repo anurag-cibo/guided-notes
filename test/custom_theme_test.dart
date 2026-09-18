@@ -79,9 +79,10 @@ void main() {
       'guide_custom_theme_',
     );
     final file = File('${directory.path}/store.sqlite');
+    final fixedNow = DateTime(2026, 9, 18, 12);
     var db = AppDatabase(NativeDatabase(file));
     try {
-      var repo = GoalsRepository(db);
+      var repo = GoalsRepository(db, now: () => fixedNow);
       await repo.saveGoal(title: 'Bestehend', color: GoalColor.ocean);
       final before = await repo.exportBackup();
       await db.close();
@@ -92,7 +93,7 @@ void main() {
       old.execute('PRAGMA user_version = 5');
       old.close();
       db = AppDatabase(NativeDatabase(file));
-      repo = GoalsRepository(db);
+      repo = GoalsRepository(db, now: () => fixedNow);
       expect(await repo.exportBackup(), before);
       final goalId = (await repo.load()).goals.single.id;
       final themeId = await repo.saveTheme(
@@ -113,7 +114,7 @@ void main() {
       await repo.saveGoal(id: goalId, title: 'Referenz bleibt');
       await db.close();
       db = AppDatabase(NativeDatabase(file));
-      repo = GoalsRepository(db);
+      repo = GoalsRepository(db, now: () => fixedNow);
       final snapshot = await repo.load();
       expect(snapshot.customThemes.single.name, 'Abendrot');
       expect(
