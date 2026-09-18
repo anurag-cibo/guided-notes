@@ -35,20 +35,14 @@ class TodosView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SectionHeading(
-                          title: frequency == TodoFrequency.daily
-                              ? 'Heute'
-                              : 'Diese Woche',
-                          addLabel: frequency == TodoFrequency.daily
-                              ? 'Tagesaufgabe hinzufügen'
-                              : 'Wochenaufgabe hinzufügen',
+                        _PeriodHeading(
+                          frequency: frequency,
+                          now: now,
                           onAdd: controller.saving
                               ? null
                               : () => _openEditor(context, frequency),
                         ),
-                        const SizedBox(height: 4),
-                        Text(_periodLabel(context, frequency, now)),
-                        gap,
+                        const SizedBox(height: 8),
                         if (!controller.snapshot.todoEntries.any(
                           (e) => e.frequency == frequency && e.isCurrent(now),
                         ))
@@ -66,7 +60,6 @@ class TodosView extends StatelessWidget {
                                   e.frequency == frequency && e.isCurrent(now),
                             ))
                           _TodoCard(controller: controller, entry: entry),
-                        const SizedBox(height: 8),
                       ],
                     ),
                   ),
@@ -109,6 +102,62 @@ class TodosView extends StatelessWidget {
               TodoEditor(controller: controller, frequency: frequency),
         ),
       );
+}
+
+class _PeriodHeading extends StatelessWidget {
+  const _PeriodHeading({
+    required this.frequency,
+    required this.now,
+    this.onAdd,
+  });
+
+  final TodoFrequency frequency;
+  final DateTime now;
+  final VoidCallback? onAdd;
+
+  String get _compactDate {
+    final start = DateTime.parse(periodStart(frequency, now));
+    String date(DateTime value) => '${value.day}.${value.month}.';
+    if (frequency == TodoFrequency.daily) return date(start);
+    final end = DateTime(start.year, start.month, start.day + 6);
+    return start.month == end.month
+        ? '${start.day}.–${date(end)}'
+        : '${date(start)}–${date(end)}';
+  }
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: Wrap(
+          spacing: 10,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              frequency == TodoFrequency.daily ? 'Heute' : 'Diese Woche',
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontSize: 18),
+            ),
+            Tooltip(
+              message: _periodLabel(context, frequency, now),
+              child: Text(
+                _compactDate,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      AddCircleButton(
+        label: frequency == TodoFrequency.daily
+            ? 'Tagesaufgabe hinzufügen'
+            : 'Wochenaufgabe hinzufügen',
+        onPressed: onAdd,
+      ),
+    ],
+  );
 }
 
 String _periodLabel(
@@ -222,9 +271,7 @@ class _TodoCard extends StatelessWidget {
             ],
           ),
           if (entry.frequency == TodoFrequency.weekly)
-            Wrap(
-              spacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
+            Row(
               children: [
                 IconButton(
                   tooltip: '${entry.title}: einmal rückgängig',
@@ -237,10 +284,30 @@ class _TodoCard extends StatelessWidget {
                           (r) => r.todos.changeCount(entry, -1),
                         ),
                 ),
-                Semantics(
-                  liveRegion: true,
-                  child: Text(
-                    '${entry.completed} von ${entry.target} erledigt',
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Semantics(
+                      liveRegion: true,
+                      label: entry.title,
+                      value: '${entry.completed} von ${entry.target}',
+                      excludeSemantics: true,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${entry.completed} von ${entry.target}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(height: 4),
+                          LinearProgressIndicator(
+                            value: entry.completed / entry.target,
+                            minHeight: 6,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 IconButton(

@@ -24,6 +24,12 @@ void main() {
       await tester.pumpWidget(GuideApp(controller: controller));
       await tester.tap(find.text('Todos'));
       await tester.pumpAndSettle();
+      expect(find.text('20.9.'), findsOneWidget);
+      expect(find.text('14.–20.9.'), findsOneWidget);
+      expect(
+        tester.getCenter(find.text('20.9.')).dy,
+        tester.getCenter(find.text('Heute')).dy,
+      );
       await tester.tap(find.byTooltip('Tagesaufgabe hinzufügen'));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextFormField), 'Lesen');
@@ -46,10 +52,26 @@ void main() {
       await tester.ensureVisible(find.byTooltip('Laufen: einmal erledigt'));
       await tester.tap(find.byTooltip('Laufen: einmal erledigt'));
       await tester.pumpAndSettle();
-      expect(find.text('1 von 2 erledigt'), findsOneWidget);
+      expect(find.text('1 von 2'), findsOneWidget);
+      expect(
+        tester
+            .widget<LinearProgressIndicator>(
+              find.byType(LinearProgressIndicator),
+            )
+            .value,
+        0.5,
+      );
       await tester.tap(find.byTooltip('Laufen: einmal rückgängig'));
       await tester.pumpAndSettle();
-      expect(find.text('0 von 2 erledigt'), findsOneWidget);
+      expect(find.text('0 von 2'), findsOneWidget);
+      expect(
+        tester
+            .widget<LinearProgressIndicator>(
+              find.byType(LinearProgressIndicator),
+            )
+            .value,
+        0,
+      );
       await tester.tap(find.byTooltip('Laufen bearbeiten'));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextFormField).first, 'Joggen');

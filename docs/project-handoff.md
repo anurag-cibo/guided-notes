@@ -120,3 +120,7 @@ Architektur: `domain` für Modelle und Fachregeln, `data` für Datenbank und Rep
 Die abschließende [CI für PR #26](https://github.com/anurag-cibo/guided-notes/actions/runs/35159852006) ist grün. Der einzige Review-Befund (wartender Dateiaufruf bei Activity-Ende) wurde in `e6d756c` behoben und vom Review als erledigt bestätigt. Der gesonderte Gerätetest einer erzwungenen Activity-Neuerzeugung bleibt eine dokumentierte Testgrenze, kein behaupteter Nachweis.
 
 Der Test-Runner deinstalliert die App standardmäßig am Ende: Für die zweiphasige Persistenzprüfung ist `--no-uninstall` nötig. Tests nur mit Testdaten ausführen; sie erzeugen und entfernen ihr synthetisches Ziel. Vollständige Befehle und Grenzen des Nachweises: [README](../README.md) und [Validierung](validation.md).
+
+## Todo-Zeiträume · 19.09.2026
+
+PR #37 integriert, APK 0.2.1 veröffentlicht. Folgeänderung 0.2.2+4 setzt das kurze Datum neben Heute/Diese Woche und ersetzt den Wochen-Zähler durch Anzahl plus Fortschrittsbalken zwischen Minus/Plus. Hinweise und Speicherung bleiben unverändert. Vor dem Update aktueller normaler Emulator-Bestand unter outputs/before-todo-periods.tar gesichert.
