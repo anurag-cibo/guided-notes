@@ -28,9 +28,17 @@ class GoalList extends StatelessWidget {
           const SizedBox(height: 8),
           const Text('Kleine Schritte. Deine Richtung.'),
           const SizedBox(height: 28),
-          Text(
-            'Deine Ziele · ${goals.length} von 5',
-            style: Theme.of(context).textTheme.titleMedium,
+          SectionHeading(
+            title: 'Deine Ziele · ${goals.length} von 5',
+            addLabel: goals.length < 5 ? 'Ziel hinzufügen' : null,
+            onAdd: controller.saving
+                ? null
+                : () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => GoalEditor(controller: controller),
+                    ),
+                  ),
           ),
           gap,
         ],
@@ -44,6 +52,7 @@ class GoalList extends StatelessWidget {
         for (final goal in goals)
           GoalTheme(
             color: goal.color,
+            colors: controller.snapshot.theme(goal.customThemeId)?.colors,
             child: Builder(
               builder: (context) => Card(
                 child: InkWell(
@@ -131,17 +140,6 @@ class GoalList extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-        if (!archived && goals.length < 5)
-          OutlinedButton.icon(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (_) => GoalEditor(controller: controller),
-              ),
-            ),
-            icon: const Icon(Icons.add),
-            label: const Text('Ziel hinzufügen'),
           ),
         if (!archived && goals.length == 5)
           const Padding(

@@ -1,5 +1,11 @@
 # Projektübergabe · 18.09.2026
 
+## Kompakte Aktionen und eigene Themes · 18.09.2026
+
+PR #30 hat die ersten Zielfarben integriert. Folgeauftrag #31 setzt die Plus-Aktionen in die Überschriften, Zielaktionen und Todo-Historie an den unteren Bildschirmrand und erweitert Themes um vier zentrale Farbrollen. Eigene Themes sind in Einstellungen/Darstellung und per Shortcut im Ziel-Editor erstellbar/bearbeitbar. Schema 6, Backupformat 5; frühere Daten und Backups bleiben unterstützt. Aktueller Branch: codex/compact-actions-custom-themes; Integrationsstatus in GitHub.
+
+**Vorfall beim Android-Test:** Die zuvor verwendete ABI-Split-APK hatte Versionscode 4001. Beim nächsten Flutter-Drive-Test mit Code 1 deinstallierte Flutter automatisch die normale App trotz `--keep-app-running`. Die vorherige lokale Emulator-Datenbank war danach nicht mehr vorhanden. Nur eine alte synthetische Test-Sicherung wurde gefunden; keine Wiederherstellung realer Inhalte möglich. Der Nutzer wurde informiert. Anschließend wurde die normale App neu gestartet. Künftig werden Test-Entrypoints unter integration_test automatisch als separates Android-Paket de.anurag.guided_notes.integration gebaut. Keine ABI-Splits mehr für normale Emulator-Updates; kleinere APK stattdessen mit --target-platform android-x64. Ein neuer isolierter Test prüft die unveränderte normale Datenbank per Prüfsumme. Frühere pauschale Aussagen, --keep-app-running verhindere jeden Datenverlust, sind überholt.
+
 ## Zielthemen und kompakter Zielkopf · 18.09.2026
 
 PR #28 hat Todos, Einstellungen und Zielbilder nach main integriert; Issues #13–19 sind geschlossen. Der Folgeauftrag #29 ergänzt fünf Farbthemen pro Ziel mit sofortiger Vorschau im Editor, Speicherung in Schema 5 und Backupformat 4. Alte Daten und Backups bleiben lesbar. Emoji, Titel und Fortschrittskreis überlappen das Cover; Archivieren und Erreicht-Schalter stehen in einer Zeile, ohne Untertitel. Branch: codex/goal-themes. Der aktuelle Integrationsstatus steht in GitHub.

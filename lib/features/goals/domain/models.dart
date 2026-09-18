@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import '../../todos/domain/todo_models.dart';
+import 'theme_colors.dart';
+export 'theme_colors.dart';
 
 enum MilestoneStatus {
   notStarted('Noch nicht begonnen'),
@@ -35,6 +37,7 @@ class Goal {
     this.archived = false,
     this.coverImage,
     this.color = GoalColor.forest,
+    this.customThemeId,
   });
   final int id;
   final String title;
@@ -45,6 +48,7 @@ class Goal {
   final bool archived;
   final Uint8List? coverImage;
   final GoalColor color;
+  final int? customThemeId;
 }
 
 class Milestone {
@@ -70,10 +74,15 @@ class GoalSnapshot {
     Iterable<Milestone> milestones, {
     Iterable<TodoTemplate> todoTemplates = const [],
     Iterable<TodoEntry> todoEntries = const [],
+    Iterable<CustomGoalTheme> customThemes = const [],
   }) : goals = List.unmodifiable(goals),
        milestones = List.unmodifiable(milestones),
        todoTemplates = List.unmodifiable(todoTemplates),
-       todoEntries = List.unmodifiable(todoEntries);
+       todoEntries = List.unmodifiable(todoEntries),
+       customThemes = List.unmodifiable(customThemes);
+  final List<CustomGoalTheme> customThemes;
+  CustomGoalTheme? theme(int? id) =>
+      customThemes.where((t) => t.id == id).firstOrNull;
   final List<Goal> goals;
   final List<Milestone> milestones;
   final List<TodoTemplate> todoTemplates;
@@ -82,7 +91,8 @@ class GoalSnapshot {
       goals.isEmpty &&
       milestones.isEmpty &&
       todoTemplates.isEmpty &&
-      todoEntries.isEmpty;
+      todoEntries.isEmpty &&
+      customThemes.isEmpty;
   List<Goal> get activeGoals => goals.where((g) => !g.archived).toList();
   List<Milestone> forGoal(int id) =>
       milestones.where((m) => m.goalId == id).toList();

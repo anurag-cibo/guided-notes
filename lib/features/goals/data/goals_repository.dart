@@ -19,6 +19,7 @@ class GoalsRepository {
     await database.customStatement('DELETE FROM todo_templates');
     await database.customStatement('DELETE FROM milestones');
     await database.customStatement('DELETE FROM goals');
+    await database.customStatement('DELETE FROM goal_themes');
   });
 
   Future<String> exportBackup() async => BackupCodec.encode(await load());
@@ -33,12 +34,25 @@ class GoalsRepository {
       final current = await load();
       if (!current.isEmpty) {
         throw const RuleViolation(
-          'Wiederherstellen ist nur in einer leeren App möglich. Vorhandene Ziele, Todos und Archive bleiben unverändert.',
+          'Wiederherstellen ist nur in einer leeren App möglich. Vorhandene Ziele, Todos, Archive und eigene Themes bleiben unverändert.',
+        );
+      }
+      for (final t in snapshot.customThemes) {
+        await database.customStatement(
+          'INSERT INTO goal_themes(id,name,primary_color,secondary_color,accent_color,surface_color) VALUES(?,?,?,?,?,?)',
+          [
+            t.id,
+            t.name,
+            t.colors.primary,
+            t.colors.secondary,
+            t.colors.accent,
+            t.colors.surface,
+          ],
         );
       }
       for (final g in snapshot.goals) {
         await database.customStatement(
-          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color) VALUES (?,?,?,?,?,?,?,?,?)',
+          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id) VALUES (?,?,?,?,?,?,?,?,?,?)',
           [
             g.id,
             g.title,
@@ -49,6 +63,7 @@ class GoalsRepository {
             g.archived ? 1 : 0,
             g.coverImage,
             g.color.name,
+            g.customThemeId,
           ],
         );
       }
@@ -109,7 +124,57 @@ class GoalsRepository {
       ),
       todoTemplates: await todos.templates(),
       todoEntries: await todos.entries(),
+      customThemes: await _loadThemes(),
     );
+  });
+
+  Future<List<CustomGoalTheme>> _loadThemes() async => [
+    for (final row
+        in await database
+            .customSelect('SELECT * FROM goal_themes ORDER BY id')
+            .get())
+      CustomGoalTheme(
+        id: row.read<int>('id'),
+        name: row.read<String>('name'),
+        colors: ThemeColors(
+          primary: row.read<int>('primary_color'),
+          secondary: row.read<int>('secondary_color'),
+          accent: row.read<int>('accent_color'),
+          surface: row.read<int>('surface_color'),
+        ),
+      ),
+  ];
+
+  Future<int> saveTheme({
+    int? id,
+    required String name,
+    required ThemeColors colors,
+  }) => database.transaction(() async {
+    final title = requiredTitle(name);
+    if (!colors.isValid) {
+      throw const RuleViolation('Bitte gültige Farben eingeben.');
+    }
+    final values = [
+      Variable(title),
+      Variable(colors.primary),
+      Variable(colors.secondary),
+      Variable(colors.accent),
+      Variable(colors.surface),
+    ];
+    if (id == null) {
+      return database.customInsert(
+        'INSERT INTO goal_themes(name,primary_color,secondary_color,accent_color,surface_color) VALUES(?,?,?,?,?)',
+        variables: values,
+      );
+    }
+    final changed = await database.customUpdate(
+      'UPDATE goal_themes SET name=?,primary_color=?,secondary_color=?,accent_color=?,surface_color=? WHERE id=?',
+      variables: [...values, Variable(id)],
+    );
+    if (changed != 1) {
+      throw const RuleViolation('Dieses Theme existiert nicht mehr.');
+    }
+    return id;
   });
 
   Future<void> saveGoal({
@@ -121,6 +186,8 @@ class GoalsRepository {
     Uint8List? coverImage,
     bool removeCoverImage = false,
     GoalColor? color,
+    int? customThemeId,
+    bool clearCustomTheme = false,
   }) => database.transaction(() async {
     final name = requiredTitle(title);
     final symbol = emoji.trim().isEmpty ? '◎' : emoji.trim();
@@ -128,10 +195,14 @@ class GoalsRepository {
       throw const RuleViolation('Bitte nur ein Emoji oder Zeichen verwenden.');
     }
     if (coverImage != null) await CoverImages.validate(coverImage);
+    if (customThemeId != null &&
+        !(await _loadThemes()).any((t) => t.id == customThemeId)) {
+      throw const RuleViolation('Dieses Theme ist nicht verfügbar.');
+    }
     if (id == null) {
       await _checkCapacity();
       await database.customStatement(
-        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [
           name,
           symbol,
@@ -139,6 +210,7 @@ class GoalsRepository {
           _encodeDate(dueDate),
           coverImage,
           (color ?? GoalColor.forest).name,
+          customThemeId,
         ],
       );
     } else {
@@ -150,13 +222,14 @@ class GoalsRepository {
         );
       }
       await database.customStatement(
-        'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ?, color = ? WHERE id = ?',
+        'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ?, color = ?, custom_theme_id = ? WHERE id = ?',
         [
           name,
           symbol,
           motivation.trim(),
           _encodeDate(dueDate),
           (color ?? existing.color).name,
+          customThemeId ?? (clearCustomTheme ? null : existing.customThemeId),
           id,
         ],
       );
@@ -277,6 +350,7 @@ class GoalsRepository {
     achieved: row.read<int>('achieved') == 1,
     archived: row.read<int>('archived') == 1,
     coverImage: row.readNullable<Uint8List>('cover_image'),
+    customThemeId: row.readNullable<int>('custom_theme_id'),
     color:
         GoalColor.values
             .where((c) => c.name == row.read<String>('color'))

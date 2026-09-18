@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme/guide_theme.dart';
+import 'goal_theme.dart';
 
 import '../application/goals_controller.dart';
 import '../domain/models.dart';
@@ -73,9 +73,24 @@ class _MilestonesViewState extends State<MilestonesView> {
         id: 'goal-${goal.id}',
         child: Padding(
           padding: const EdgeInsets.only(top: 16, bottom: 12),
-          child: Text(
-            '${goal.emoji} ${goal.title}',
-            style: Theme.of(context).textTheme.titleLarge,
+          child: GoalTheme(
+            color: goal.color,
+            colors: snapshot.theme(goal.customThemeId)?.colors,
+            child: SectionHeading(
+              title: '${goal.emoji} ${goal.title}',
+              addLabel: 'Zwischenziel hinzufügen',
+              onAdd: widget.controller.saving
+                  ? null
+                  : () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => MilestoneEditor(
+                          controller: widget.controller,
+                          goal: goal,
+                        ),
+                      ),
+                    ),
+            ),
           ),
         ),
       ));
@@ -92,50 +107,58 @@ class _MilestonesViewState extends State<MilestonesView> {
       for (final milestone in milestones) {
         rows.add((
           id: 'milestone-${milestone.id}',
-          child: Card(
-            color: milestoneSurface(context, milestone.status),
-            shape: milestone.id == _focusMilestone
-                ? RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
-                    ),
-                  )
-                : null,
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              title: Text(milestone.title),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8),
-                  Text('${milestone.status.label} · ${milestone.progress} %'),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: milestone.progress / 100,
-                    minHeight: 5,
-                    borderRadius: BorderRadius.circular(8),
+          child: GoalTheme(
+            color: goal.color,
+            colors: snapshot.theme(goal.customThemeId)?.colors,
+            child: Builder(
+              builder: (context) => Card(
+                shape: milestone.id == _focusMilestone
+                    ? RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2,
+                        ),
+                      )
+                    : null,
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(16),
+                  title: Text(milestone.title),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      Text(
+                        '${milestone.status.label} · ${milestone.progress} %',
+                      ),
+                      const SizedBox(height: 8),
+                      LinearProgressIndicator(
+                        value: milestone.progress / 100,
+                        minHeight: 5,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      if (milestone.dueDate != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          deadlineLabel(
+                            milestone.dueDate,
+                            achieved:
+                                milestone.status == MilestoneStatus.achieved,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  if (milestone.dueDate != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      deadlineLabel(
-                        milestone.dueDate,
-                        achieved: milestone.status == MilestoneStatus.achieved,
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => MilestoneEditor(
+                        controller: widget.controller,
+                        goal: goal,
+                        milestone: milestone,
                       ),
                     ),
-                  ],
-                ],
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => MilestoneEditor(
-                    controller: widget.controller,
-                    goal: goal,
-                    milestone: milestone,
                   ),
                 ),
               ),
@@ -143,23 +166,6 @@ class _MilestonesViewState extends State<MilestonesView> {
           ),
         ));
       }
-      rows.add((
-        id: 'add-${goal.id}',
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 24),
-          child: OutlinedButton.icon(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (_) =>
-                    MilestoneEditor(controller: widget.controller, goal: goal),
-              ),
-            ),
-            icon: const Icon(Icons.add),
-            label: const Text('Zwischenziel hinzufügen'),
-          ),
-        ),
-      ));
     }
     final target = _focusMilestone != null
         ? 'milestone-$_focusMilestone'

@@ -36,6 +36,8 @@ void main() {
         legacy.execute('DROP TABLE app_settings');
         legacy.execute('ALTER TABLE goals DROP COLUMN cover_image');
         legacy.execute('ALTER TABLE goals DROP COLUMN color');
+        legacy.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
+        legacy.execute('DROP TABLE goal_themes');
         legacy.execute('PRAGMA user_version = 2');
         legacy.close();
         db = AppDatabase(NativeDatabase(file));

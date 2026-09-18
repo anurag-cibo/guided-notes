@@ -6,6 +6,63 @@ import '../data/goals_repository.dart';
 const pagePadding = EdgeInsets.all(20);
 const gap = SizedBox(height: 16);
 
+class AddCircleButton extends StatelessWidget {
+  const AddCircleButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+  });
+  final String label;
+  final VoidCallback? onPressed;
+  @override
+  Widget build(BuildContext context) => IconButton.filledTonal(
+    tooltip: label,
+    onPressed: onPressed,
+    style: IconButton.styleFrom(
+      shape: const CircleBorder(),
+      minimumSize: const Size(40, 40),
+    ),
+    icon: const Icon(Icons.add, size: 20),
+  );
+}
+
+class SectionHeading extends StatelessWidget {
+  const SectionHeading({
+    super.key,
+    required this.title,
+    this.addLabel,
+    this.onAdd,
+  });
+  final String title;
+  final String? addLabel;
+  final VoidCallback? onAdd;
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+      ),
+      if (addLabel != null) ...[
+        const SizedBox(width: 12),
+        AddCircleButton(label: addLabel!, onPressed: onAdd),
+      ],
+    ],
+  );
+}
+
+class BottomPanel extends StatelessWidget {
+  const BottomPanel({super.key, required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => SafeArea(
+    top: false,
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+      child: child,
+    ),
+  );
+}
+
 Future<bool> runMutation(
   BuildContext context,
   GoalsController controller,
