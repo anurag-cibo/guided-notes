@@ -1,4 +1,8 @@
-# Projektübergabe · 18.09.2026
+# Projektübergabe · 19.09.2026
+
+## Kompaktere Todos · 19.09.2026
+
+PR #36 ist integriert; APK 0.2.0 veröffentlicht. Der anschließende UI-Wunsch ersetzt die Prozentpunkte-Texteingabe durch ein begrenztes Scrollrad (1–100). Die Todo-Liste zeigt nur einen grünen Beitrag neben dem Titel; Zuordnung und Hinweise bleiben im Editor, Hinweise jetzt als Stichpunkte. Speicherung und Berechnung bleiben unverändert. Version 0.2.1+3 verwendet denselben privaten Release-Schlüssel. Aktuelle Emulator-Daten vor dem Update unter `outputs/before-todo-wheel.tar` gesichert; niemals durch Testdaten ersetzen.
 
 ## Todo-Verknüpfung und Handy-APK · #35
 

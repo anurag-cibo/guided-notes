@@ -166,11 +166,39 @@ class _TodoCard extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(
-                    entry.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      decoration: done ? TextDecoration.lineThrough : null,
-                    ),
+                  child: Wrap(
+                    spacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        entry.title,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              decoration: done
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                      ),
+                      if (goal != null &&
+                          !goal.archived &&
+                          entry.progressIncrement > 0)
+                        Semantics(
+                          label:
+                              '${entry.progressIncrement} Prozentpunkte pro Erledigung',
+                          excludeSemantics: true,
+                          child: Text(
+                            '+${entry.progressIncrement} %',
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? const Color(0xff80d6ad)
+                                      : const Color(0xff187347),
+                                ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -227,18 +255,6 @@ class _TodoCard extends StatelessWidget {
                         ),
                 ),
               ],
-            ),
-          if (milestone != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                '${goal!.title} · ${milestone.title}${entry.progressIncrement == 0
-                    ? ''
-                    : goal.archived
-                    ? ' · Fortschritt pausiert (archiviert)'
-                    : ' · +${entry.progressIncrement} Prozentpunkte je Erledigung'}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
             ),
           if (!template.active) const Text('Endet nach diesem Zeitraum.'),
           if (template.active &&
