@@ -42,7 +42,7 @@ void main() {
           controller.snapshot.goals.where((g) => g.title == 'Android-Testziel'),
           isEmpty,
         );
-        await tester.tap(find.text('Ziel hinzufügen'));
+        await tester.tap(find.byTooltip('Ziel hinzufügen'));
         await tester.pumpAndSettle();
         await tester.enterText(
           find.byKey(const ValueKey('goal-title')),
@@ -59,8 +59,8 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Android-Testziel'));
         await tester.pumpAndSettle();
-        await tester.ensureVisible(find.text('Zwischenziel hinzufügen'));
-        await tester.tap(find.text('Zwischenziel hinzufügen'));
+        await tester.ensureVisible(find.byTooltip('Zwischenziel hinzufügen'));
+        await tester.tap(find.byTooltip('Zwischenziel hinzufügen'));
         await tester.pumpAndSettle();
         await tester.enterText(
           find.byType(TextFormField).first,

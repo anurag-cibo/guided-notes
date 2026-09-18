@@ -1,5 +1,11 @@
 # Speicherung und Migration
 
+## Schema 6 und Backupformat 5: eigene Themes · 18.09.2026
+
+`goal_themes` speichert Name und vier opake sRGB-Farbwerte (Primär, Sekundär, Akzent, Flächenton). `goals.custom_theme_id` referenziert ein eigenes Theme; die bisherige Farbkennung bleibt als Standardauswahl erhalten. Migrationen aus Schema 1–5 erhalten Inhalte; vorhandene Ziele benötigen kein eigenes Theme. Palette und Darstellung sind getrennt, lesbare Hell-/Dunkelrollen werden zentral abgeleitet.
+
+Backupformat 5 enthält sämtliche eigenen Themes und Zielreferenzen. Import validiert Farbwerte, eindeutige IDs und bestehende Referenzen vor der atomaren Übernahme. Alte Formate 1–4 bleiben unterstützt. Auch allein vorhandene Themes verhindern einen Import; „Alle Inhalte löschen“ entfernt sie nach den Zielen in derselben Transaktion. Ein abgebrochener Import rollt auch bereits eingefügte Themes zurück. Neue Sicherungen benötigen Format-5-Unterstützung.
+
 ## Schema 5 und Backupformat 4: Zielfarben · 18.09.2026
 
 Die Spalte goals.color speichert die stabile Farbkennung (forest, ocean, lavender, rose, amber). Migrationen aus Schema 1–4 erhalten alle Inhalte und vergeben forest als Standard. Farbwerte gehören zum Ziel, die globale Hell-/Dunkelwahl bleibt unabhängig. Unbekannte Datenbankwerte werden mit Wald dargestellt; ungültige Farbwerte in neuen Backups werden vor dem Import abgelehnt. Backupformat 4 erhält das Farbthema, Formate 1–3 werden weiterhin gelesen und erhalten Wald. Bilder bleiben ab Format 3 enthalten. Neu exportierte Sicherungen benötigen Format-4-Unterstützung. Die folgenden Abschnitte beschreiben die früheren Erweiterungen.
@@ -25,7 +31,7 @@ Schema 2 ergänzt `todo_templates` (ID, Titel, täglich/wöchentlich, Zielanzahl
 
 Beim Laden entstehen mit `INSERT OR IGNORE` nur aktuelle Zeiträume aktiver Vorlagen. Historische Zeilen werden nicht aus geänderten Vorlagen rekonstruiert. Anlegen, Bearbeiten, Beenden und Zählen erfolgen in Transaktionen. Die Kalenderregeln stehen in den [Produktentscheidungen](product-decisions.md#todos-tages--und-wochenaufgaben).
 
-Backupformat 2 ergänzt `todoTemplates` und `todoEntries`; Format 1 wird weiterhin gelesen und enthält keine Todos. Import prüft zusätzlich eindeutige Vorlagen/Zeiträume, Tages- bzw. Montagsschlüssel, übereinstimmende Häufigkeiten, Zielanzahlen (1–999; täglich genau 1) und Erledigungsgrenzen. Schon ein vorhandener Todo-Datensatz verhindert einen Import. Alle Inhalte werden gemeinsam in einer Transaktion importiert. Neu erzeugte Sicherungen benötigen eine App mit Unterstützung für Format 4.
+Backupformat 2 ergänzt `todoTemplates` und `todoEntries`; Format 1 wird weiterhin gelesen und enthält keine Todos. Import prüft zusätzlich eindeutige Vorlagen/Zeiträume, Tages- bzw. Montagsschlüssel, übereinstimmende Häufigkeiten, Zielanzahlen (1–999; täglich genau 1) und Erledigungsgrenzen. Schon ein vorhandener Todo-Datensatz verhindert einen Import. Alle Inhalte werden gemeinsam in einer Transaktion importiert. Neu erzeugte Sicherungen benötigen eine App mit Unterstützung für Format 5.
 
 Tests verwenden eine echte Schema-1-SQLite-Datei aus `test/fixtures/schema_v1.sql`, prüfen Migration mit archiviertem Ziel und Zwischenziel sowie vollständiges Schließen/Wiederöffnen mit Todos. Zusätzlich geprüft: Kalendergrenzen, ausgelassene Zeiträume, Uhr-Rückstellung, Vorlagenänderungen, Rückgängig, Zählergrenzen und Backup inklusive Rollback bei Schreibfehlern.
 

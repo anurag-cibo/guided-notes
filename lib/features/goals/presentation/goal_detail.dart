@@ -26,6 +26,7 @@ class GoalDetail extends StatelessWidget {
       final milestones = controller.snapshot.forGoal(goalId);
       return GoalTheme(
         color: goal.color,
+        colors: controller.snapshot.theme(goal.customThemeId)?.colors,
         child: Builder(
           builder: (context) => Scaffold(
             appBar: AppBar(
@@ -45,6 +46,55 @@ class GoalDetail extends StatelessWidget {
                   ),
               ],
             ),
+            bottomNavigationBar: goal.archived
+                ? null
+                : BottomPanel(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: controller.saving
+                                ? null
+                                : () async {
+                                    if (await runMutation(
+                                          context,
+                                          controller,
+                                          (r) => r.setArchived(goalId, true),
+                                        ) &&
+                                        context.mounted) {
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                            child: const Text(
+                              'Ziel archivieren',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: MergeSemantics(
+                            child: Row(
+                              children: [
+                                const Expanded(child: Text('Ziel erreicht')),
+                                Switch(
+                                  key: const ValueKey('goal-achieved'),
+                                  value: goal.achieved,
+                                  onChanged: controller.saving
+                                      ? null
+                                      : (value) => runMutation(
+                                          context,
+                                          controller,
+                                          (r) => r.setAchieved(goalId, value),
+                                        ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
             body: ListView(
               padding: pagePadding,
               children: [
@@ -69,9 +119,20 @@ class GoalDetail extends StatelessWidget {
                   ),
                 ),
                 gap,
-                Text(
-                  'Zwischenziele',
-                  style: Theme.of(context).textTheme.titleLarge,
+                SectionHeading(
+                  title: 'Zwischenziele',
+                  addLabel: goal.archived ? null : 'Zwischenziel hinzufügen',
+                  onAdd: controller.saving
+                      ? null
+                      : () => Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => MilestoneEditor(
+                              controller: controller,
+                              goal: goal,
+                            ),
+                          ),
+                        ),
                 ),
                 if (milestones.isEmpty)
                   const Padding(
@@ -108,65 +169,7 @@ class GoalDetail extends StatelessWidget {
                             ),
                     ),
                   ),
-                if (!goal.archived) ...[
-                  OutlinedButton.icon(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) =>
-                            MilestoneEditor(controller: controller, goal: goal),
-                      ),
-                    ),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Zwischenziel hinzufügen'),
-                  ),
-                  gap,
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: controller.saving
-                              ? null
-                              : () async {
-                                  if (await runMutation(
-                                        context,
-                                        controller,
-                                        (r) => r.setArchived(goalId, true),
-                                      ) &&
-                                      context.mounted) {
-                                    Navigator.pop(context);
-                                  }
-                                },
-                          child: const Text(
-                            'Ziel archivieren',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: MergeSemantics(
-                          child: Row(
-                            children: [
-                              const Expanded(child: Text('Ziel erreicht')),
-                              Switch(
-                                key: const ValueKey('goal-achieved'),
-                                value: goal.achieved,
-                                onChanged: controller.saving
-                                    ? null
-                                    : (value) => runMutation(
-                                        context,
-                                        controller,
-                                        (r) => r.setAchieved(goalId, value),
-                                      ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else ...[
+                if (goal.archived) ...[
                   gap,
                   const Text('Archiviert · Zwischenziele bleiben erhalten.'),
                   gap,

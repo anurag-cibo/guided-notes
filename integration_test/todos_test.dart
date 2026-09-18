@@ -27,7 +27,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Todos'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Tagesaufgabe hinzufügen'));
+      await tester.tap(find.byTooltip('Tagesaufgabe hinzufügen'));
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextFormField), 'Zehn Minuten lesen');
       FocusManager.instance.primaryFocus?.unfocus();
@@ -39,9 +39,9 @@ void main() {
       await tester.tap(find.byType(Checkbox));
       await tester.pumpAndSettle();
       expect(controller.snapshot.todoEntries.single.completed, 1);
-      await tester.ensureVisible(find.text('Wochenaufgabe hinzufügen'));
+      await tester.ensureVisible(find.byTooltip('Wochenaufgabe hinzufügen'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Wochenaufgabe hinzufügen'));
+      await tester.tap(find.byTooltip('Wochenaufgabe hinzufügen'));
       await tester.pumpAndSettle();
       await tester.enterText(
         find.byType(TextFormField).first,

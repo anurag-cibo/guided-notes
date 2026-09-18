@@ -5,6 +5,7 @@ import '../../goals/presentation/backup_screen.dart';
 import '../../goals/presentation/common.dart';
 import '../application/settings_controller.dart';
 import 'appearance_selector.dart';
+import 'custom_themes_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({
@@ -27,6 +28,24 @@ class SettingsScreen extends StatelessWidget {
           const Text('Wähle, was sich für dich gut anfühlt.'),
           gap,
           AppearanceSelector(settings: settings),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.palette_outlined),
+              title: const Text('Eigene Themes'),
+              subtitle: const Text(
+                'Farben für deine Ziele erstellen und bearbeiten',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: goals.loading || goals.error != null
+                  ? null
+                  : () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => CustomThemesScreen(controller: goals),
+                      ),
+                    ),
+            ),
+          ),
           if (settings.error != null) ...[
             Text(
               settings.error!,
@@ -78,7 +97,9 @@ class SettingsScreen extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.delete_outline),
                   title: const Text('Alle Inhalte löschen'),
-                  subtitle: const Text('Ziele, Todos und Archive'),
+                  subtitle: const Text(
+                    'Ziele, Todos, Archive und eigene Themes',
+                  ),
                   onTap:
                       goals.loading ||
                           goals.saving ||
@@ -173,7 +194,7 @@ class SettingsScreen extends StatelessWidget {
         scrollable: true,
         title: const Text('Alle Inhalte endgültig löschen?'),
         content: const Text(
-          'Alle Ziele, Zwischenziele, Todos und vergangenen Stände auf diesem Gerät werden unwiderruflich gelöscht. Exportiere vorher eine Sicherung, wenn du sie behalten möchtest. Deine Darstellungswahl bleibt erhalten.',
+          'Alle Ziele, Zwischenziele, Todos, vergangenen Stände und eigenen Themes auf diesem Gerät werden unwiderruflich gelöscht. Exportiere vorher eine Sicherung, wenn du sie behalten möchtest. Deine Darstellungswahl bleibt erhalten.',
         ),
         actions: [
           TextButton(

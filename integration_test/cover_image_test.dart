@@ -24,7 +24,7 @@ void main() {
       await controller.load();
       await tester.pumpWidget(GuideApp(controller: controller));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Ziel hinzufügen'));
+      await tester.tap(find.byTooltip('Ziel hinzufügen'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Hintergrundbild auswählen'));
       for (

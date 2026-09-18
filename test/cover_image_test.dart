@@ -41,6 +41,8 @@ void main() {
         old.execute('ALTER TABLE goals DROP COLUMN cover_image');
         old.execute('PRAGMA user_version = 3');
         old.execute('ALTER TABLE goals DROP COLUMN color');
+        old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
+        old.execute('DROP TABLE goal_themes');
         old.close();
         db = AppDatabase(NativeDatabase(file));
         var repo = GoalsRepository(db);
@@ -142,7 +144,7 @@ void main() {
       await controller.load();
       await tester.pumpWidget(GuideApp(controller: controller));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Ziel hinzufügen'));
+      await tester.tap(find.byTooltip('Ziel hinzufügen'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Hintergrundbild auswählen'));
       await tester.pumpAndSettle();

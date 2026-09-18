@@ -13,7 +13,18 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 4,
+        'version': 5,
+        'customThemes': [
+          for (final t in snapshot.customThemes)
+            {
+              'id': t.id,
+              'name': t.name,
+              'primary': t.colors.primary,
+              'secondary': t.colors.secondary,
+              'accent': t.colors.accent,
+              'surface': t.colors.surface,
+            },
+        ],
         'todoTemplates': [
           for (final t in snapshot.todoTemplates)
             {
@@ -42,6 +53,7 @@ class BackupCodec {
               'title': g.title,
               'emoji': g.emoji,
               'color': g.color.name,
+              'customThemeId': g.customThemeId,
               'motivation': g.motivation,
               'dueDate': date(g.dueDate),
               'achieved': g.achieved,
@@ -74,14 +86,43 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          ![1, 2, 3, 4].contains(root['version'])) {
+          ![1, 2, 3, 4, 5].contains(root['version'])) {
         throw const FormatException();
       }
+      final themes = <CustomGoalTheme>[];
+      if (root['version'] >= 5) {
+        for (final value in root['customThemes'] as List) {
+          final t = value as Map<String, dynamic>;
+          final colors = ThemeColors(
+            primary: t['primary'] as int,
+            secondary: t['secondary'] as int,
+            accent: t['accent'] as int,
+            surface: t['surface'] as int,
+          );
+          if (!colors.isValid) throw const FormatException();
+          themes.add(
+            CustomGoalTheme(
+              id: _id(t['id']),
+              name: _title(t['name']),
+              colors: colors,
+            ),
+          );
+        }
+      }
+      final themeIds = themes.map((t) => t.id).toSet();
+      if (themeIds.length != themes.length) throw const FormatException();
       final goals = (root['goals'] as List).map((value) {
         final g = value as Map<String, dynamic>;
+        final themeId = root['version'] >= 5 && g['customThemeId'] != null
+            ? _id(g['customThemeId'])
+            : null;
+        if (themeId != null && !themeIds.contains(themeId)) {
+          throw const FormatException();
+        }
         return Goal(
           id: _id(g['id']),
           title: _title(g['title']),
+          customThemeId: themeId,
           emoji: g['emoji'] as String,
           motivation: g['motivation'] as String,
           dueDate: _date(g['dueDate']),
@@ -176,10 +217,11 @@ class BackupCodec {
         milestones,
         todoTemplates: templates,
         todoEntries: entries,
+        customThemes: themes,
       );
     } catch (_) {
       throw const RuleViolation(
-        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–4, höchstens 10 MB).',
+        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–5, höchstens 10 MB).',
       );
     }
   }

@@ -25,10 +25,20 @@ void main() {
       var controller = GoalsController(GoalsRepository(database));
       try {
         final r = controller.repository;
+        final customThemeId = await r.saveTheme(
+          name: 'Abend am Meer',
+          colors: const ThemeColors(
+            primary: 0xff286eaa,
+            secondary: 0xff347d82,
+            accent: 0xffaa536c,
+            surface: 0xff417db8,
+          ),
+        );
         await r.saveGoal(
           title: 'Gesundheit',
           emoji: '🌿',
           color: GoalColor.ocean,
+          customThemeId: customThemeId,
           motivation: 'Mehr Energie. Mehr Lebensqualität. Ich möchte mich in meinem Körper wohlfühlen.',
         );
         final id = (await r.load()).goals.single.id;
@@ -114,6 +124,16 @@ void main() {
           await tester.tap(find.byTooltip('Einstellungen'));
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-settings');
+          await tester.tap(find.text('Eigene Themes'));
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot('appearance-$mode-themes');
+          await tester.tap(find.text('Abend am Meer'));
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot('appearance-$mode-theme-editor');
+          await tester.tap(find.byType(BackButton));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byType(BackButton));
+          await tester.pumpAndSettle();
           await tester.tap(find.byType(BackButton));
           await tester.pumpAndSettle();
           await tester.tap(find.text('Ziele').last);

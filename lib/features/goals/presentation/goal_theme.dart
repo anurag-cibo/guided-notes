@@ -3,34 +3,81 @@ import 'package:flutter/material.dart';
 import '../domain/models.dart';
 
 extension GoalPalette on GoalColor {
-  Color get seed => switch (this) {
-    GoalColor.forest => const Color(0xff187c68),
-    GoalColor.ocean => const Color(0xff286eaa),
-    GoalColor.lavender => const Color(0xff8060a8),
-    GoalColor.rose => const Color(0xffaa536c),
-    GoalColor.amber => const Color(0xff9a6b23),
+  ThemeColors get colors => switch (this) {
+    GoalColor.forest => const ThemeColors(
+      primary: 0xff187c68,
+      secondary: 0xff60764a,
+      accent: 0xffb48a3c,
+      surface: 0xff40846a,
+    ),
+    GoalColor.ocean => const ThemeColors(
+      primary: 0xff286eaa,
+      secondary: 0xff347d82,
+      accent: 0xff8760a1,
+      surface: 0xff417db8,
+    ),
+    GoalColor.lavender => const ThemeColors(
+      primary: 0xff8060a8,
+      secondary: 0xffa66889,
+      accent: 0xff467d84,
+      surface: 0xff9570b5,
+    ),
+    GoalColor.rose => const ThemeColors(
+      primary: 0xffaa536c,
+      secondary: 0xff9c6d53,
+      accent: 0xff785798,
+      surface: 0xffb96a85,
+    ),
+    GoalColor.amber => const ThemeColors(
+      primary: 0xff9a6b23,
+      secondary: 0xff9b5740,
+      accent: 0xff627746,
+      surface: 0xffb98335,
+    ),
   };
+  Color get seed => Color(colors.primary);
 }
 
 /// Scope goal accents without changing the app-wide appearance preference.
 class GoalTheme extends StatelessWidget {
-  const GoalTheme({super.key, required this.color, required this.child});
+  const GoalTheme({
+    super.key,
+    required this.color,
+    this.colors,
+    required this.child,
+  });
   final GoalColor color;
+  final ThemeColors? colors;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
     final base = Theme.of(context);
+    final roles = colors ?? color.colors;
     final palette = ColorScheme.fromSeed(
-      seedColor: color.seed,
+      seedColor: Color(roles.primary),
+      brightness: base.brightness,
+    );
+    final secondary = ColorScheme.fromSeed(
+      seedColor: Color(roles.secondary),
+      brightness: base.brightness,
+    );
+    final accent = ColorScheme.fromSeed(
+      seedColor: Color(roles.accent),
+      brightness: base.brightness,
+    );
+    final tone = ColorScheme.fromSeed(
+      seedColor: Color(roles.surface),
       brightness: base.brightness,
     );
     final background = Color.alphaBlend(
-      palette.primary.withValues(alpha: .045),
+      tone.primary.withValues(alpha: .045),
       base.scaffoldBackgroundColor,
     );
     final surface = Color.alphaBlend(
-      palette.primary.withValues(alpha: .04),
+      tone.primary.withValues(
+        alpha: base.brightness == Brightness.dark ? .16 : .10,
+      ),
       base.colorScheme.surface,
     );
     return Theme(
@@ -40,10 +87,14 @@ class GoalTheme extends StatelessWidget {
           onPrimary: palette.onPrimary,
           primaryContainer: palette.primaryContainer,
           onPrimaryContainer: palette.onPrimaryContainer,
-          secondary: palette.secondary,
-          onSecondary: palette.onSecondary,
-          secondaryContainer: palette.secondaryContainer,
-          onSecondaryContainer: palette.onSecondaryContainer,
+          secondary: secondary.primary,
+          onSecondary: secondary.onPrimary,
+          secondaryContainer: secondary.primaryContainer,
+          onSecondaryContainer: secondary.onPrimaryContainer,
+          tertiary: accent.primary,
+          onTertiary: accent.onPrimary,
+          tertiaryContainer: accent.primaryContainer,
+          onTertiaryContainer: accent.onPrimaryContainer,
         ),
         scaffoldBackgroundColor: background,
         appBarTheme: base.appBarTheme.copyWith(backgroundColor: background),
@@ -59,9 +110,17 @@ class GoalColorSelector extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    this.customThemes = const [],
+    this.customThemeId,
+    this.onCustomChanged,
+    this.onCreate,
   });
   final GoalColor value;
   final ValueChanged<GoalColor>? onChanged;
+  final List<CustomGoalTheme> customThemes;
+  final int? customThemeId;
+  final ValueChanged<int>? onCustomChanged;
+  final VoidCallback? onCreate;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -78,8 +137,27 @@ class GoalColorSelector extends StatelessWidget {
               key: ValueKey('goal-color-${color.name}'),
               label: Text(color.label),
               avatar: CircleAvatar(backgroundColor: color.seed, radius: 8),
-              selected: value == color,
+              selected: customThemeId == null && value == color,
               onSelected: onChanged == null ? null : (_) => onChanged!(color),
+            ),
+          for (final theme in customThemes)
+            ChoiceChip(
+              key: ValueKey('custom-theme-${theme.id}'),
+              label: Text(theme.name),
+              avatar: CircleAvatar(
+                backgroundColor: Color(theme.colors.primary),
+                radius: 8,
+              ),
+              selected: customThemeId == theme.id,
+              onSelected: onCustomChanged == null
+                  ? null
+                  : (_) => onCustomChanged!(theme.id),
+            ),
+          if (onCreate != null)
+            IconButton.filledTonal(
+              tooltip: 'Eigenes Theme erstellen',
+              onPressed: onCreate,
+              icon: const Icon(Icons.add, size: 20),
             ),
         ],
       ),

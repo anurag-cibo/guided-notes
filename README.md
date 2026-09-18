@@ -30,17 +30,21 @@ Das Emoji-Feld links neben dem Titel erlaubt ein sichtbares Zeichen, auch zusamm
 
 Beim Anlegen oder Bearbeiten eines Ziels unter **Farbthema** Wald, Ozean, Lavendel, Rose oder Sonne wählen. Die Vorschau reagiert sofort; gespeichert wird mit dem Ziel. Das Thema färbt Zielkarten, Cover-Fallback, Detailflächen, Schaltflächen und Fortschrittskreis passend zu Hell- oder Dunkelmodus. Eigene Fotos bleiben unverändert. Bestehende Ziele erhalten Wald; die Auswahl ist auch im Backup enthalten.
 
+Eigene Themes lassen sich unter **Einstellungen → Darstellung → Eigene Themes** erstellen und bearbeiten. Das kleine Plus neben der Theme-Auswahl im Ziel-Editor öffnet denselben Editor und übernimmt das neue Theme; übrige Eingaben bleiben erhalten. Primärfarbe, Sekundärfarbe, Akzentfarbe und Flächenton werden über Farbfelder oder Hex-Werte gewählt. Änderungen an einem eigenen Theme gelten für alle zugeordneten Ziele. Eigene Themes sind im Backup enthalten und werden bei „Alle Inhalte löschen“ mit entfernt.
+
+Die zentralen Farbrollen stehen in `ThemeColors`, Vorgaben und Ableitung für Hell/Dunkel in `goal_theme.dart`. Karten von Zielen und Zwischenzielen verwenden dieselbe sanfte Flächentönung. Die Statusbezeichnung bleibt unabhängig vom Zieltheme sichtbar. Kleine Plus-Kreise sitzen in den Überschriften; Zielaktionen und Todo-Historie bleiben am unteren Bildschirmrand.
+
 ## Einstellungen und Darstellung
 
 Das Zahnrad in jedem Hauptbereich öffnet die Einstellungen. Die App folgt zunächst dem Gerät; Hell- und Dunkelmodus können dauerhaft gewählt werden. Beide Darstellungen umfassen Ziele, Zwischenziele, Todos, Formulare und Dialoge. Unter „Allgemein“ stehen Sicherung und bestätigtes Löschen aller Inhalte bereit. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf Wunsch als klar gekennzeichnete Platzhalter sichtbar. Dateninformationen und verwendete Lizenzen sind ebenfalls erreichbar.
 
-Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 5 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 6 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
 
 ## Daten sichern
 
 Über das Zahnrad **Einstellungen → Datensicherung** oben rechts lassen sich Ziele, Zwischenziele, Todo-Vorlagen, Tages-/Wochenstände und Archive als JSON-Datei exportieren. Android öffnet die Dateiauswahl für den Speicherort. Die Datei enthält auch Motivationstexte und ist unverschlüsselt; eine Kopie außerhalb des Geräts schützt vor Geräteverlust.
 
-**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 4, bis 10 MB. Alte Sicherungen mit Version 1 bis 3 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
+**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 5, bis 10 MB. Alte Sicherungen mit Version 1 bis 4 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
 
 ## Entwicklung starten
 
@@ -80,6 +84,12 @@ Die installierbare APK liegt unter `build/app/outputs/flutter-apk/app-debug.apk`
 
 Navigator und ChangeNotifier reichen für diesen Ablauf. Keine vorsorglichen Routing-, State-, Sync- oder Ereignisframeworks. Drift wird mit explizitem SQL für Ziele, Zwischenziele, Todos und Einstellungen verwendet; daher kein zusätzlicher Codegenerator. Fachmodell und Widgets kennen keine SQL-Zeilen. Details zur [Speicherung und Migration](docs/storage.md).
 
+## Android-Gerätetests getrennt ausführen
+
+Entrypoints unter `integration_test/` werden automatisch mit der Paketkennung `de.anurag.guided_notes.integration` und dem Namen **The Guide · Test** gebaut. Die normale App bleibt `de.anurag.guided_notes`. Die Trennung ist für explizite Test-Targets mit `flutter drive` geprüft. Vor Verwendung fremder/vorgebauter Test-APKs deren Paketkennung kontrollieren; keine Test-APK mit der normalen Kennung installieren.
+
+Für den vorhandenen x86_64-Emulator kann `flutter build apk --debug --target-platform android-x64` eine kleinere normale APK ohne Änderung des Versionscodes bauen. **Kein `--split-per-abi` im Emulator-Workflow:** ABI-Splits erhöhen den Versionscode, und Flutter kann bei späteren Downgrade-Fehlern automatisch deinstallieren. `--keep-app-running` verhindert nur die Deinstallation am Testende, nicht diesen Installations-Fallback.
+
 ## Prüfung und Zusammenarbeit
 
 GitHub Actions prüft Formatierung, Analyse, Fachregel-/Persistenz-/Widgettests und einen Android-Debug-Build. Ein APK-Artefakt steht nach erfolgreichem CI-Lauf bereit. Die Tests decken unter anderem die Fünf-Ziele-Grenze bei schnellen Aktionen, Fremdschlüssel, Transaktionsrollback, Dateineustart, den ersten Bedienablauf, große Schrift und einen Sprung ans Ende einer langen Zwischenzielliste ab.
@@ -87,9 +97,9 @@ GitHub Actions prüft Formatierung, Analyse, Fachregel-/Persistenz-/Widgettests 
 Der Android-Test läuft in zwei getrennten Prozessen auf einem Testgerät; Phase 2 prüft die Daten der ersten Phase und entfernt ausschließlich ihr synthetisches Testziel:
 
 ```powershell
-.\tool\flutter.ps1 test integration_test/app_test.dart -d emulator-5554 --no-uninstall
+.\tool\flutter.ps1 drive --driver integration_test/screenshot_driver.dart --target integration_test/app_test.dart -d emulator-5554 --keep-app-running
 # App vollständig stoppen, optional Flugmodus aktivieren, danach:
-.\tool\flutter.ps1 test integration_test/app_test.dart -d emulator-5554 --no-uninstall --dart-define=VERIFY_RESTART=true
+.\tool\flutter.ps1 drive --driver integration_test/screenshot_driver.dart --target integration_test/app_test.dart -d emulator-5554 --keep-app-running --dart-define=VERIFY_RESTART=true
 ```
 
 Nicht gegen einen wichtigen Datenbestand ausführen. Das Testziel heißt `Android-Testziel`; es wird nicht in eine neu installierte App vorbefüllt.

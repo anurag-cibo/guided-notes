@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../features/goals/domain/models.dart';
-
 /// Central palette shared by every screen, including forms and dialogs.
 ThemeData guideTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
@@ -68,15 +66,4 @@ ThemeData guideTheme(Brightness brightness) {
       ),
     ),
   );
-}
-
-Color milestoneSurface(BuildContext context, MilestoneStatus status) {
-  final dark = Theme.of(context).brightness == Brightness.dark;
-  return switch (status) {
-    MilestoneStatus.achieved ||
-    MilestoneStatus.onTrack => Color(dark ? 0xff203e37 : 0xffeaf6ee),
-    MilestoneStatus.offTrack => Color(dark ? 0xff443825 : 0xfffff1df),
-    MilestoneStatus.onHold => Color(dark ? 0xff38334b : 0xfff0edf7),
-    MilestoneStatus.notStarted => Color(dark ? 0xff233547 : 0xffedf2f7),
-  };
 }

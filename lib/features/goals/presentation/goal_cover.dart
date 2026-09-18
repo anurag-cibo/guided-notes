@@ -42,7 +42,7 @@ class _CoverPainter extends CustomPainter {
     canvas.drawCircle(
       Offset(size.width * .77, 20),
       30,
-      Paint()..color = colors.primary.withValues(alpha: .12),
+      Paint()..color = colors.tertiary.withValues(alpha: .20),
     );
     final hills = Path()
       ..moveTo(0, size.height * .8)
@@ -58,7 +58,7 @@ class _CoverPainter extends CustomPainter {
       ..close();
     canvas.drawPath(
       hills,
-      Paint()..color = colors.primary.withValues(alpha: .16),
+      Paint()..color = colors.secondary.withValues(alpha: .22),
     );
   }
 

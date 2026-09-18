@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../data/cover_image.dart';
 import 'goal_cover.dart';
 import 'goal_theme.dart';
+import '../../settings/presentation/custom_themes_screen.dart';
 
 import '../application/goals_controller.dart';
 import '../domain/models.dart';
@@ -29,6 +30,7 @@ class _GoalEditorState extends State<GoalEditor> {
   bool _picking = false;
   late Uint8List? _cover = widget.goal?.coverImage;
   late GoalColor _color = widget.goal?.color ?? GoalColor.forest;
+  late int? _customThemeId = widget.goal?.customThemeId;
   @override
   void dispose() {
     _title.dispose();
@@ -52,6 +54,8 @@ class _GoalEditorState extends State<GoalEditor> {
         coverImage: _cover,
         removeCoverImage: _cover == null,
         color: _color,
+        customThemeId: _customThemeId,
+        clearCustomTheme: _customThemeId == null,
       ),
     );
     if (!mounted) return;
@@ -89,6 +93,7 @@ class _GoalEditorState extends State<GoalEditor> {
   @override
   Widget build(BuildContext context) => GoalTheme(
     color: _color,
+    colors: widget.controller.snapshot.theme(_customThemeId)?.colors,
     child: Builder(
       builder: (context) => Scaffold(
         appBar: AppBar(
@@ -182,9 +187,39 @@ class _GoalEditorState extends State<GoalEditor> {
               gap,
               GoalColorSelector(
                 value: _color,
+                customThemes: widget.controller.snapshot.customThemes,
+                customThemeId: _customThemeId,
+                onCustomChanged: _saving
+                    ? null
+                    : (id) => setState(() => _customThemeId = id),
+                onCreate: _saving
+                    ? null
+                    : () async {
+                        final id = await Navigator.push<int>(
+                          context,
+                          MaterialPageRoute<int>(
+                            builder: (_) => ThemeEditor(
+                              controller: widget.controller,
+                              initialColors:
+                                  widget.controller.snapshot
+                                      .theme(_customThemeId)
+                                      ?.colors ??
+                                  _color.colors,
+                            ),
+                          ),
+                        );
+                        if (mounted) {
+                          setState(() {
+                            if (id != null) _customThemeId = id;
+                          });
+                        }
+                      },
                 onChanged: _saving
                     ? null
-                    : (value) => setState(() => _color = value),
+                    : (value) => setState(() {
+                        _color = value;
+                        _customThemeId = null;
+                      }),
               ),
               gap,
               TextFormField(

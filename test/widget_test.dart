@@ -176,7 +176,7 @@ void main() {
     await tester.pumpWidget(GuideApp(controller: controller));
     await tester.pumpAndSettle();
     expect(find.text('Noch keine Ziele'), findsOneWidget);
-    await tester.tap(find.text('Ziel hinzufügen'));
+    await tester.tap(find.byTooltip('Ziel hinzufügen'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.text('Speichern'),
@@ -204,7 +204,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Balkon begrünen'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Zwischenziel hinzufügen'));
+    await tester.tap(find.byTooltip('Zwischenziel hinzufügen'));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.byType(TextFormField).first,
@@ -244,7 +244,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
-    expect(find.text('Ziel hinzufügen'), findsOneWidget);
+    expect(find.byTooltip('Ziel hinzufügen'), findsOneWidget);
   });
 
   testWidgets(
@@ -264,7 +264,7 @@ void main() {
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
       await tester.pumpWidget(GuideApp(controller: controller));
       await tester.pumpAndSettle();
-      expect(find.text('Ziel hinzufügen'), findsNothing);
+      expect(find.byTooltip('Ziel hinzufügen'), findsNothing);
       await tester.scrollUntilVisible(find.text('Archiv'), 400);
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Archiv'));

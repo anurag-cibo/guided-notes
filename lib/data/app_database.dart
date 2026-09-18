@@ -19,7 +19,17 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
+
+  Future<void> _createGoalThemes() =>
+      customStatement('''CREATE TABLE goal_themes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL CHECK(length(trim(name)) > 0),
+    primary_color INTEGER NOT NULL CHECK(primary_color BETWEEN 4278190080 AND 4294967295),
+    secondary_color INTEGER NOT NULL CHECK(secondary_color BETWEEN 4278190080 AND 4294967295),
+    accent_color INTEGER NOT NULL CHECK(accent_color BETWEEN 4278190080 AND 4294967295),
+    surface_color INTEGER NOT NULL CHECK(surface_color BETWEEN 4278190080 AND 4294967295)
+  )''');
 
   Future<void> _createSettings() =>
       customStatement('''CREATE TABLE app_settings (
@@ -57,6 +67,7 @@ class AppDatabase extends GeneratedDatabase {
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (_) async {
+      await _createGoalThemes();
       await customStatement('''CREATE TABLE goals (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL CHECK(length(trim(title)) > 0),
@@ -66,7 +77,8 @@ class AppDatabase extends GeneratedDatabase {
         achieved INTEGER NOT NULL DEFAULT 0 CHECK(achieved IN (0, 1)),
         archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0, 1)),
         cover_image BLOB,
-        color TEXT NOT NULL DEFAULT 'forest'
+        color TEXT NOT NULL DEFAULT 'forest',
+        custom_theme_id INTEGER REFERENCES goal_themes(id)
       )''');
       await customStatement('''CREATE TABLE milestones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,7 +106,7 @@ class AppDatabase extends GeneratedDatabase {
       await _createSettings();
     },
     onUpgrade: (_, from, to) async {
-      if (from < 1 || from > 4 || to != 5) {
+      if (from < 1 || from > 5 || to != 6) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
@@ -107,6 +119,12 @@ class AppDatabase extends GeneratedDatabase {
       if (from < 5) {
         await customStatement(
           "ALTER TABLE goals ADD COLUMN color TEXT NOT NULL DEFAULT 'forest'",
+        );
+      }
+      if (from < 6) {
+        await _createGoalThemes();
+        await customStatement(
+          'ALTER TABLE goals ADD COLUMN custom_theme_id INTEGER REFERENCES goal_themes(id)',
         );
       }
     },

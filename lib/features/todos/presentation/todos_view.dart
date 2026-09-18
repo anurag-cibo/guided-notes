@@ -11,75 +11,81 @@ class TodosView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = controller.repository.now();
-    return ListView(
-      padding: pagePadding,
+    return Column(
       children: [
-        Text(
-          'Kleine Schritte, jeden Tag.',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Hake ab, was du geschafft hast. Morgen beginnt ein neuer Tag.',
-        ),
-        const SizedBox(height: 28),
-        for (final frequency in TodoFrequency.values)
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    frequency == TodoFrequency.daily ? 'Heute' : 'Diese Woche',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(_periodLabel(context, frequency, now)),
-                  gap,
-                  if (!controller.snapshot.todoEntries.any(
-                    (e) => e.frequency == frequency && e.isCurrent(now),
-                  ))
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Text(
-                        frequency == TodoFrequency.daily
-                            ? 'Was möchtest du jeden Tag tun?'
-                            : 'Was möchtest du mehrmals pro Woche tun?',
-                      ),
-                    ),
-                  for (final entry in controller.snapshot.todoEntries.where(
-                    (e) => e.frequency == frequency && e.isCurrent(now),
-                  ))
-                    _TodoCard(controller: controller, entry: entry),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: OutlinedButton.icon(
-                      onPressed: controller.saving
-                          ? null
-                          : () => _openEditor(context, frequency),
-                      icon: const Icon(Icons.add),
-                      label: Text(
-                        frequency == TodoFrequency.daily
-                            ? 'Tagesaufgabe hinzufügen'
-                            : 'Wochenaufgabe hinzufügen',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ],
+        Expanded(
+          child: ListView(
+            padding: pagePadding,
+            children: [
+              Text(
+                'Kleine Schritte, jeden Tag.',
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-            ),
+              const SizedBox(height: 8),
+              const Text(
+                'Hake ab, was du geschafft hast. Morgen beginnt ein neuer Tag.',
+              ),
+              const SizedBox(height: 28),
+              for (final frequency in TodoFrequency.values)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SectionHeading(
+                          title: frequency == TodoFrequency.daily
+                              ? 'Heute'
+                              : 'Diese Woche',
+                          addLabel: frequency == TodoFrequency.daily
+                              ? 'Tagesaufgabe hinzufügen'
+                              : 'Wochenaufgabe hinzufügen',
+                          onAdd: controller.saving
+                              ? null
+                              : () => _openEditor(context, frequency),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(_periodLabel(context, frequency, now)),
+                        gap,
+                        if (!controller.snapshot.todoEntries.any(
+                          (e) => e.frequency == frequency && e.isCurrent(now),
+                        ))
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text(
+                              frequency == TodoFrequency.daily
+                                  ? 'Was möchtest du jeden Tag tun?'
+                                  : 'Was möchtest du mehrmals pro Woche tun?',
+                            ),
+                          ),
+                        for (final entry
+                            in controller.snapshot.todoEntries.where(
+                              (e) =>
+                                  e.frequency == frequency && e.isCurrent(now),
+                            ))
+                          _TodoCard(controller: controller, entry: entry),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
           ),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: const Icon(Icons.history),
-          title: const Text('Vergangene Zeiträume'),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute<void>(
-              builder: (_) => TodoHistoryScreen(controller: controller),
+        ),
+        BottomPanel(
+          child: Card(
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              leading: const Icon(Icons.history),
+              title: const Text('Vergangene Zeiträume'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => TodoHistoryScreen(controller: controller),
+                ),
+              ),
             ),
           ),
         ),

@@ -77,6 +77,8 @@ void main() {
         await db.close();
         final old = sqlite.sqlite3.open(file.path);
         old.execute('ALTER TABLE goals DROP COLUMN color');
+        old.execute('ALTER TABLE goals DROP COLUMN custom_theme_id');
+        old.execute('DROP TABLE goal_themes');
         old.execute('PRAGMA user_version = 4');
         old.close();
         db = AppDatabase(NativeDatabase(file));

@@ -4,6 +4,11 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Flutter supplies -Ptarget for run, test and drive. Device tests use their own
+// Android package, so even the tool's reinstall fallback cannot erase app data.
+val entrypoint = project.findProperty("target")?.toString()?.replace('\\', '/') ?: "lib/main.dart"
+val isDeviceTest = entrypoint.split('/').contains("integration_test")
+
 android {
     namespace = "de.anurag.guided_notes"
     compileSdk = flutter.compileSdkVersion
@@ -15,8 +20,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "de.anurag.guided_notes"
+        applicationId = if (isDeviceTest) "de.anurag.guided_notes.integration" else "de.anurag.guided_notes"
+        manifestPlaceholders["appLabel"] = if (isDeviceTest) "The Guide · Test" else "The Guide"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
