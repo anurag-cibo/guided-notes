@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../data/goals_repository.dart';
 import '../domain/models.dart';
+import '../../todos/domain/todo_models.dart';
 
 class GoalsController extends ChangeNotifier {
   GoalsController(this.repository);
@@ -26,13 +27,22 @@ class GoalsController extends ChangeNotifier {
   }
 
   /// One UI mutation at a time; the database enforces invariants independently.
-  Future<String?> mutate(Future<void> Function(GoalsRepository) action) async {
+  Future<String?> mutate(Future<void> Function(GoalsRepository) action) =>
+      _mutate(() async {
+        await action(repository);
+        return repository.load();
+      });
+
+  Future<String?> changeTodoCount(TodoEntry entry, int delta) =>
+      _mutate(() => repository.changeTodoCount(snapshot, entry, delta));
+
+  Future<String?> _mutate(Future<GoalSnapshot> Function() update) async {
     if (saving) return 'Bitte kurz warten, die Änderung wird gespeichert.';
     saving = true;
-    notifyListeners();
+    // The lock protects writes, but is not a visual loading state. Publishing it
+    // would briefly disable every checkbox/button and rebuild the screen twice.
     try {
-      await action(repository);
-      snapshot = await repository.load();
+      snapshot = await update();
       return null;
     } on RuleViolation catch (e) {
       return e.message;

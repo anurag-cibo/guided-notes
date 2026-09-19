@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,9 +7,58 @@ import 'package:guided_notes/app.dart';
 import 'package:guided_notes/data/app_database.dart';
 import 'package:guided_notes/features/goals/application/goals_controller.dart';
 import 'package:guided_notes/features/goals/data/goals_repository.dart';
+import 'package:guided_notes/features/goals/domain/models.dart';
 import 'package:guided_notes/features/todos/domain/todo_models.dart';
 
 void main() {
+  testWidgets(
+    'slow count save does not disable unrelated checkboxes or plus buttons',
+    (tester) async {
+      final db = AppDatabase(NativeDatabase.memory());
+      final r = _SlowCountRepository(db);
+      final c = GoalsController(r);
+      addTearDown(() async {
+        c.dispose();
+        await db.close();
+      });
+      for (final title in ['Lesen', 'Trinken']) {
+        await r.todos.save(
+          title: title,
+          frequency: TodoFrequency.daily,
+          target: 1,
+        );
+      }
+      await c.load();
+      await tester.pumpWidget(GuideApp(controller: c));
+      await tester.tap(find.text('Todos'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(c.saving, isTrue);
+      expect(
+        tester.widget<Checkbox>(find.byType(Checkbox).last).onChanged,
+        isNotNull,
+      );
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byWidgetPredicate(
+                (w) =>
+                    w is IconButton && w.tooltip == 'Tagesaufgabe hinzufügen',
+              ),
+            )
+            .onPressed,
+        isNotNull,
+      );
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      r.gate.complete();
+      await tester.pumpAndSettle();
+      expect(c.snapshot.todoEntries.first.completed, 1);
+      expect(c.snapshot.todoEntries.last.completed, 0);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
   testWidgets(
     'todos create, check, undo, edit, roll over and back navigation',
     (tester) async {
@@ -152,4 +203,18 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     },
   );
+}
+
+class _SlowCountRepository extends GoalsRepository {
+  _SlowCountRepository(super.database);
+  final gate = Completer<void>();
+  @override
+  Future<GoalSnapshot> changeTodoCount(
+    GoalSnapshot previous,
+    TodoEntry entry,
+    int delta,
+  ) async {
+    await gate.future;
+    return super.changeTodoCount(previous, entry, delta);
+  }
 }

@@ -177,15 +177,16 @@ class _TodoCard extends StatelessWidget {
   final GoalsController controller;
   final TodoEntry entry;
 
+  Future<bool> _changeCount(BuildContext context, int delta) =>
+      showMutationResult(context, controller.changeTodoCount(entry, delta));
+
   @override
   Widget build(BuildContext context) {
-    final template = controller.snapshot.todoTemplates.firstWhere(
-      (t) => t.id == entry.templateId,
-    );
+    final template = controller.snapshot.todoTemplate(entry.templateId)!;
     final done = entry.completed == entry.target;
-    final milestone = controller.snapshot.milestones
-        .where((m) => m.id == entry.milestoneId)
-        .firstOrNull;
+    final milestone = entry.milestoneId == null
+        ? null
+        : controller.snapshot.milestone(entry.milestoneId!);
     final goal = milestone == null
         ? null
         : controller.snapshot.goal(milestone.goalId);
@@ -202,14 +203,8 @@ class _TodoCard extends StatelessWidget {
                   value: done,
                   onChanged: controller.saving
                       ? null
-                      : (value) => runMutation(
-                          context,
-                          controller,
-                          (r) => r.todos.changeCount(
-                            entry,
-                            value == true ? 1 : -1,
-                          ),
-                        ),
+                      : (value) =>
+                            _changeCount(context, value == true ? 1 : -1),
                   semanticLabel: entry.title,
                 ),
               Expanded(
@@ -278,11 +273,7 @@ class _TodoCard extends StatelessWidget {
                   icon: const Icon(Icons.remove_circle_outline),
                   onPressed: controller.saving || entry.completed == 0
                       ? null
-                      : () => runMutation(
-                          context,
-                          controller,
-                          (r) => r.todos.changeCount(entry, -1),
-                        ),
+                      : () => _changeCount(context, -1),
                 ),
                 Expanded(
                   child: Padding(
@@ -315,11 +306,7 @@ class _TodoCard extends StatelessWidget {
                   icon: const Icon(Icons.add_circle_outline),
                   onPressed: controller.saving || done
                       ? null
-                      : () => runMutation(
-                          context,
-                          controller,
-                          (r) => r.todos.changeCount(entry, 1),
-                        ),
+                      : () => _changeCount(context, 1),
                 ),
               ],
             ),

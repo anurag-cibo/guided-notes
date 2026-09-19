@@ -6,6 +6,7 @@ import '../domain/models.dart';
 import 'backup_codec.dart';
 import 'cover_image.dart';
 import '../../todos/data/todos_repository.dart';
+import '../../todos/domain/todo_models.dart';
 
 class GoalsRepository {
   GoalsRepository(this.database, {DateTime Function()? now})
@@ -126,6 +127,77 @@ class GoalsRepository {
     });
   }
 
+  /// Refresh only rows a count change can affect, in the write transaction.
+  /// In particular, undo may affect a milestone from an earlier assignment.
+  Future<GoalSnapshot> changeTodoCount(
+    GoalSnapshot previous,
+    TodoEntry entry,
+    int delta,
+  ) => database.transaction(() async {
+    bool samePeriod(int id, String period) =>
+        id == entry.templateId && period == entry.period;
+    int comparePeriod(TodoProgressCredit credit) {
+      final id = credit.templateId.compareTo(entry.templateId);
+      return id != 0 ? id : credit.period.compareTo(entry.period);
+    }
+
+    final previousEntry = previous.todoEntries.firstWhere(
+      (e) => samePeriod(e.templateId, e.period),
+    );
+    final affectedIds = <int>{
+      for (final credit in previous.todoCredits)
+        if (delta < 0 &&
+            credit.ordinal == previousEntry.completed &&
+            samePeriod(credit.templateId, credit.period) &&
+            credit.milestoneId != null)
+          credit.milestoneId!,
+    };
+    await todos.changeCount(entry, delta);
+    final updatedEntry = await todos.entry(entry.templateId, entry.period);
+    if (updatedEntry.milestoneId != null) {
+      affectedIds.add(updatedEntry.milestoneId!);
+    }
+    final updatedMilestones = <int, Milestone>{};
+    if (affectedIds.isNotEmpty) {
+      final rows = await database
+          .customSelect(
+            'SELECT * FROM milestones WHERE id IN (${List.filled(affectedIds.length, '?').join(',')})',
+            variables: affectedIds.map((id) => Variable(id)).toList(),
+          )
+          .get();
+      for (final row in rows) {
+        final milestone = _readMilestone(row);
+        updatedMilestones[milestone.id] = milestone;
+      }
+    }
+    final credits = await todos.progress.load(entry: updatedEntry);
+    return GoalSnapshot(
+      previous.goals,
+      previous.milestones.map((m) => updatedMilestones[m.id] ?? m),
+      todoTemplates: previous.todoTemplates,
+      todoEntries: previous.todoEntries.map(
+        (e) => samePeriod(e.templateId, e.period) ? updatedEntry : e,
+      ),
+      todoCredits: [
+        for (final credit in previous.todoCredits)
+          if (comparePeriod(credit) < 0) credit,
+        ...credits,
+        for (final credit in previous.todoCredits)
+          if (comparePeriod(credit) > 0) credit,
+      ],
+      customThemes: previous.customThemes,
+    );
+  });
+
+  static Milestone _readMilestone(QueryRow r) => Milestone(
+    id: r.read<int>('id'),
+    goalId: r.read<int>('goal_id'),
+    title: r.read<String>('title'),
+    progress: r.read<int>('progress'),
+    status: MilestoneStatus.values.byName(r.read<String>('status')),
+    dueDate: _date(r.readNullable<String>('due_date')),
+  );
+
   Future<GoalSnapshot> load() => database.transaction(() async {
     // Older databases have no historical start date. Establish it once only.
     await database.customStatement(
@@ -141,16 +213,7 @@ class GoalsRepository {
         .get();
     return GoalSnapshot(
       goals.map(_readGoal),
-      milestones.map(
-        (r) => Milestone(
-          id: r.read<int>('id'),
-          goalId: r.read<int>('goal_id'),
-          title: r.read<String>('title'),
-          progress: r.read<int>('progress'),
-          status: MilestoneStatus.values.byName(r.read<String>('status')),
-          dueDate: _date(r.readNullable<String>('due_date')),
-        ),
-      ),
+      milestones.map(_readMilestone),
       todoTemplates: await todos.templates(),
       todoEntries: await todos.entries(),
       todoCredits: await todos.progress.load(),

@@ -92,6 +92,16 @@ class GoalSnapshot {
   final List<Milestone> milestones;
   final List<TodoTemplate> todoTemplates;
   final List<TodoEntry> todoEntries;
+  late final _goalsById = {for (final goal in goals) goal.id: goal};
+  late final _milestonesById = {
+    for (final milestone in milestones) milestone.id: milestone,
+  };
+  late final _todoTemplatesById = {
+    for (final template in todoTemplates) template.id: template,
+  };
+
+  Milestone? milestone(int id) => _milestonesById[id];
+  TodoTemplate? todoTemplate(int id) => _todoTemplatesById[id];
   bool get isEmpty =>
       goals.isEmpty &&
       milestones.isEmpty &&
@@ -101,12 +111,7 @@ class GoalSnapshot {
   List<Goal> get activeGoals => goals.where((g) => !g.archived).toList();
   List<Milestone> forGoal(int id) =>
       milestones.where((m) => m.goalId == id).toList();
-  Goal? goal(int id) {
-    for (final goal in goals) {
-      if (goal.id == id) return goal;
-    }
-    return null;
-  }
+  Goal? goal(int id) => _goalsById[id];
 
   int? progressFor(int id) {
     final entries = forGoal(id);

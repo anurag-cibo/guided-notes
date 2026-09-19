@@ -124,3 +124,7 @@ Der Test-Runner deinstalliert die App standardmäßig am Ende: Für die zweiphas
 ## Todo-Zeiträume · 19.09.2026
 
 PR #37 integriert, APK 0.2.1 veröffentlicht. Folgeänderung 0.2.2+4 setzt das kurze Datum neben Heute/Diese Woche und ersetzt den Wochen-Zähler durch Anzahl plus Fortschrittsbalken zwischen Minus/Plus. Hinweise und Speicherung bleiben unverändert. Vor dem Update aktueller normaler Emulator-Bestand unter outputs/before-todo-periods.tar gesichert.
+
+## Blinkende Controls beim Speichern · 19.09.2026
+
+PR #38 integriert, APK 0.2.2 veröffentlicht. Version 0.2.3+5 entfernt die globale UI-Benachrichtigung für den kurzzeitigen Schreibschutz und lädt bei Todo-Zähleränderungen nur betroffene Daten nach. Schreibschutz und Transaktionen bleiben erhalten; Formulare verwenden ihre lokalen Busy-Zustände. 56 Tests einschließlich langsamer Speicherung und inkrementellem Snapshot-Abgleich. Keine Schemaänderung. Performance-Nachweise und Grenzen stehen in docs/validation.md.

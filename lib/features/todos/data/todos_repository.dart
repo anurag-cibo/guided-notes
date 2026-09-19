@@ -69,6 +69,15 @@ class TodosRepository {
     progressIncrement: r.read<int>('progress_increment'),
   );
 
+  Future<TodoEntry> entry(int templateId, String period) async => _readEntry(
+    await database
+        .customSelect(
+          'SELECT * FROM todo_entries WHERE template_id=? AND period=?',
+          variables: [Variable(templateId), Variable(period)],
+        )
+        .getSingle(),
+  );
+
   Future<void> save({
     int? id,
     required String title,
