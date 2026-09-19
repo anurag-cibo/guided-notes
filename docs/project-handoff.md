@@ -136,3 +136,17 @@ PR #38 integriert, APK 0.2.2 veröffentlicht. Version 0.2.3+5 entfernt die globa
 Schema 9 speichert Fortschritt und Beiträge als ganzzahlige Hundertstel; Migration erhält Daten, IDs, Autoinkrement-Zähler und frühere Beiträge. Backup 8 enthält den Wochenmodus, liest Versionen 1–7 weiterhin. Anzeigen nutzen deutsche Dezimalzahlen. Die Performance-Korrektur aus PR #39 bleibt erhalten. Version 0.3.0+6 nutzt den vorhandenen privaten Release-Schlüssel. Aktueller GitHub-Stand: #40.
 
 Abschlussprüfung dieser Erweiterung: native Android-Bedienung, Dateineustart und signiertes Update erfolgreich. Aktuelle Benutzerdaten mit outputs/before-fine-progress.tar und outputs/after-fine-progress.tar semantisch verglichen und erhalten. Diese Sicherungen bleiben lokal. Als Datumstrenner ist ausdrücklich der normale Bindestrich gewünscht: 14.9-20.9.
+
+## Schmaleres Nachkomma-Rad · 19.09.2026
+
+Version 0.3.1+7 kürzt die Nachkomma-Beschriftungen (00 → 0, 20 → 2, 50 → 5; 25 bleibt 25). Das linke und rechte Rad teilen sich den Platz im Verhältnis 3:2. Prozentwerte, Speicherung und Buchungsregeln bleiben unverändert. Nutzerwunsch für weitere optische Anpassungen: zweite visuelle Prüfung anhand aktueller Screenshots mit Bewertung 1–10, mindestens 6,5 anstreben.
+
+Prüfung: Analyse ohne Befunde, alle 60 Tests einschließlich großer Schrift sowie nativer Android-Darstellungstest erfolgreich. Zweiter Reviewer: Hell 8/10, Dunkel 7,5/10, insgesamt 7,5/10; keine notwendige Korrektur. Beurteilung der Screenshots bei 2,5 %, keine pauschale visuelle Prüfung aller Nachkommastufen. Normale Emulator-App per Update geöffnet; Datenbank-Prüfsumme vor/nach Installation identisch. Sicherung: outputs/before-compact-fraction.tar.
+
+Nachfolgender Nutzerwunsch in derselben Version: einheitliche Nachkommastufen für alle ganzen Prozentwerte (0; 0,1; 0,2; 0,25; 0,3; 0,4; 0,5; 0,6; 0,7; 0,75; 0,8; 0,9). Beim Wechsel der Ganzzahl bleibt der Bruchteil erhalten, nur bei 100 % wird er auf 0 begrenzt. 60 Tests erneut erfolgreich, einschließlich 99,25 → 100 und vollständigem Speichern/Erledigen/Undo mit 8,5 %. Android-Abschlussprüfung wird mit dem aktualisierten Stand wiederholt.
+
+## Todos im Zwischenziel-Editor · 19.09.2026
+
+Version 0.3.1+7 bündelt die einheitliche Prozentwahl und #43. Status und Frist stehen nebeneinander, mit Umbruch bei großer Schrift. Verknüpfte aktuelle Todos erscheinen in täglich/wöchentlich gruppierten Karten. Beide Ansichten verwenden dieselben TodoGroup/TodoRow-Komponenten. Plus wählt das Zwischenziel vor und aktiviert 2,5 %. Neue Zwischenziele zuerst speichern. Vor Todo-Aktionen werden offene Zwischenziel-Änderungen gespeichert; ein kurzer Hinweis erklärt das. Neue Beiträge aktualisieren Fortschritt und Status im Editor, sodass späteres Speichern sie nicht überschreibt.
+
+Analyse ohne Befunde; 61 Tests einschließlich gemeinsamer Zähler, Neuanlage mit Zuordnung, manueller Fortschrittsänderung vor Erledigung, Rücknahme, anschließendem Speichern und großer Schrift. Nativer Android-Test in Hell/Dunkel erfolgreich. Zweiter Screenshot-Reviewer: beide Modi 8/10. Drei lokal erzeugte Testmotive im Emulator unter Downloads/The-Guide-Testbilder (hell, dunkel, Hochformat); lokale Kopien outputs/testbilder. Keine Nutzerdaten durch Testdaten ersetzen.

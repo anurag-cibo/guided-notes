@@ -330,12 +330,12 @@ void main() {
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(c.snapshot.todoTemplates.single.milestoneId, milestoneId);
-    expect(c.snapshot.todoTemplates.single.progressIncrement, 8);
-    expect(find.text('+8 %'), findsOneWidget);
+    expect(c.snapshot.todoTemplates.single.progressIncrement, 8.5);
+    expect(find.text('+8,5 %'), findsOneWidget);
     expect(find.textContaining('Gesundheit · Bewegen'), findsNothing);
     await tester.tap(find.byType(Checkbox));
     await tester.pumpAndSettle();
-    expect(c.snapshot.milestones.single.progress, 98);
+    expect(c.snapshot.milestones.single.progress, 98.5);
     await tester.tap(find.byType(Checkbox));
     await tester.pumpAndSettle();
     expect(c.snapshot.milestones.single.progress, 90);

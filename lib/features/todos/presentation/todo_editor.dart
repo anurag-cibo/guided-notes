@@ -12,10 +12,12 @@ class TodoEditor extends StatefulWidget {
     required this.controller,
     required this.frequency,
     this.template,
+    this.initialMilestoneId,
   });
   final GoalsController controller;
   final TodoFrequency frequency;
   final TodoTemplate? template;
+  final int? initialMilestoneId;
   @override
   State<TodoEditor> createState() => _TodoEditorState();
 }
@@ -27,9 +29,12 @@ class _TodoEditorState extends State<TodoEditor> {
     text: '${widget.template?.target ?? 3}',
   );
   bool _busy = false;
-  late int? _milestoneId = widget.template?.milestoneId;
+  late int? _milestoneId = widget.template == null
+      ? widget.initialMilestoneId
+      : widget.template!.milestoneId;
   late bool _trackProgress =
-      _milestoneId != null && (widget.template?.progressIncrement ?? 0) > 0;
+      _milestoneId != null &&
+      (widget.template == null || widget.template!.progressIncrement > 0);
   late double _increment = (widget.template?.progressIncrement ?? 0) > 0
       ? widget.template!.progressIncrement
       : 2.5;
