@@ -1,5 +1,19 @@
 # Validierung
 
+## Release 0.4.0 und Performanceprüfung · 19.09.2026
+
+84 Unit-/Widgettests und Analyse erfolgreich. Profiltest integration_test/performance_test.dart mit 5 Zielen, 100 Zwischenzielen und 12 aktuellen Todos im getrennten Android-Paket. Flutter-Profilmodus, x86_64-Emulator API 36; Scroll-/Sliderablauf zuvor aufgewärmt, gleiche synthetische Daten und Gesten vorher/nachher. Keine Bildschirmaufnahme während der Messung. FrameTiming misst UI-Aufbau und Rasterdauer getrennt.
+
+| Ablauf | Frames vorher/nachher | UI p95 vorher/nachher (ms) | Raster p95 vorher/nachher (ms) | UI/Raster >16,67 ms vorher → nachher |
+|---|---:|---:|---:|---:|
+| 100 Zwischenziele scrollen | 334/334 | 4.325 / 2.712 | 15.176 / 3.615 | 8/4 → 0/0 |
+| Slider mit 12 verknüpften Todos | 165/165 | 8.088 / 6.168 | 3.613 / 3.666 | 0/0 → 0/0 |
+| Todo-Zähler (12 sichtbare Aufgaben) | 38/38 | 4.542 / 5.087 | 3.503 / 3.303 | 0/0 → 0/0 |
+
+Gezielte Änderungen: Material-Farbpaletten pro Farbwert/Helligkeit wiederverwenden (maximal 64 Einträge); unveränderte Todo-Gruppen bei Sliderbewegungen behalten. Einheiten-/Skalen-/Snapshotänderungen aktualisieren die Gruppen weiterhin. Der Widgettest prüft Wiederverwendung neben weiterhin direkter Einheitenvorschau. Der Legacy-Backuptest entfernt Format-11-Felder vollständig für die Format-10-Fixture.
+
+Einzelmessungen auf dem Emulator, keine statistisch abgesicherte Geräte-Benchmark oder Garantie für ruckelfreie Hardware. Die Scroll-Ausreißer des Ausgangslaufs (UI maximal 43,156 ms, Raster 18,837 ms) sind im finalen Lauf nicht erneut aufgetreten (10,335/7,788 ms). Todo-p95 schwankt leicht; keine Verbesserung dafür behauptet. Rohlogs lokal unter outputs/performance-{before,final}.log, Vergleich outputs/performance-summary.json. Frühere native Funktions-/Migrations-/Neustart-/Backuptests und visuelle Reviews sind unten dokumentiert.
+
 ## Kurzer Emoji-Impuls und Überschriften-Navigation · 19.09.2026
 
 Neuester Nutzerwunsch ersetzt die zeitgesteuerte Fade-Markierung: Emoji-Hintergrund blinkt 180 ms ohne Fade auf und verschwindet direkt. Die gesamte Leiste behält ihren 320-ms-Fade beim Scrollen. Zielüberschriften im Zwischenziele-Tab öffnen Zieldetails. Dort wechselt die Überschrift Zwischenziele zum bestehenden Haupttab und fokussiert die passende Zielgruppe; keine gestapelten Detailseiten. Plus-Buttons bleiben getrennt bedienbar. Archivierte Ziele sind weiterhin nicht im aktiven Zwischenziele-Tab enthalten.

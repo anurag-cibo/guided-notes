@@ -4,7 +4,7 @@ Eine ruhige Android-App für bis zu fünf aktive Ziele und ihre Zwischenziele. *
 
 **Todos-Erweiterung (17.09.2026):** Der dritte Tab „Todos“ bietet wiederkehrende Tagesaufgaben und Wochenaufgaben mit Zielanzahl. Abhaken und Rückgängig werden offline gespeichert. Wochen beginnen montags, der lokale Kalender bestimmt den Zeitraum. Titel und Zielanzahl lassen sich für den nächsten Zeitraum ändern; „Aufgabe entfernen“ blendet ein Todo sofort aus allen aktuellen Listen aus und stoppt Wiederholungen. Historie und bereits gutgeschriebene Zwischenziel-Beiträge bleiben erhalten. Vergangene Zeiträume sind nur lesbar. Details: [Todo-Regeln](docs/product-decisions.md#todos-tages--und-wochenaufgaben).
 
-**Stand 17.09.2026:** Die Android-Version läuft. Ziele, Details und Zwischenziele wurden anhand der UI-Inspiration ruhiger gestaltet; Archivaktionen und Datensicherung sind geprüft. Die gestalterische Rückmeldung und mehrtägige Nutzererprobung bleiben in #4 offen. Kontext für weitere Chats: [Projektübergabe](docs/project-handoff.md).
+**Stand 19.09.2026 · Version 0.4.0+10:** Eigene Messskalen, flexible Sortierung, überarbeitete Zielkarten und kompakte Eingaben sind umgesetzt. Der maßgebliche Entscheidungsstand steht in [Produktentscheidungen](docs/product-decisions.md), Prüfungen in [Validierung](docs/validation.md), der Abschlusskontext in [Projektübergabe](docs/project-handoff.md). Die nächste Alltagserprobung dauert ein bis zwei Tage (#4). Eine vollständige konsolidierte Feature- und Entscheidungsliste ist als [Issue #52](https://github.com/anurag-cibo/guided-notes/issues/52) beauftragt.
 
 ## Erste Version
 

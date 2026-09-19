@@ -51,26 +51,28 @@ class GoalTheme extends StatelessWidget {
   final ThemeColors? colors;
   final Widget child;
 
+  // Many rows share the same seeds. Material palette generation is independent
+  // of context; keep a small bounded cache instead of repeating it on scroll.
+  static final _palettes = <(int, Brightness), ColorScheme>{};
+  static ColorScheme _palette(int seed, Brightness brightness) {
+    final key = (seed, brightness);
+    final cached = _palettes[key];
+    if (cached != null) return cached;
+    if (_palettes.length >= 64) _palettes.remove(_palettes.keys.first);
+    return _palettes[key] = ColorScheme.fromSeed(
+      seedColor: Color(seed),
+      brightness: brightness,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final base = Theme.of(context);
     final roles = colors ?? color.colors;
-    final palette = ColorScheme.fromSeed(
-      seedColor: Color(roles.primary),
-      brightness: base.brightness,
-    );
-    final secondary = ColorScheme.fromSeed(
-      seedColor: Color(roles.secondary),
-      brightness: base.brightness,
-    );
-    final accent = ColorScheme.fromSeed(
-      seedColor: Color(roles.accent),
-      brightness: base.brightness,
-    );
-    final tone = ColorScheme.fromSeed(
-      seedColor: Color(roles.surface),
-      brightness: base.brightness,
-    );
+    final palette = _palette(roles.primary, base.brightness);
+    final secondary = _palette(roles.secondary, base.brightness);
+    final accent = _palette(roles.accent, base.brightness);
+    final tone = _palette(roles.surface, base.brightness);
     final background = Color.alphaBlend(
       tone.primary.withValues(alpha: .045),
       base.scaffoldBackgroundColor,

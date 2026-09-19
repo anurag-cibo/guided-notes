@@ -15,6 +15,8 @@ import 'package:guided_notes/features/todos/domain/todo_models.dart';
 
 import 'fixtures/legacy_todos.dart';
 
+import 'package:guided_notes/features/todos/presentation/todo_group.dart';
+
 void main() {
   late AppDatabase db;
   late GoalsRepository r;
@@ -228,6 +230,20 @@ void main() {
       final legacy =
           jsonDecode(await repo.exportBackup()) as Map<String, dynamic>;
       legacy['version'] = 10;
+      for (final milestone in legacy['milestones'] as List) {
+        for (final key in [
+          'motivation',
+          'startValue',
+          'targetValue',
+          'currentValue',
+          'unit',
+        ]) {
+          (milestone as Map).remove(key);
+        }
+      }
+      for (final credit in legacy['todoCredits'] as List) {
+        (credit as Map).remove('valueAmount');
+      }
       await store.close();
       store = AppDatabase(NativeDatabase(file));
       repo = GoalsRepository(store);
@@ -302,9 +318,16 @@ void main() {
         final slider = find.byKey(const ValueKey('metric-slider'));
         final label = find.byKey(const ValueKey('metric-slider-value'));
         final right = tester.getCenter(label).dx;
+        final todoGroups = tester
+            .widgetList<TodoGroup>(find.byType(TodoGroup))
+            .toList();
         tester.widget<Slider>(slider).onChanged!(33.33);
         await tester.pumpAndSettle();
         expect(value(), '96,7');
+        expect(
+          tester.widgetList<TodoGroup>(find.byType(TodoGroup)).toList(),
+          orderedEquals(todoGroups),
+        );
         expect(tester.widget<Text>(label).data, '96,7');
         tester.widget<Slider>(slider).onChanged!(0);
         await tester.pumpAndSettle();

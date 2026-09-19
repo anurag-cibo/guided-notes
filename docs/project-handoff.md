@@ -1,5 +1,15 @@
 # Projektübergabe · 19.09.2026
 
+## Abschlussstand für die nächste Testpause · 0.4.0+10
+
+Release 0.4.0 bündelt #48, #50 und #51 über PR #49. Beauftragt: nach Prüfungen squash mergen, signierte universelle APK veröffentlichen, erledigten Branch löschen und diese Aufgabe archivieren. Integrations-/Veröffentlichungsstatus direkt in GitHub prüfen. Der vorhandene Release-Schlüssel bleibt unverändert und privat. Normale Emulator-App ausschließlich per Debug-Update aktualisieren; nie deinstallieren.
+
+Maßgeblich sind README und der aktuelle Abschnitt in docs/product-decisions.md. Kurz: Warum ausschließlich bei neuen großen Zielen verpflichtend; Zwischenziele mit frei definierter Skala in beide Richtungen, Einheitenfeld direkt editierbar, Zehntelslider und manuelle Hundertstel. Todo-Vorschau sofort, tatsächliche Beiträge/Undo/Historie bleiben erhalten. Ziele/Zwischenziele per langem Drücken sortierbar, Wechsel zwischen Zielen möglich. Emoji-Leiste mit kurzem Impuls, weich ausblendende Leiste, verknüpfte Überschriften. Zielkarten mit schaltbarem Cover und kleinem Zeitkreis. Jeder App-Neustart beginnt hell. Schema 12, Backup 11, Import 1–10 kompatibel.
+
+84 Tests und Profilprüfung bestanden. Farbpaletten und unveränderte Todo-Widgets werden wiederverwendet. Im finalen Emulatorlauf keine UI-/Rasterframes über 16,67 ms in den drei gemessenen Abläufen; keine allgemeine Hardware-FPS-Garantie. Messwerte in docs/validation.md.
+
+Nächster Schritt: ein bis zwei Tage Alltagserprobung (#4), konkrete Ruckler mit Bildschirm/Aktion/Gerät notieren. Auf Nutzerwunsch neu angelegt: [#52 vollständige Feature-Liste und konsolidierte Entscheidungen](https://github.com/anurag-cibo/guided-notes/issues/52). #20 und #21 bleiben offene Produktfragen, nicht Teil dieses Releases. Die folgenden Abschnitte sind historische Zwischenstände; insbesondere das frühere Zwischenziel-Warum wurde ausdrücklich verworfen.
+
 ## Einheit direkt im Feld, Zehntelschritte und heller Start · 19.09.2026
 
 Eigene Einheit wird direkt im Einheitenfeld eingegeben; der Pfeil öffnet weiterhin die drei Optionen. Keine zusätzliche Eingabezeile. Der Slider rundet auf eine Nachkommastelle, erhält aber exakte bestehende Bereichsgrenzen; manuelle Eingaben bleiben bis zwei Nachkommastellen möglich. GuideApp startet bei jedem Neustart sofort hell, auch bei gespeicherter dunkler Wahl und dunklem Gerät. Manuelles Umschalten während der Nutzung bleibt möglich. Schema/Backup unverändert.

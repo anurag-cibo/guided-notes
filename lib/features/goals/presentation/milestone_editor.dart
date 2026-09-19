@@ -373,6 +373,41 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
       );
     },
   );
+  GoalSnapshot? _todoSnapshot;
+  MetricScale? _todoScale;
+  List<Widget> _todoGroups = const [];
+
+  List<Widget> _linkedTodos() {
+    final snapshot = widget.controller.snapshot;
+    final scale =
+        _scale ??
+        MetricScale(
+          start: widget.milestone!.scale.start,
+          target: widget.milestone!.scale.target,
+          unit: _unit.text.trim(),
+        );
+    // Slider frames only change the measurement. Reuse the immutable Todo
+    // widgets until their data or contribution unit/direction actually changes.
+    if (!identical(snapshot, _todoSnapshot) ||
+        _todoScale?.start != scale.start ||
+        _todoScale?.target != scale.target ||
+        _todoScale?.unit != scale.unit) {
+      _todoSnapshot = snapshot;
+      _todoScale = scale;
+      _todoGroups = [
+        for (final frequency in TodoFrequency.values)
+          TodoGroup(
+            controller: widget.controller,
+            frequency: frequency,
+            milestoneId: widget.milestone!.id,
+            beforeAction: _beforeTodoAction,
+            previewScale: scale,
+          ),
+      ];
+    }
+    return _todoGroups;
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -427,20 +462,7 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 8),
-              for (final frequency in TodoFrequency.values)
-                TodoGroup(
-                  controller: widget.controller,
-                  frequency: frequency,
-                  milestoneId: widget.milestone!.id,
-                  beforeAction: _beforeTodoAction,
-                  previewScale:
-                      _scale ??
-                      MetricScale(
-                        start: widget.milestone!.scale.start,
-                        target: widget.milestone!.scale.target,
-                        unit: _unit.text.trim(),
-                      ),
-                ),
+              ..._linkedTodos(),
               gap,
               TextButton(
                 onPressed: _saving
