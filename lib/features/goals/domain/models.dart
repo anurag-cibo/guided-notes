@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import '../../todos/domain/todo_models.dart';
 import 'theme_colors.dart';
+import 'progress_amount.dart';
+export 'progress_amount.dart';
 export 'theme_colors.dart';
 
 enum MilestoneStatus {
@@ -65,7 +67,7 @@ class Milestone {
   final int id;
   final int goalId;
   final String title;
-  final int progress;
+  final double progress;
   final MilestoneStatus status;
   final DateTime? dueDate;
 }
@@ -113,11 +115,14 @@ class GoalSnapshot {
       milestones.where((m) => m.goalId == id).toList();
   Goal? goal(int id) => _goalsById[id];
 
-  int? progressFor(int id) {
+  double? progressFor(int id) {
     final entries = forGoal(id);
     if (entries.isEmpty) return null;
-    return (entries.fold<int>(0, (sum, m) => sum + m.progress) / entries.length)
-        .round();
+    return (entries.fold<double>(0, (sum, m) => sum + m.progress) /
+                entries.length *
+                100)
+            .round() /
+        100;
   }
 }
 
@@ -134,20 +139,23 @@ String requiredTitle(String value) {
   return title;
 }
 
-({int progress, MilestoneStatus status}) normalizeProgress(
-  int progress,
+({double progress, MilestoneStatus status}) normalizeProgress(
+  num progress,
   MilestoneStatus status,
 ) {
-  if (progress < 0 || progress > 100) {
+  if (!progress.isFinite || progress < 0 || progress > 100) {
     throw const RuleViolation('Fortschritt muss zwischen 0 und 100 liegen.');
   }
   if (status == MilestoneStatus.achieved || progress == 100) {
     return (progress: 100, status: MilestoneStatus.achieved);
   }
   if (status == MilestoneStatus.notStarted && progress > 0) {
-    return (progress: progress, status: MilestoneStatus.onTrack);
+    return (
+      progress: progressPercent(progressUnits(progress)),
+      status: MilestoneStatus.onTrack,
+    );
   }
-  return (progress: progress, status: status);
+  return (progress: progressPercent(progressUnits(progress)), status: status);
 }
 
 String deadlineLabel(DateTime? due, {bool achieved = false, DateTime? now}) {

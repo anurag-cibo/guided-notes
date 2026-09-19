@@ -19,15 +19,15 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
-  Future<void> _addTodoLinks() async {
+  Future<void> _addTodoLinks({int scale = 1}) async {
     for (final table in ['todo_templates', 'todo_entries']) {
       await customStatement(
         'ALTER TABLE $table ADD COLUMN milestone_id INTEGER REFERENCES milestones(id) ON DELETE SET NULL',
       );
       await customStatement(
-        'ALTER TABLE $table ADD COLUMN progress_increment INTEGER NOT NULL DEFAULT 0 CHECK(progress_increment BETWEEN 0 AND 100)',
+        'ALTER TABLE $table ADD COLUMN progress_increment INTEGER NOT NULL DEFAULT 0 CHECK(progress_increment BETWEEN 0 AND ${100 * scale})',
       );
     }
     await customStatement('''CREATE TABLE todo_progress_credits (
@@ -35,12 +35,85 @@ class AppDatabase extends GeneratedDatabase {
       period TEXT NOT NULL,
       ordinal INTEGER NOT NULL CHECK(ordinal BETWEEN 1 AND 999),
       milestone_id INTEGER REFERENCES milestones(id) ON DELETE SET NULL,
-      amount INTEGER NOT NULL CHECK(amount BETWEEN 0 AND 100),
+      amount INTEGER NOT NULL CHECK(amount BETWEEN 0 AND ${100 * scale}),
       previous_status TEXT NOT NULL CHECK(previous_status IN ('notStarted','onTrack','offTrack','onHold','achieved')),
       PRIMARY KEY(template_id, period, ordinal),
       FOREIGN KEY(template_id, period) REFERENCES todo_entries(template_id, period) ON DELETE CASCADE
     )''');
   }
+
+  Future<void> _addProgressMode() async {
+    for (final table in ['todo_templates', 'todo_entries']) {
+      await customStatement(
+        "ALTER TABLE $table ADD COLUMN progress_mode TEXT NOT NULL DEFAULT 'perCompletion' CHECK(progress_mode IN ('perCompletion','onTarget'))",
+      );
+    }
+  }
+
+  Future<void> _createMilestones() async {
+    await customStatement('''CREATE TABLE milestones (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      goal_id INTEGER NOT NULL REFERENCES goals(id) ON DELETE CASCADE,
+      title TEXT NOT NULL CHECK(length(trim(title)) > 0),
+      progress INTEGER NOT NULL DEFAULT 0 CHECK(progress BETWEEN 0 AND 10000),
+      status TEXT NOT NULL DEFAULT 'notStarted'
+        CHECK(status IN ('notStarted','onTrack','offTrack','onHold','achieved')),
+      due_date TEXT,
+      CHECK((status = 'achieved') = (progress = 10000)),
+      CHECK(status != 'notStarted' OR progress = 0)
+    )''');
+    await customStatement(
+      'CREATE INDEX milestones_goal ON milestones(goal_id, id)',
+    );
+  }
+
+  Future<void> _migrateProgressUnits() => transaction(() async {
+    await customStatement(
+      "CREATE TEMP TABLE migration_sequences AS SELECT name,seq FROM sqlite_sequence WHERE name IN ('milestones','todo_templates')",
+    );
+    // Copy dependants before dropping in FK order. Goals and their images stay
+    // untouched; persisted contributions retain exact undo semantics.
+    const tables = [
+      'todo_progress_credits',
+      'todo_entries',
+      'todo_templates',
+      'milestones',
+    ];
+    for (final table in tables) {
+      await customStatement(
+        'CREATE TEMP TABLE migration_$table AS SELECT * FROM $table',
+      );
+    }
+    for (final table in tables) {
+      await customStatement('DROP TABLE $table');
+    }
+    await _createMilestones();
+    await _createTodos();
+    await _addTodoLinks(scale: 100);
+    await _addProgressMode();
+    await customStatement(
+      'INSERT INTO milestones(id,goal_id,title,progress,status,due_date) SELECT id,goal_id,title,progress*100,status,due_date FROM migration_milestones',
+    );
+    await customStatement(
+      'INSERT INTO todo_templates(id,title,frequency,target,active,milestone_id,progress_increment) SELECT id,title,frequency,target,active,milestone_id,progress_increment*100 FROM migration_todo_templates',
+    );
+    await customStatement(
+      'INSERT INTO todo_entries(template_id,period,title,frequency,target,completed,milestone_id,progress_increment) SELECT template_id,period,title,frequency,target,completed,milestone_id,progress_increment*100 FROM migration_todo_entries',
+    );
+    await customStatement(
+      'INSERT INTO todo_progress_credits(template_id,period,ordinal,milestone_id,amount,previous_status) SELECT template_id,period,ordinal,milestone_id,amount*100,previous_status FROM migration_todo_progress_credits',
+    );
+    for (final table in tables) {
+      await customStatement('DROP TABLE migration_$table');
+    }
+    await customStatement(
+      'UPDATE sqlite_sequence SET seq=MAX(seq, (SELECT seq FROM migration_sequences WHERE name=sqlite_sequence.name)) WHERE name IN (SELECT name FROM migration_sequences)',
+    );
+    await customStatement(
+      'INSERT INTO sqlite_sequence(name,seq) SELECT name,seq FROM migration_sequences WHERE name NOT IN (SELECT name FROM sqlite_sequence)',
+    );
+    await customStatement('DROP TABLE migration_sequences');
+  });
 
   Future<void> _createGoalThemes() =>
       customStatement('''CREATE TABLE goal_themes (
@@ -102,20 +175,7 @@ class AppDatabase extends GeneratedDatabase {
         color TEXT NOT NULL DEFAULT 'forest',
         custom_theme_id INTEGER REFERENCES goal_themes(id)
       )''');
-      await customStatement('''CREATE TABLE milestones (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        goal_id INTEGER NOT NULL REFERENCES goals(id) ON DELETE CASCADE,
-        title TEXT NOT NULL CHECK(length(trim(title)) > 0),
-        progress INTEGER NOT NULL DEFAULT 0 CHECK(progress BETWEEN 0 AND 100),
-        status TEXT NOT NULL DEFAULT 'notStarted'
-          CHECK(status IN ('notStarted', 'onTrack', 'offTrack', 'onHold', 'achieved')),
-        due_date TEXT,
-        CHECK((status = 'achieved') = (progress = 100)),
-        CHECK(status != 'notStarted' OR progress = 0)
-      )''');
-      await customStatement(
-        'CREATE INDEX milestones_goal ON milestones(goal_id, id)',
-      );
+      await _createMilestones();
       await customStatement('''CREATE TRIGGER limit_goal_insert
         BEFORE INSERT ON goals WHEN NEW.archived = 0
         AND (SELECT count(*) FROM goals WHERE archived = 0) >= 5
@@ -125,11 +185,12 @@ class AppDatabase extends GeneratedDatabase {
         AND (SELECT count(*) FROM goals WHERE archived = 0) >= 5
         BEGIN SELECT RAISE(ABORT, 'active_goal_limit'); END''');
       await _createTodos();
-      await _addTodoLinks();
+      await _addTodoLinks(scale: 100);
+      await _addProgressMode();
       await _createSettings();
     },
     onUpgrade: (_, from, to) async {
-      if (from < 1 || from > 7 || to != 8) {
+      if (from < 1 || from > 8 || to != 9) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
@@ -154,6 +215,7 @@ class AppDatabase extends GeneratedDatabase {
         await customStatement('ALTER TABLE goals ADD COLUMN started_on TEXT');
       }
       if (from < 8) await _addTodoLinks();
+      await _migrateProgressUnits();
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

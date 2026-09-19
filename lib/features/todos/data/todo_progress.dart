@@ -23,8 +23,11 @@ class TodoProgress {
     if (row != null) {
       previous = MilestoneStatus.values.byName(row.read<String>('status'));
       final before = row.read<int>('progress');
-      if (row.read<int>('archived') == 0) {
-        amount = entry.progressIncrement.clamp(0, 100 - before);
+      if (row.read<int>('archived') == 0 &&
+          (entry.progressMode == TodoProgressMode.perCompletion ||
+              ordinal == entry.target)) {
+        amount = progressUnits(entry.progressIncrement)
+            .clamp(0, 10000 - before);
         if (amount > 0) {
           await _update(entry.milestoneId!, before + amount, previous);
         }
@@ -59,9 +62,9 @@ class TodoProgress {
     final row = await _milestone(id);
     final amount = credit.read<int>('amount');
     if (row != null && amount > 0) {
-      final progress = (row.read<int>('progress') - amount).clamp(0, 100);
+      final progress = (row.read<int>('progress') - amount).clamp(0, 10000);
       var status = MilestoneStatus.values.byName(row.read<String>('status'));
-      if (status == MilestoneStatus.achieved && progress < 100) {
+      if (status == MilestoneStatus.achieved && progress < 10000) {
         status = MilestoneStatus.values.byName(
           credit.read<String>('previous_status'),
         );
@@ -78,10 +81,10 @@ class TodoProgress {
   }
 
   Future<void> _update(int id, int progress, MilestoneStatus status) async {
-    final normalized = normalizeProgress(progress, status);
+    final normalized = normalizeProgress(progressPercent(progress), status);
     await database.customStatement(
       'UPDATE milestones SET progress=?,status=? WHERE id=?',
-      [normalized.progress, normalized.status.name, id],
+      [progressUnits(normalized.progress), normalized.status.name, id],
     );
   }
 
@@ -102,7 +105,7 @@ class TodoProgress {
         period: r.read<String>('period'),
         ordinal: r.read<int>('ordinal'),
         milestoneId: r.readNullable<int>('milestone_id'),
-        amount: r.read<int>('amount'),
+        amount: progressPercent(r.read<int>('amount')),
         previousStatus: r.read<String>('previous_status'),
       ),
   ];

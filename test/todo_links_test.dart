@@ -13,6 +13,7 @@ import 'package:guided_notes/features/goals/data/backup_codec.dart';
 import 'package:guided_notes/features/goals/data/goals_repository.dart';
 import 'package:guided_notes/features/goals/domain/models.dart';
 import 'package:guided_notes/features/todos/domain/todo_models.dart';
+import 'package:guided_notes/features/todos/presentation/progress_increment_picker.dart';
 
 import 'fixtures/legacy_todos.dart';
 
@@ -301,15 +302,26 @@ void main() {
     await tester.ensureVisible(
       find.byKey(const ValueKey('todo-track-progress')),
     );
-    await tester.tap(find.byType(Switch));
+    expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+    expect(
+      tester
+          .widget<ProgressIncrementPicker>(find.byType(ProgressIncrementPicker))
+          .value,
+      2.5,
+    );
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byType(CupertinoPicker));
-    await tester.drag(find.byType(CupertinoPicker), const Offset(0, -120));
+    await tester.ensureVisible(find.byType(CupertinoPicker).first);
+    await tester.drag(
+      find.byType(CupertinoPicker).first,
+      const Offset(0, -120),
+    );
     await tester.pumpAndSettle();
-    final wheel = tester.widget<CupertinoPicker>(find.byType(CupertinoPicker));
-    expect(wheel.scrollController!.selectedItem, greaterThan(4));
+    final wheel = tester.widget<CupertinoPicker>(
+      find.byType(CupertinoPicker).first,
+    );
+    expect(wheel.scrollController!.selectedItem, greaterThan(2));
     wheel.scrollController!.animateToItem(
-      7,
+      8,
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
     );
@@ -332,10 +344,10 @@ void main() {
     expect(find.text('Gesundheit · Bewegen'), findsOneWidget);
     expect(
       tester
-          .widget<CupertinoPicker>(find.byType(CupertinoPicker))
+          .widget<CupertinoPicker>(find.byType(CupertinoPicker).first)
           .scrollController!
           .selectedItem,
-      7,
+      8,
     );
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());

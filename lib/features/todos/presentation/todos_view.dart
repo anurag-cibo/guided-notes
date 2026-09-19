@@ -1,3 +1,5 @@
+import '../../goals/domain/progress_amount.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../goals/application/goals_controller.dart';
@@ -117,12 +119,10 @@ class _PeriodHeading extends StatelessWidget {
 
   String get _compactDate {
     final start = DateTime.parse(periodStart(frequency, now));
-    String date(DateTime value) => '${value.day}.${value.month}.';
+    String date(DateTime value) => '${value.day}.${value.month}';
     if (frequency == TodoFrequency.daily) return date(start);
     final end = DateTime(start.year, start.month, start.day + 6);
-    return start.month == end.month
-        ? '${start.day}.–${date(end)}'
-        : '${date(start)}–${date(end)}';
+    return '${date(start)}-${date(end)}';
   }
 
   @override
@@ -228,10 +228,10 @@ class _TodoCard extends StatelessWidget {
                           entry.progressIncrement > 0)
                         Semantics(
                           label:
-                              '${entry.progressIncrement} Prozentpunkte pro Erledigung',
+                              '${formatProgress(entry.progressIncrement)} Prozentpunkte ${entry.progressMode == TodoProgressMode.onTarget ? 'bei vollständiger Wochenaufgabe' : 'pro Erledigung'}',
                           excludeSemantics: true,
                           child: Text(
-                            '+${entry.progressIncrement} %',
+                            '+${formatProgress(entry.progressIncrement)} %',
                             style: Theme.of(context).textTheme.labelLarge
                                 ?.copyWith(
                                   color:

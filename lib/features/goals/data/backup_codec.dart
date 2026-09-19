@@ -13,7 +13,7 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 7,
+        'version': 8,
         'todoCredits': [
           for (final c in snapshot.todoCredits)
             {
@@ -46,6 +46,7 @@ class BackupCodec {
               'active': t.active,
               'milestoneId': t.milestoneId,
               'progressIncrement': t.progressIncrement,
+              'progressMode': t.progressMode.name,
             },
         ],
         'todoEntries': [
@@ -59,6 +60,7 @@ class BackupCodec {
               'completed': e.completed,
               'milestoneId': e.milestoneId,
               'progressIncrement': e.progressIncrement,
+              'progressMode': e.progressMode.name,
             },
         ],
         'goals': [
@@ -102,7 +104,7 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          ![1, 2, 3, 4, 5, 6, 7].contains(root['version'])) {
+          ![1, 2, 3, 4, 5, 6, 7, 8].contains(root['version'])) {
         throw const FormatException();
       }
       final themes = <CustomGoalTheme>[];
@@ -158,7 +160,7 @@ class BackupCodec {
       }
       final milestones = (root['milestones'] as List).map((value) {
         final m = value as Map<String, dynamic>;
-        final progress = m['progress'] as int;
+        final progress = _percent(m['progress']);
         final status = MilestoneStatus.values.byName(m['status'] as String);
         if (progress < 0 ||
             progress > 100 ||
@@ -203,6 +205,7 @@ class BackupCodec {
               target: _target(t['target'], frequency),
               active: t['active'] as bool,
               milestoneId: linkId(t),
+              progressMode: _mode(t, root['version'] as int, frequency),
               progressIncrement: root['version'] >= 7
                   ? _percent(t['progressIncrement'])
                   : 0,
@@ -238,6 +241,7 @@ class BackupCodec {
               target: target,
               completed: completed,
               milestoneId: linkId(e),
+              progressMode: _mode(e, root['version'] as int, frequency),
               progressIncrement: root['version'] >= 7
                   ? _percent(e['progressIncrement'])
                   : 0,
@@ -286,7 +290,7 @@ class BackupCodec {
       );
     } catch (_) {
       throw const RuleViolation(
-        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–7, höchstens 10 MB).',
+        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–8, höchstens 10 MB).',
       );
     }
   }
@@ -314,11 +318,26 @@ class BackupCodec {
     return value;
   }
 
-  static int _percent(dynamic value) {
-    if (value is! int || value < 0 || value > 100) {
+  static double _percent(dynamic value) {
+    if (value is! num || !value.isFinite || value < 0 || value > 100) {
       throw const FormatException();
     }
-    return value;
+    return progressPercent(progressUnits(value));
+  }
+
+  static TodoProgressMode _mode(
+    Map<String, dynamic> value,
+    int version,
+    TodoFrequency frequency,
+  ) {
+    final mode = version < 8
+        ? TodoProgressMode.perCompletion
+        : TodoProgressMode.values.byName(value['progressMode'] as String);
+    if (frequency == TodoFrequency.daily &&
+        mode != TodoProgressMode.perCompletion) {
+      throw const FormatException();
+    }
+    return mode;
   }
 
   static int _id(dynamic value) {

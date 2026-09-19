@@ -75,10 +75,10 @@ void main() {
       await tester.pumpWidget(GuideApp(controller: controller));
       await tester.tap(find.text('Todos'));
       await tester.pumpAndSettle();
-      expect(find.text('20.9.'), findsOneWidget);
-      expect(find.text('14.–20.9.'), findsOneWidget);
+      expect(find.text('20.9'), findsOneWidget);
+      expect(find.text('14.9-20.9'), findsOneWidget);
       expect(
-        tester.getCenter(find.text('20.9.')).dy,
+        tester.getCenter(find.text('20.9')).dy,
         tester.getCenter(find.text('Heute')).dy,
       );
       await tester.tap(find.byTooltip('Tagesaufgabe hinzufügen'));

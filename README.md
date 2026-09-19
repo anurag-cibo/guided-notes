@@ -22,7 +22,7 @@ Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kale
 
 ## Todos und Zwischenziel-Fortschritt
 
-Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenziel über eine durchsuchbare, nach Zielen gruppierte Auswahl zuordnen. Der zusätzliche Schalter **Fortschritt automatisch erhöhen** aktiviert einen Beitrag von 1–100 ganzen Prozentpunkten pro Erledigung, auswählbar über ein Scrollrad. Bei Wochenaufgaben zählt jede einzelne Wiederholung. Ohne Schalter bleibt es bei der Zuordnung, ohne Zuordnung bleibt das Todo unabhängig. In der Liste steht nur der aktive Beitrag als grüne Zahl (z. B. **+5 %**); die Zuordnung ist im Aufgaben-Editor sichtbar.
+Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenziel über eine durchsuchbare, nach Zielen gruppierte Auswahl zuordnen. Der zusätzliche Schalter **Fortschritt automatisch erhöhen** aktiviert einen Beitrag von 0,1–100 Prozentpunkten, auswählbar über zwei Scrollräder für ganze Prozent und Nachkommastufen. Bei neuer Zuordnung ist der Beitrag mit 2,5 % aktiviert. Wochenaufgaben können je Wiederholung oder einmal beim Erreichen aller Wiederholungen Fortschritt erhalten. Rücknahme der letzten Wiederholung nimmt auch diesen Abschlussbeitrag zurück. Ohne Schalter bleibt es bei der Zuordnung, ohne Zuordnung bleibt das Todo unabhängig. In der Liste steht nur der aktive Beitrag als grüne Zahl (z. B. **+5 %**); die Zuordnung ist im Aufgaben-Editor sichtbar.
 
 Der Zwischenzielfortschritt steigt höchstens auf 100 %. Rückgängig zieht nur den tatsächlich gutgeschriebenen Beitrag ab – auch nach Neustart, Backup oder einem Wechsel der Zuordnung. Beispiel: 97 % + 10 Prozentpunkte ergibt 100 %, Rückgängig wieder 97 %. Änderungen an Zuordnung und Beitrag gelten sofort für neue Erledigungen; alte Erledigungen werden nicht nachträglich gewertet. Titel und Wochenanzahl ändern sich weiterhin erst ab dem nächsten Zeitraum. Archivierte Ziele erhalten keine neuen Beiträge. Löschen eines Zwischenziels erhält die Todos und löst ihre Zuordnung.
 
@@ -48,13 +48,13 @@ Die zentralen Farbrollen stehen in `ThemeColors`, Vorgaben und Ableitung für He
 
 Das Zahnrad in jedem Hauptbereich öffnet die Einstellungen. Die App folgt zunächst dem Gerät; Hell- und Dunkelmodus können dauerhaft gewählt werden. Beide Darstellungen umfassen Ziele, Zwischenziele, Todos, Formulare und Dialoge. Unter „Allgemein“ stehen Sicherung und bestätigtes Löschen aller Inhalte bereit. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf Wunsch als klar gekennzeichnete Platzhalter sichtbar. Dateninformationen und verwendete Lizenzen sind ebenfalls erreichbar.
 
-Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 8 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 9 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
 
 ## Daten sichern
 
 Über das Zahnrad **Einstellungen → Datensicherung** oben rechts lassen sich Ziele, Zwischenziele, Todo-Vorlagen, Tages-/Wochenstände und Archive als JSON-Datei exportieren. Android öffnet die Dateiauswahl für den Speicherort. Die Datei enthält auch Motivationstexte und ist unverschlüsselt; eine Kopie außerhalb des Geräts schützt vor Geräteverlust.
 
-**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 7, bis 10 MB. Alte Sicherungen mit Version 1 bis 6 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
+**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 8, bis 10 MB. Alte Sicherungen mit Version 1 bis 7 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
 
 ## APK fürs Handy
 

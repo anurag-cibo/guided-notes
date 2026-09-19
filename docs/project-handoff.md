@@ -128,3 +128,11 @@ PR #37 integriert, APK 0.2.1 veröffentlicht. Folgeänderung 0.2.2+4 setzt das k
 ## Blinkende Controls beim Speichern · 19.09.2026
 
 PR #38 integriert, APK 0.2.2 veröffentlicht. Version 0.2.3+5 entfernt die globale UI-Benachrichtigung für den kurzzeitigen Schreibschutz und lädt bei Todo-Zähleränderungen nur betroffene Daten nach. Schreibschutz und Transaktionen bleiben erhalten; Formulare verwenden ihre lokalen Busy-Zustände. 56 Tests einschließlich langsamer Speicherung und inkrementellem Snapshot-Abgleich. Keine Schemaänderung. Performance-Nachweise und Grenzen stehen in docs/validation.md.
+
+## Feine Beiträge und Wochenabschluss · 19.09.2026
+
+#40: Zwei Auswahlräder für ganze Prozent (0–100) und wechselnde Nachkommastufen. Unter 2: Zehntel plus Viertel/drei Viertel, bei 2: 0/0,2/0,4/0,5/0,6/0,8, bei 3: Viertel, bei 4: halbe, ab 5: ganze Prozent. Neue Zuordnung aktiviert 2,5 %. Wochenmodus „je Wiederholung“ oder „bei vollständiger Wochenaufgabe“; Abschlussbeitrag wird sofort bei der letzten Wiederholung gebucht und beim Rückgängigmachen zurückgenommen. Modusänderungen beeinflussen nur neue Buchungen.
+
+Schema 9 speichert Fortschritt und Beiträge als ganzzahlige Hundertstel; Migration erhält Daten, IDs, Autoinkrement-Zähler und frühere Beiträge. Backup 8 enthält den Wochenmodus, liest Versionen 1–7 weiterhin. Anzeigen nutzen deutsche Dezimalzahlen. Die Performance-Korrektur aus PR #39 bleibt erhalten. Version 0.3.0+6 nutzt den vorhandenen privaten Release-Schlüssel. Aktueller GitHub-Stand: #40.
+
+Abschlussprüfung dieser Erweiterung: native Android-Bedienung, Dateineustart und signiertes Update erfolgreich. Aktuelle Benutzerdaten mit outputs/before-fine-progress.tar und outputs/after-fine-progress.tar semantisch verglichen und erhalten. Diese Sicherungen bleiben lokal. Als Datumstrenner ist ausdrücklich der normale Bindestrich gewünscht: 14.9-20.9.

@@ -30,9 +30,11 @@ class _TodoEditorState extends State<TodoEditor> {
   late int? _milestoneId = widget.template?.milestoneId;
   late bool _trackProgress =
       _milestoneId != null && (widget.template?.progressIncrement ?? 0) > 0;
-  late int _increment = (widget.template?.progressIncrement ?? 0) > 0
+  late double _increment = (widget.template?.progressIncrement ?? 0) > 0
       ? widget.template!.progressIncrement
-      : 5;
+      : 2.5;
+  late TodoProgressMode _progressMode =
+      widget.template?.progressMode ?? TodoProgressMode.perCompletion;
   @override
   void dispose() {
     _title.dispose();
@@ -54,6 +56,7 @@ class _TodoEditorState extends State<TodoEditor> {
             ? _increment
             : 0,
         frequency: widget.frequency,
+        progressMode: _progressMode,
         target: widget.frequency == TodoFrequency.daily
             ? 1
             : int.parse(_target.text.trim()),
@@ -171,8 +174,14 @@ class _TodoEditorState extends State<TodoEditor> {
                       );
                       if (!mounted || selected == null) return;
                       setState(() {
+                        final newlyLinked =
+                            selected != -1 && selected != _milestoneId;
                         _milestoneId = selected == -1 ? null : selected;
                         if (_milestoneId == null) _trackProgress = false;
+                        if (newlyLinked) {
+                          _trackProgress = true;
+                          _increment = 2.5;
+                        }
                       });
                     },
             ),
@@ -187,14 +196,31 @@ class _TodoEditorState extends State<TodoEditor> {
                     : (value) => setState(() => _trackProgress = value),
               ),
               if (_trackProgress) ...[
+                if (widget.frequency == TodoFrequency.weekly) ...[
+                  DropdownButtonFormField<TodoProgressMode>(
+                    initialValue: _progressMode,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Fortschritt gutschreiben',
+                    ),
+                    items: [
+                      for (final mode in TodoProgressMode.values)
+                        DropdownMenuItem(value: mode, child: Text(mode.label)),
+                    ],
+                    onChanged: _busy
+                        ? null
+                        : (value) => setState(() => _progressMode = value!),
+                  ),
+                  gap,
+                ],
                 ProgressIncrementPicker(
                   key: const ValueKey('todo-progress-increment'),
                   value: _increment,
                   onChanged: _busy ? null : (value) => _increment = value,
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  '• Beitrag je Erledigung, auch bei Wochen-Wiederholungen\n• Fortschritt bis maximal 100 %\n• Rückgängig nimmt den Beitrag zurück',
+                Text(
+                  '${_progressMode == TodoProgressMode.onTarget ? '• Beitrag sobald alle Wiederholungen geschafft sind' : '• Beitrag je Erledigung'}\n• Fortschritt bis maximal 100 %\n• Rückgängig nimmt den Beitrag zurück',
                 ),
               ],
             ],

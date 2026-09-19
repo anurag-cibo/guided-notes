@@ -23,7 +23,10 @@ class TodosRepository {
         target: r.read<int>('target'),
         active: r.read<int>('active') == 1,
         milestoneId: r.readNullable<int>('milestone_id'),
-        progressIncrement: r.read<int>('progress_increment'),
+        progressIncrement: progressPercent(r.read<int>('progress_increment')),
+        progressMode: TodoProgressMode.values.byName(
+          r.read<String>('progress_mode'),
+        ),
       ),
   ];
 
@@ -33,8 +36,8 @@ class TodosRepository {
       if (!t.active) continue;
       await database.customStatement(
         '''INSERT OR IGNORE INTO todo_entries
-        (template_id, period, title, frequency, target, completed, milestone_id, progress_increment)
-        VALUES (?, ?, ?, ?, ?, 0, ?, ?)''',
+        (template_id, period, title, frequency, target, completed, milestone_id, progress_increment, progress_mode)
+        VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?)''',
         [
           t.id,
           periodStart(t.frequency, today),
@@ -42,7 +45,8 @@ class TodosRepository {
           t.frequency.name,
           t.target,
           t.milestoneId,
-          t.progressIncrement,
+          progressUnits(t.progressIncrement),
+          t.progressMode.name,
         ],
       );
     }
@@ -66,7 +70,10 @@ class TodosRepository {
     target: r.read<int>('target'),
     completed: r.read<int>('completed'),
     milestoneId: r.readNullable<int>('milestone_id'),
-    progressIncrement: r.read<int>('progress_increment'),
+    progressIncrement: progressPercent(r.read<int>('progress_increment')),
+    progressMode: TodoProgressMode.values.byName(
+      r.read<String>('progress_mode'),
+    ),
   );
 
   Future<TodoEntry> entry(int templateId, String period) async => _readEntry(
@@ -84,10 +91,12 @@ class TodosRepository {
     required TodoFrequency frequency,
     required int target,
     int? milestoneId,
-    int progressIncrement = 0,
+    num progressIncrement = 0,
+    TodoProgressMode progressMode = TodoProgressMode.perCompletion,
   }) => database.transaction(() async {
     final name = requiredTitle(title);
-    if (progressIncrement < 0 ||
+    if (!progressIncrement.isFinite ||
+        progressIncrement < 0 ||
         progressIncrement > 100 ||
         (milestoneId == null && progressIncrement != 0)) {
       throw const RuleViolation(
@@ -117,11 +126,22 @@ class TodosRepository {
         'Bitte eine Wochenanzahl zwischen 1 und 999 eingeben.',
       );
     }
+    final incrementUnits = progressUnits(progressIncrement);
+    if (frequency == TodoFrequency.daily) {
+      progressMode = TodoProgressMode.perCompletion;
+    }
     await ensureCurrentPeriods();
     if (id == null) {
       await database.customStatement(
-        'INSERT INTO todo_templates(title,frequency,target,active,milestone_id,progress_increment) VALUES(?,?,?,1,?,?)',
-        [name, frequency.name, target, milestoneId, progressIncrement],
+        'INSERT INTO todo_templates(title,frequency,target,active,milestone_id,progress_increment,progress_mode) VALUES(?,?,?,1,?,?,?)',
+        [
+          name,
+          frequency.name,
+          target,
+          milestoneId,
+          incrementUnits,
+          progressMode.name,
+        ],
       );
     } else {
       final t = await _requireTemplate(id);
@@ -131,13 +151,19 @@ class TodosRepository {
         );
       }
       await database.customStatement(
-        'UPDATE todo_templates SET title=?,target=?,milestone_id=?,progress_increment=? WHERE id=?',
-        [name, target, milestoneId, progressIncrement, id],
+        'UPDATE todo_templates SET title=?,target=?,milestone_id=?,progress_increment=?,progress_mode=? WHERE id=?',
+        [name, target, milestoneId, incrementUnits, progressMode.name, id],
       );
       // Linking affects future completions immediately, never past credits.
       await database.customStatement(
-        'UPDATE todo_entries SET milestone_id=?,progress_increment=? WHERE template_id=? AND period=?',
-        [milestoneId, progressIncrement, id, periodStart(frequency, now())],
+        'UPDATE todo_entries SET milestone_id=?,progress_increment=?,progress_mode=? WHERE template_id=? AND period=?',
+        [
+          milestoneId,
+          incrementUnits,
+          progressMode.name,
+          id,
+          periodStart(frequency, now()),
+        ],
       );
     }
     await ensureCurrentPeriods();

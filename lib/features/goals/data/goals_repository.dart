@@ -76,7 +76,7 @@ class GoalsRepository {
             m.id,
             m.goalId,
             m.title,
-            m.progress,
+            progressUnits(m.progress),
             m.status.name,
             BackupCodec.date(m.dueDate),
           ],
@@ -84,7 +84,7 @@ class GoalsRepository {
       }
       for (final t in snapshot.todoTemplates) {
         await database.customStatement(
-          'INSERT INTO todo_templates(id,title,frequency,target,active,milestone_id,progress_increment) VALUES(?,?,?,?,?,?,?)',
+          'INSERT INTO todo_templates(id,title,frequency,target,active,milestone_id,progress_increment,progress_mode) VALUES(?,?,?,?,?,?,?,?)',
           [
             t.id,
             t.title,
@@ -92,13 +92,14 @@ class GoalsRepository {
             t.target,
             t.active ? 1 : 0,
             t.milestoneId,
-            t.progressIncrement,
+            progressUnits(t.progressIncrement),
+            t.progressMode.name,
           ],
         );
       }
       for (final e in snapshot.todoEntries) {
         await database.customStatement(
-          'INSERT INTO todo_entries(template_id,period,title,frequency,target,completed,milestone_id,progress_increment) VALUES(?,?,?,?,?,?,?,?)',
+          'INSERT INTO todo_entries(template_id,period,title,frequency,target,completed,milestone_id,progress_increment,progress_mode) VALUES(?,?,?,?,?,?,?,?,?)',
           [
             e.templateId,
             e.period,
@@ -107,7 +108,8 @@ class GoalsRepository {
             e.target,
             e.completed,
             e.milestoneId,
-            e.progressIncrement,
+            progressUnits(e.progressIncrement),
+            e.progressMode.name,
           ],
         );
       }
@@ -119,7 +121,7 @@ class GoalsRepository {
             c.period,
             c.ordinal,
             c.milestoneId,
-            c.amount,
+            progressUnits(c.amount),
             c.previousStatus,
           ],
         );
@@ -193,7 +195,7 @@ class GoalsRepository {
     id: r.read<int>('id'),
     goalId: r.read<int>('goal_id'),
     title: r.read<String>('title'),
-    progress: r.read<int>('progress'),
+    progress: progressPercent(r.read<int>('progress')),
     status: MilestoneStatus.values.byName(r.read<String>('status')),
     dueDate: _date(r.readNullable<String>('due_date')),
   );
@@ -345,7 +347,7 @@ class GoalsRepository {
     int? id,
     required int goalId,
     required String title,
-    int progress = 0,
+    num progress = 0,
     MilestoneStatus status = MilestoneStatus.notStarted,
     DateTime? dueDate,
   }) => database.transaction(() async {
@@ -354,7 +356,7 @@ class GoalsRepository {
     final normalized = normalizeProgress(progress, status);
     final values = [
       name,
-      normalized.progress,
+      progressUnits(normalized.progress),
       normalized.status.name,
       _encodeDate(dueDate),
     ];
