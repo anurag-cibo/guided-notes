@@ -18,8 +18,13 @@ void main() {
     final db = AppDatabase(NativeDatabase.memory());
     final r = GoalsRepository(db);
     final c = GoalsController(r);
-    await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
     await r.saveGoal(
+      motivation: 'Meine persönliche Richtung',
+      title: 'Gesundheit',
+      emoji: '🌿',
+    );
+    await r.saveGoal(
+      motivation: 'Meine persönliche Richtung',
       title: 'Beruf & Lernen',
       emoji: '📚',
       color: GoalColor.lavender,
@@ -94,7 +99,12 @@ void main() {
     await move('drag-milestone-1', 'drag-milestone-3', 'motion-cross-goal');
     expect(c.snapshot.forGoal(2).map((m) => m.id), [1, 3]);
     await c.mutate(
-      (r) => r.saveGoal(title: 'Finanzen', emoji: '💰', color: GoalColor.amber),
+      (r) => r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Finanzen',
+        emoji: '💰',
+        color: GoalColor.amber,
+      ),
     );
     await tester.pumpAndSettle();
     await move('drag-milestone-2', 'drop-goal-3', 'motion-empty-group');

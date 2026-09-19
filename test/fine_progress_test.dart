@@ -16,7 +16,7 @@ void main() {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
     final r = GoalsRepository(db, now: () => now);
-    await r.saveGoal(title: 'A');
+    await r.saveGoal(motivation: 'Meine persönliche Richtung', title: 'A');
     final goal = (await r.load()).goals.single;
     await r.saveMilestone(
       motivation: 'Mein nächster Schritt zum Ziel',
@@ -52,7 +52,7 @@ void main() {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
     final r = GoalsRepository(db, now: () => now);
-    await r.saveGoal(title: 'A');
+    await r.saveGoal(motivation: 'Meine persönliche Richtung', title: 'A');
     final goal = (await r.load()).goals.single;
     await r.saveMilestone(
       motivation: 'Mein nächster Schritt zum Ziel',

@@ -325,6 +325,11 @@ class GoalsRepository {
       throw const RuleViolation('Dieses Theme ist nicht verfügbar.');
     }
     if (id == null) {
+      if (motivation.trim().isEmpty) {
+        throw const RuleViolation(
+          'Bitte beschreibe, warum dir dieses Ziel wichtig ist.',
+        );
+      }
       await _checkCapacity();
       await database.customStatement(
         'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id, started_on, show_card_cover, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT COALESCE(MAX(sort_order),0)+1 FROM goals))',
@@ -390,11 +395,6 @@ class GoalsRepository {
     }
     final previous = previousRow == null ? null : _readMilestone(previousRow);
     final reason = (motivation ?? previous?.motivation ?? '').trim();
-    if (reason.isEmpty) {
-      throw const RuleViolation(
-        'Bitte beschreibe, warum dir dieses Zwischenziel wichtig ist.',
-      );
-    }
     final metric = scale ?? previous?.scale ?? const MetricScale();
     int value;
     try {

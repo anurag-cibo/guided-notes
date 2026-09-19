@@ -32,6 +32,7 @@ void main() {
       final controller = GoalsController(GoalsRepository(db));
       try {
         await controller.repository.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           title: 'Ein ausführlicher Zielname mit vielen Wörtern',
           color: GoalColor.rose,
         );
@@ -97,13 +98,22 @@ void main() {
         db = AppDatabase(NativeDatabase(file));
         repo = GoalsRepository(db, now: () => fixedNow);
         expect(await repo.exportBackup(), before);
-        await repo.saveGoal(id: id, title: 'Ozean', color: GoalColor.ocean);
+        await repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          id: id,
+          title: 'Ozean',
+          color: GoalColor.ocean,
+        );
         await repo.setArchived(id, true);
         await db.close();
         db = AppDatabase(NativeDatabase(file));
         repo = GoalsRepository(db, now: () => fixedNow);
         expect((await repo.load()).goals.single.color, GoalColor.ocean);
-        await repo.saveGoal(id: id, title: 'Farbe bleibt');
+        await repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          id: id,
+          title: 'Farbe bleibt',
+        );
         final backup = await repo.exportBackup();
         await repo.deleteAllContents();
         await repo.importBackup(backup);
@@ -143,7 +153,10 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       final controller = GoalsController(GoalsRepository(db));
       try {
-        await controller.repository.saveGoal(title: 'Gesundheit');
+        await controller.repository.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Gesundheit',
+        );
         final id = (await controller.repository.load()).goals.single.id;
         await controller.repository.saveMilestone(
           motivation: 'Mein nächster Schritt zum Ziel',

@@ -18,7 +18,10 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       final repository = GoalsRepository(db, now: () => DateTime(2026, 9, 19));
       final controller = GoalsController(repository);
-      await repository.saveGoal(title: 'Gesundheit');
+      await repository.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Gesundheit',
+      );
       final goal = (await repository.load()).goals.single;
       await repository.saveMilestone(
         motivation: 'Mein nächster Schritt zum Ziel',

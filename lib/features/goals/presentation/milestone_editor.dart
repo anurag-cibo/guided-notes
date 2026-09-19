@@ -23,9 +23,6 @@ class MilestoneEditor extends StatefulWidget {
 class _MilestoneEditorState extends State<MilestoneEditor> {
   final _form = GlobalKey<FormState>();
   late final _title = TextEditingController(text: widget.milestone?.title);
-  late final _motivation = TextEditingController(
-    text: widget.milestone?.motivation ?? '',
-  );
   late final _start = TextEditingController(
     text: formatProgress(widget.milestone?.scale.start ?? 0),
   );
@@ -125,7 +122,6 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
         saved.scale.start == parseMetric(_start.text) &&
         saved.scale.target == parseMetric(_target.text) &&
         saved.scale.unit == _unit.text.trim() &&
-        saved.motivation == _motivation.text.trim() &&
         saved.status == _status &&
         saved.dueDate == _due) {
       return true;
@@ -139,7 +135,7 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
   void dispose() {
     widget.controller.removeListener(_refreshTodos);
     _title.dispose();
-    for (final field in [_motivation, _start, _target, _current, _unit]) {
+    for (final field in [_start, _target, _current, _unit]) {
       field.dispose();
     }
     super.dispose();
@@ -157,7 +153,6 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
         title: _title.text,
         currentValue: parseMetric(_current.text),
         scale: _scale,
-        motivation: _motivation.text,
         status: _status,
         dueDate: _due,
       ),
@@ -359,19 +354,6 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
               textCapitalization: TextCapitalization.sentences,
               validator: (v) => v == null || v.trim().isEmpty
                   ? 'Bitte einen Titel eingeben.'
-                  : null,
-            ),
-            gap,
-            TextFormField(
-              key: const ValueKey('milestone-why'),
-              controller: _motivation,
-              minLines: 2,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: 'Warum ist dir dieses Zwischenziel wichtig?',
-              ),
-              validator: (value) => value == null || value.trim().isEmpty
-                  ? 'Bitte beschreibe dein Warum.'
                   : null,
             ),
             gap,

@@ -86,6 +86,7 @@ void main() {
           title: 'Erholsam schlafen',
         );
         await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           title: 'Beruf & Karriere',
           emoji: '💻',
           color: GoalColor.lavender,
@@ -97,6 +98,7 @@ void main() {
           progress: 45,
         );
         await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           title: 'Finanzen',
           showCardCover: false,
           emoji: '💰',
@@ -109,6 +111,7 @@ void main() {
           progress: 25.5,
         );
         await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           title: 'Beziehungen',
           emoji: '❤️',
           color: GoalColor.rose,

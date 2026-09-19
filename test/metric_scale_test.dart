@@ -21,7 +21,7 @@ void main() {
   setUp(() async {
     db = AppDatabase(NativeDatabase.memory());
     r = GoalsRepository(db);
-    await r.saveGoal(title: 'Lernen');
+    await r.saveGoal(motivation: 'Meine persönliche Richtung', title: 'Lernen');
   });
   tearDown(() => db.close());
 
@@ -98,7 +98,10 @@ void main() {
   test(
     'descending amounts survive scale edits, goal moves and backup',
     () async {
-      await r.saveGoal(title: 'Gesundheit');
+      await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Gesundheit',
+      );
       await r.saveMilestone(
         goalId: 1,
         title: 'Gewicht',
@@ -142,12 +145,8 @@ void main() {
   );
 
   test(
-    'why and scale validation are atomic; unitless and custom units persist',
+    'scale validation is atomic; unitless and custom units persist',
     () async {
-      await expectLater(
-        r.saveMilestone(goalId: 1, title: 'Ohne Warum'),
-        throwsA(isA<RuleViolation>()),
-      );
       await r.saveMilestone(
         goalId: 1,
         title: 'Bücher',
@@ -171,10 +170,6 @@ void main() {
           throwsA(isA<RuleViolation>()),
         );
       }
-      await expectLater(
-        r.saveMilestone(id: 1, goalId: 1, title: 'Ungültig', motivation: '  '),
-        throwsA(isA<RuleViolation>()),
-      );
       await expectLater(
         r.saveMilestone(id: 1, goalId: 1, title: 'Ungültig', currentValue: 13),
         throwsA(isA<RuleViolation>()),
@@ -200,7 +195,10 @@ void main() {
     var store = AppDatabase(NativeDatabase(file));
     var repo = GoalsRepository(store);
     try {
-      await repo.saveGoal(title: 'Bestehend');
+      await repo.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Bestehend',
+      );
       await repo.saveMilestone(
         goalId: 1,
         title: 'Schritt',
@@ -250,7 +248,7 @@ void main() {
   });
 
   testWidgets(
-    'create measurement with required why, set unit and contribute using the linked unit',
+    'create measurement without why, set unit and contribute using the linked unit',
     (tester) async {
       final c = GoalsController(r);
       await c.load();
@@ -265,19 +263,7 @@ void main() {
           find.byType(TextFormField).first,
           'Bücher lesen',
         );
-        await tester.pumpAndSettle();
-        await tester.ensureVisible(find.text('Speichern'));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Speichern'));
-        await tester.pumpAndSettle();
-        expect(c.snapshot.milestones, isEmpty);
-        expect(find.text('Bitte beschreibe dein Warum.'), findsOneWidget);
-        await tester.pumpAndSettle();
-        await tester.ensureVisible(find.byKey(const ValueKey('milestone-why')));
-        await tester.enterText(
-          find.byKey(const ValueKey('milestone-why')),
-          'Neue Perspektiven gewinnen',
-        );
+        expect(find.byKey(const ValueKey('milestone-why')), findsNothing);
         final units = find.byKey(const ValueKey('metric-unit-false'));
         await tester.pumpAndSettle();
         await tester.ensureVisible(units);

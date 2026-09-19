@@ -26,7 +26,10 @@ void main() {
   setUp(() async {
     db = AppDatabase(NativeDatabase.memory());
     r = GoalsRepository(db, now: () => fixedNow);
-    await r.saveGoal(title: 'Gesundheit');
+    await r.saveGoal(
+      motivation: 'Meine persönliche Richtung',
+      title: 'Gesundheit',
+    );
     goalId = (await r.load()).goals.single.id;
     await r.saveMilestone(
       motivation: 'Mein nächster Schritt zum Ziel',
@@ -212,7 +215,7 @@ void main() {
       await db.close();
       db = AppDatabase(NativeDatabase(file));
       r = GoalsRepository(db, now: () => fixedNow);
-      await r.saveGoal(title: 'Alt');
+      await r.saveGoal(motivation: 'Meine persönliche Richtung', title: 'Alt');
       final g = (await r.load()).goals.single;
       await r.saveMilestone(
         motivation: 'Mein nächster Schritt zum Ziel',
@@ -369,7 +372,10 @@ void main() {
   testWidgets(
     'goal selector disappears down and reappears after small upward scroll',
     (tester) async {
-      await r.saveGoal(title: 'Zweites Ziel');
+      await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Zweites Ziel',
+      );
       for (var i = 0; i < 20; i++) {
         await r.saveMilestone(
           motivation: 'Mein nächster Schritt zum Ziel',

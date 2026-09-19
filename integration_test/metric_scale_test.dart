@@ -24,11 +24,16 @@ void main() {
     var c = GoalsController(r);
     try {
       await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
         title: 'Wissen & Alltag',
         emoji: '📚',
         color: GoalColor.lavender,
       );
-      await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
+      await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Gesundheit',
+        emoji: '🌿',
+      );
       await r.saveMilestone(
         goalId: 1,
         title: 'Zwölf Bücher lesen',
@@ -88,6 +93,33 @@ void main() {
           await tester.tap(find.byType(BackButton));
           await tester.pumpAndSettle();
         }
+        await tester.tap(find.text('Ziele').last);
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Ziel hinzufügen'));
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const ValueKey('goal-title')),
+          'Mehr Zeit für mich',
+        );
+        await tester.ensureVisible(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Bitte beschreibe, warum dir dieses Ziel wichtig ist.'),
+          findsOneWidget,
+        );
+        await tester.ensureVisible(find.byKey(const ValueKey('goal-why')));
+        await tester.pumpAndSettle();
+        await binding.takeScreenshot('goal-why-$mode-required');
+        await tester.enterText(
+          find.byKey(const ValueKey('goal-why')),
+          'Ich möchte meinen Alltag bewusster gestalten.',
+        );
+        await tester.ensureVisible(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Zwischenziele').last);
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const ValueKey('goal-jump-1')));

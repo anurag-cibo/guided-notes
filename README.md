@@ -11,10 +11,10 @@ Eine ruhige Android-App für bis zu fünf aktive Ziele und ihre Zwischenziele. *
 Ziel anlegen → Motivation festhalten → Zwischenziele hinzufügen → Fortschritt und Status pflegen. Ziele, Zwischenziele, Todos und Archive werden offline in SQLite gespeichert, ohne Konto. Drei Hauptbereiche und klare Zurück-Navigation halten den Ablauf klein.
 
 - Maximal fünf aktive, also nicht archivierte Ziele. Erreichte Ziele zählen bis zum Archivieren mit.
-- Beliebig viele Zwischenziele, nach Ziel gruppiert, mit verpflichtendem Warum, eigener Messskala, Status und optionaler Frist.
+- Beliebig viele Zwischenziele, nach Ziel gruppiert, mit eigener Messskala, Status und optionaler Frist.
 - Zielfortschritt ist das gleichgewichtete Mittel seiner Zwischenziele. Zielerfolg ist eine separate bewusste Markierung.
 - Archivieren erhält alle Inhalte; Wiederherstellen prüft die Fünf-Ziele-Grenze. Endgültiges Löschen verlangt eine Bestätigung und entfernt die zugehörigen Zwischenziele atomar.
-- Motivation genügt zunächst als Freitext. Ein eigener Bereich für freie Notizen ist nicht Teil dieses Starts.
+- Das Warum ist bei der Erstellung eines großen Ziels verpflichtend. Ohne Begründung (auch bei bloßen Leerzeichen) bleibt das Formular offen und zeigt einen Hinweis. Bestehende Ziele ohne Warum bleiben bearbeitbar. Motivation genügt als Freitext. Ein eigener Bereich für freie Notizen ist nicht Teil dieses Starts.
 
 Beispiele, genaue Status-/Zeitregeln und der reduzierte Screenflow stehen in [Produktentscheidungen](docs/product-decisions.md). Die [UI-Inspiration](docs/reference/ui-inspiration.png) bleibt eine Anregung und keine verbindliche Spezifikation.
 
@@ -22,9 +22,9 @@ Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kale
 
 ## Messwerte und Einheiten
 
-Ein Zwischenziel hat ein eigenes verpflichtendes **Warum**, eine **Einheit**, **Startwert**, **Zielwert** und **aktuellen Wert**. Vorgegeben sind Prozent, Kilogramm, Seiten, Zentimeter, Gläser und Bücher; eigene Einheiten und **Ohne Einheit** sind möglich. Beide Richtungen werden unterstützt, etwa 80 → 100 Seiten oder 100 → 80 kg. Zahlen erlauben zwei Nachkommastellen. Der aktuelle Wert liegt zwischen Start und Ziel; Start und Ziel müssen verschieden sein.
+Ein Zwischenziel hat eine **Einheit**, **Startwert**, **Zielwert** und **aktuellen Wert**. Vorgegeben sind Prozent, Kilogramm, Seiten, Zentimeter, Gläser und Bücher; eigene Einheiten und **Ohne Einheit** sind möglich. Beide Richtungen werden unterstützt, etwa 80 → 100 Seiten oder 100 → 80 kg. Zahlen erlauben zwei Nachkommastellen. Der aktuelle Wert liegt zwischen Start und Ziel; Start und Ziel müssen verschieden sein.
 
-Die Zwischenziellisten zeigen den Messwert und das Ziel, beispielsweise **3 / 12 Bücher**. Der Balken und der Gesamtfortschritt des großen Ziels verwenden den erreichten Anteil der Strecke: 90 auf einer Skala von 80 bis 100 entspricht 50 %. Ein Erreichen des Zielwerts setzt den Status Erreicht. Bestehende Zwischenziele behalten zunächst 0–100 %; ein fehlendes Warum muss beim nächsten Speichern im Editor ergänzt werden, ohne alte Inhalte zu löschen.
+Die Zwischenziellisten zeigen den Messwert und das Ziel, beispielsweise **3 / 12 Bücher**. Der Balken und der Gesamtfortschritt des großen Ziels verwenden den erreichten Anteil der Strecke: 90 auf einer Skala von 80 bis 100 entspricht 50 %. Ein Erreichen des Zielwerts setzt den Status Erreicht. Bestehende Zwischenziele behalten zunächst 0–100 %. Zwischenziele haben kein Warum-Feld.
 
 ## Todos und Zwischenziel-Fortschritt
 

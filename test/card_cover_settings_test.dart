@@ -22,7 +22,10 @@ void main() {
     var db = AppDatabase(NativeDatabase(file));
     var r = GoalsRepository(db);
     try {
-      await r.saveGoal(title: 'Bestehendes Ziel');
+      await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Bestehendes Ziel',
+      );
       final id = (await r.load()).goals.single.id;
       await r.saveMilestone(
         motivation: 'Mein nächster Schritt zum Ziel',
@@ -59,8 +62,17 @@ void main() {
         (await db.customSelect('PRAGMA foreign_key_check').get()),
         isEmpty,
       );
-      await r.saveGoal(id: id, title: 'Bestehendes Ziel', showCardCover: false);
-      await r.saveGoal(id: id, title: 'Umbenannt');
+      await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        id: id,
+        title: 'Bestehendes Ziel',
+        showCardCover: false,
+      );
+      await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        id: id,
+        title: 'Umbenannt',
+      );
       await db.close();
       db = AppDatabase(NativeDatabase(file));
       r = GoalsRepository(db);
@@ -100,6 +112,7 @@ void main() {
       try {
         for (var i = 0; i < 5; i++) {
           await r.saveGoal(
+            motivation: 'Meine persönliche Richtung',
             title: 'Ziel $i',
             emoji: i < 2 ? '🌿' : ['🌻', '📚', '🧘🏽‍♂️'][i - 2],
           );

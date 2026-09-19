@@ -18,7 +18,11 @@ void main() {
       final r = GoalsRepository(db);
       final c = GoalsController(r);
       try {
-        await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Gesundheit',
+          emoji: '🌿',
+        );
         for (var i = 0; i < 20; i++) {
           await r.saveMilestone(
             motivation: 'Mein nächster Schritt zum Ziel',
@@ -27,6 +31,7 @@ void main() {
           );
         }
         await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           title: 'Beruf & Lernen',
           emoji: '📚',
           color: GoalColor.lavender,

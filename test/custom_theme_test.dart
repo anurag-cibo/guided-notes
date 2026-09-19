@@ -28,6 +28,7 @@ void main() {
       final controller = GoalsController(GoalsRepository(db));
       try {
         await controller.repository.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           title: 'Ein Ziel',
           color: GoalColor.rose,
         );
@@ -88,7 +89,11 @@ void main() {
     var db = AppDatabase(NativeDatabase(file));
     try {
       var repo = GoalsRepository(db, now: () => fixedNow);
-      await repo.saveGoal(title: 'Bestehend', color: GoalColor.ocean);
+      await repo.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Bestehend',
+        color: GoalColor.ocean,
+      );
       final before = await repo.exportBackup();
       await db.close();
       final old = sqlite.sqlite3.open(file.path);
@@ -107,17 +112,26 @@ void main() {
         colors: GoalColor.rose.colors,
       );
       await repo.saveGoal(
+        motivation: 'Meine persönliche Richtung',
         id: goalId,
         title: 'Bestehend',
         customThemeId: themeId,
       );
-      await repo.saveGoal(title: 'Zweites Ziel', customThemeId: themeId);
+      await repo.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Zweites Ziel',
+        customThemeId: themeId,
+      );
       await repo.saveTheme(
         id: themeId,
         name: 'Abendrot',
         colors: GoalColor.lavender.colors,
       );
-      await repo.saveGoal(id: goalId, title: 'Referenz bleibt');
+      await repo.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        id: goalId,
+        title: 'Referenz bleibt',
+      );
       await db.close();
       db = AppDatabase(NativeDatabase(file));
       repo = GoalsRepository(db, now: () => fixedNow);
@@ -155,6 +169,7 @@ void main() {
       await db.customStatement('DROP TRIGGER fail_goal_import');
       await repo.importBackup(backup);
       await repo.saveGoal(
+        motivation: 'Meine persönliche Richtung',
         id: goalId,
         title: 'Standard',
         color: GoalColor.amber,
@@ -162,7 +177,12 @@ void main() {
       );
       expect((await repo.load()).goal(goalId)!.customThemeId, isNull);
       await expectLater(
-        repo.saveGoal(id: goalId, title: 'Ungültig', customThemeId: 999),
+        repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          id: goalId,
+          title: 'Ungültig',
+          customThemeId: 999,
+        ),
         throwsA(isA<RuleViolation>()),
       );
       expect((await repo.load()).goal(goalId)!.title, 'Standard');
@@ -203,6 +223,11 @@ void main() {
         await tester.enterText(
           find.byKey(const ValueKey('goal-title')),
           'Mein Ziel',
+        );
+        await tester.ensureVisible(find.byKey(const ValueKey('goal-why')));
+        await tester.enterText(
+          find.byKey(const ValueKey('goal-why')),
+          'Meine persönliche Richtung',
         );
         await tester.ensureVisible(find.byTooltip('Eigenes Theme erstellen'));
         await tester.tap(find.byTooltip('Eigenes Theme erstellen'));

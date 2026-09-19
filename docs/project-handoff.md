@@ -1,5 +1,11 @@
 # Projektübergabe · 19.09.2026
 
+## Korrektur: Warum nur beim großen Ziel · 19.09.2026
+
+Die neueste Nutzerkorrektur ersetzt die vorherige Zwischenziel-Warum-Anforderung vollständig: kein Warum-Feld und keine Pflichtprüfung bei Zwischenzielen. Beim Erstellen großer Ziele ist das bestehende Warum jetzt verpflichtend; leere/Whitespace-Eingaben verhindern das Anlegen, mit mehrzeiligem Hinweis direkt am Feld. Formular und Repository prüfen die Regel. Bestehende Ziele ohne Warum bleiben bearbeitbar. Bereits gespeicherte Zwischenziel-Motivationen bleiben lediglich für verlustfreie Backups in Schema 12 erhalten; keine erneute Migration. Alle Messskalen bleiben unverändert.
+
+81 Unit-/Widgettests erfolgreich. Der native Test prüft den blockierten und erfolgreichen Erstellungsablauf sowie Zwischenziele ohne Warum in Hell/Dunkel. Aktueller GitHub-Stand: PR #49, Issue #51. Die älteren Abschnitte beschreiben den vorherigen Stand. Analyse, Format und normaler Debug-Build erfolgreich. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8,5/10, keine optischen Blocker. Normale Emulator-App nach Sicherung outputs/before-why-correction.tar per Update geöffnet; Datenbank bytegleich (SHA256 0691e7228c44dc36efe6cf2e4e415ac96303594cf0e21687abf24369ad305842).
+
 ## Eigene Messskalen und Zwischenziel-Warum · 19.09.2026
 
 Folgeauftrag #51 ergänzt PR #49. Zwischenziele haben ein eigenes verpflichtendes Warum, Startwert, Zielwert, aktuellen Wert und eine voreingestellte/freie oder leere Einheit. Nutzerbestätigt sind beide Richtungen, etwa 100 → 80 kg. Bis zu zwei Nachkommastellen; aktueller Wert innerhalb der Skala. Zielfortschritt bleibt der normalisierte Durchschnitt. Todos buchen positive Beitragsgrößen automatisch in Richtung des Zielwerts; Anzeige z. B. −0,5 kg. Deckelung und Rücknahme verwenden den tatsächlich gebuchten Messwert. Standard 0–100 % behält das kompakte Beitragsrad, andere Skalen eine Zahleneingabe.

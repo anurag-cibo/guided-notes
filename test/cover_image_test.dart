@@ -43,6 +43,7 @@ void main() {
         final c = GoalsController(r);
         await tester.runAsync(
           () => r.saveGoal(
+            motivation: 'Meine persönliche Richtung',
             title: 'Ein langes persönliches Ziel mit vielen kleinen Schritten',
             coverImage: picture,
           ),
@@ -78,13 +79,22 @@ void main() {
           '35.25 %',
         );
         expect(tester.takeException(), isNull);
-        await r.saveGoal(id: id, title: 'Ohne Bild', removeCoverImage: true);
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          id: id,
+          title: 'Ohne Bild',
+          removeCoverImage: true,
+        );
         await c.load();
         await tester.pumpAndSettle();
         expect(find.byType(Image), findsNothing);
         await tester.runAsync(
-          () =>
-              r.saveGoal(id: id, title: 'Wieder mit Bild', coverImage: picture),
+          () => r.saveGoal(
+            motivation: 'Meine persönliche Richtung',
+            id: id,
+            title: 'Wieder mit Bild',
+            coverImage: picture,
+          ),
         );
         await c.load();
         await tester.pumpAndSettle();
@@ -108,6 +118,7 @@ void main() {
         try {
           await tester.runAsync(
             () => r.saveGoal(
+              motivation: 'Meine persönliche Richtung',
               title: 'Mein Ziel',
               coverImage: ownImage ? picture : null,
             ),
@@ -188,7 +199,9 @@ void main() {
       final file = File('${dir.path}/data.sqlite');
       var db = AppDatabase(NativeDatabase(file));
       try {
-        await GoalsRepository(db).saveGoal(title: 'Vorher');
+        await GoalsRepository(
+          db,
+        ).saveGoal(motivation: 'Meine persönliche Richtung', title: 'Vorher');
         await db.close();
         final old = sqlite.sqlite3.open(file.path);
         old.execute('ALTER TABLE goals DROP COLUMN cover_image');
@@ -205,6 +218,7 @@ void main() {
         expect(goal.title, 'Vorher');
         expect(goal.coverImage, isNull);
         await repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           id: goal.id,
           title: 'Mit Bild',
           emoji: '🧘🏽‍♂️',
@@ -214,19 +228,29 @@ void main() {
         db = AppDatabase(NativeDatabase(file));
         repo = GoalsRepository(db);
         expect((await repo.load()).goals.single.coverImage, picture);
-        await repo.saveGoal(id: goal.id, title: 'Bild bleibt');
+        await repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          id: goal.id,
+          title: 'Bild bleibt',
+        );
         expect((await repo.load()).goals.single.coverImage, picture);
         final backup = await repo.exportBackup();
         await repo.deleteAllContents();
         await repo.importBackup(backup);
         expect((await repo.load()).goals.single.coverImage, picture);
         await repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           id: goal.id,
           title: 'Ohne Bild',
           removeCoverImage: true,
         );
         expect((await repo.load()).goals.single.coverImage, isNull);
-        await repo.saveGoal(id: goal.id, title: 'Löschen', coverImage: picture);
+        await repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          id: goal.id,
+          title: 'Löschen',
+          coverImage: picture,
+        );
         await repo.setArchived(goal.id, true);
         await repo.deleteGoal(goal.id);
         expect((await repo.load()).isEmpty, isTrue);
@@ -244,17 +268,24 @@ void main() {
       try {
         final repo = GoalsRepository(db);
         await repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           title: 'Bleibt',
           emoji: '🇩🇪',
           coverImage: picture,
         );
         final goal = (await repo.load()).goals.single;
         await expectLater(
-          repo.saveGoal(id: goal.id, title: 'Fehler', emoji: 'ab'),
+          repo.saveGoal(
+            motivation: 'Meine persönliche Richtung',
+            id: goal.id,
+            title: 'Fehler',
+            emoji: 'ab',
+          ),
           throwsA(isA<RuleViolation>()),
         );
         await expectLater(
           repo.saveGoal(
+            motivation: 'Meine persönliche Richtung',
             id: goal.id,
             title: 'Fehler',
             coverImage: Uint8List.fromList([1, 2, 3]),
@@ -325,6 +356,11 @@ void main() {
       await tester.enterText(
         find.byKey(const ValueKey('goal-title')),
         'Ruhe finden',
+      );
+      await tester.ensureVisible(find.byKey(const ValueKey('goal-why')));
+      await tester.enterText(
+        find.byKey(const ValueKey('goal-why')),
+        'Meine persönliche Richtung',
       );
       await tester.scrollUntilVisible(
         find.text('Speichern'),

@@ -106,7 +106,10 @@ void main() {
   testWidgets(
     'empty details and backup import preview, cancellation and export',
     (tester) async {
-      await controller.repository.saveGoal(title: 'Ohne Schritte');
+      await controller.repository.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Ohne Schritte',
+      );
       await controller.load();
       final backup = await controller.repository.exportBackup();
       final id = controller.snapshot.goals.single.id;
@@ -206,6 +209,20 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
+    expect(controller.snapshot.goals, isEmpty);
+    expect(
+      find.text('Bitte beschreibe, warum dir dieses Ziel wichtig ist.'),
+      findsOneWidget,
+    );
+    await tester.ensureVisible(find.byKey(const ValueKey('goal-why')));
+    await tester.enterText(
+      find.byKey(const ValueKey('goal-why')),
+      'Mehr Natur im Alltag',
+    );
+    await tester.ensureVisible(find.text('Speichern'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Speichern'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Balkon begrünen'));
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Zwischenziel hinzufügen'));
@@ -213,10 +230,6 @@ void main() {
     await tester.enterText(
       find.byType(TextFormField).first,
       'Pflanzen auswählen',
-    );
-    await tester.enterText(
-      find.byKey(const ValueKey('milestone-why')),
-      'Frisches Gemüse genießen',
     );
     await tester.scrollUntilVisible(
       find.text('Speichern'),
@@ -260,6 +273,7 @@ void main() {
     (tester) async {
       for (var i = 0; i < 5; i++) {
         await controller.repository.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           title: 'Ein ausführlicher Zielname Nummer $i',
         );
       }
@@ -287,8 +301,14 @@ void main() {
   testWidgets('direct target near end of long list and cluster switch', (
     tester,
   ) async {
-    await controller.repository.saveGoal(title: 'Erstes Ziel');
-    await controller.repository.saveGoal(title: 'Zweites Ziel');
+    await controller.repository.saveGoal(
+      motivation: 'Meine persönliche Richtung',
+      title: 'Erstes Ziel',
+    );
+    await controller.repository.saveGoal(
+      motivation: 'Meine persönliche Richtung',
+      title: 'Zweites Ziel',
+    );
     final goals = (await controller.repository.load()).goals;
     for (var i = 0; i < 80; i++) {
       await controller.repository.saveMilestone(

@@ -103,163 +103,175 @@ class _GoalEditorState extends State<GoalEditor> {
         ),
         body: Form(
           key: _form,
-          child: ListView(
+          child: SingleChildScrollView(
             padding: pagePadding,
-            children: [
-              Semantics(
-                label: 'Hintergrundbild-Vorschau',
-                child: GoalCover(image: _cover, height: 120),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _saving || _picking ? null : _pickCover,
-                      icon: const Icon(Icons.add_photo_alternate_outlined),
-                      label: Text(
-                        _picking
-                            ? 'Bild wird geladen …'
-                            : _cover == null
-                            ? 'Hintergrundbild auswählen'
-                            : 'Hintergrundbild ändern',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Semantics(
+                  label: 'Hintergrundbild-Vorschau',
+                  child: GoalCover(image: _cover, height: 120),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _saving || _picking ? null : _pickCover,
+                        icon: const Icon(Icons.add_photo_alternate_outlined),
+                        label: Text(
+                          _picking
+                              ? 'Bild wird geladen …'
+                              : _cover == null
+                              ? 'Hintergrundbild auswählen'
+                              : 'Hintergrundbild ändern',
+                        ),
                       ),
                     ),
-                  ),
-                  if (_cover != null)
-                    IconButton(
-                      tooltip: 'Hintergrundbild entfernen',
-                      onPressed: _saving || _picking
-                          ? null
-                          : () => setState(() => _cover = null),
-                      icon: const Icon(Icons.delete_outline),
-                    ),
-                  const SizedBox(width: 4),
-                  Tooltip(
-                    message: 'Hintergrund auf Zielkarte anzeigen',
-                    child: Semantics(
-                      label: 'Hintergrund auf Zielkarte anzeigen',
-                      child: Switch(
-                        key: const ValueKey('show-card-cover'),
-                        value: _showCardCover,
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        onChanged: _saving || _picking
+                    if (_cover != null)
+                      IconButton(
+                        tooltip: 'Hintergrundbild entfernen',
+                        onPressed: _saving || _picking
                             ? null
-                            : (value) => setState(() => _showCardCover = value),
+                            : () => setState(() => _cover = null),
+                        icon: const Icon(Icons.delete_outline),
+                      ),
+                    const SizedBox(width: 4),
+                    Tooltip(
+                      message: 'Hintergrund auf Zielkarte anzeigen',
+                      child: Semantics(
+                        label: 'Hintergrund auf Zielkarte anzeigen',
+                        child: Switch(
+                          key: const ValueKey('show-card-cover'),
+                          value: _showCardCover,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          onChanged: _saving || _picking
+                              ? null
+                              : (value) =>
+                                    setState(() => _showCardCover = value),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              gap,
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 80,
-                    child: TextFormField(
-                      key: const ValueKey('goal-emoji'),
-                      controller: _emoji,
-                      onTap: () => _emoji.selection = TextSelection(
-                        baseOffset: 0,
-                        extentOffset: _emoji.text.length,
+                  ],
+                ),
+                gap,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 80,
+                      child: TextFormField(
+                        key: const ValueKey('goal-emoji'),
+                        controller: _emoji,
+                        onTap: () => _emoji.selection = TextSelection(
+                          baseOffset: 0,
+                          extentOffset: _emoji.text.length,
+                        ),
+                        enabled: !_saving,
+                        textAlign: TextAlign.center,
+                        decoration: const InputDecoration(
+                          labelText: 'Emoji',
+                          counterText: '',
+                        ),
+                        maxLength: 1,
+                        inputFormatters: [
+                          TextInputFormatter.withFunction((oldValue, newValue) {
+                            if (newValue.text.characters.length <= 1) {
+                              return newValue;
+                            }
+                            final symbol = newValue.text.characters.first;
+                            return TextEditingValue(
+                              text: symbol,
+                              selection: TextSelection.collapsed(
+                                offset: symbol.length,
+                              ),
+                            );
+                          }),
+                        ],
                       ),
-                      enabled: !_saving,
-                      textAlign: TextAlign.center,
-                      decoration: const InputDecoration(
-                        labelText: 'Emoji',
-                        counterText: '',
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        key: const ValueKey('goal-title'),
+                        controller: _title,
+                        enabled: !_saving,
+                        decoration: const InputDecoration(labelText: 'Titel'),
+                        textCapitalization: TextCapitalization.sentences,
+                        validator: (v) => v == null || v.trim().isEmpty
+                            ? 'Bitte einen Titel eingeben.'
+                            : null,
                       ),
-                      maxLength: 1,
-                      inputFormatters: [
-                        TextInputFormatter.withFunction((oldValue, newValue) {
-                          if (newValue.text.characters.length <= 1) {
-                            return newValue;
-                          }
-                          final symbol = newValue.text.characters.first;
-                          return TextEditingValue(
-                            text: symbol,
-                            selection: TextSelection.collapsed(
-                              offset: symbol.length,
+                    ),
+                  ],
+                ),
+                gap,
+                GoalColorSelector(
+                  value: _color,
+                  customThemes: widget.controller.snapshot.customThemes,
+                  customThemeId: _customThemeId,
+                  onCustomChanged: _saving
+                      ? null
+                      : (id) => setState(() => _customThemeId = id),
+                  onCreate: _saving
+                      ? null
+                      : () async {
+                          final id = await Navigator.push<int>(
+                            context,
+                            MaterialPageRoute<int>(
+                              builder: (_) => ThemeEditor(
+                                controller: widget.controller,
+                                initialColors:
+                                    widget.controller.snapshot
+                                        .theme(_customThemeId)
+                                        ?.colors ??
+                                    _color.colors,
+                              ),
                             ),
                           );
+                          if (mounted) {
+                            setState(() {
+                              if (id != null) _customThemeId = id;
+                            });
+                          }
+                        },
+                  onChanged: _saving
+                      ? null
+                      : (value) => setState(() {
+                          _color = value;
+                          _customThemeId = null;
                         }),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      key: const ValueKey('goal-title'),
-                      controller: _title,
-                      enabled: !_saving,
-                      decoration: const InputDecoration(labelText: 'Titel'),
-                      textCapitalization: TextCapitalization.sentences,
-                      validator: (v) => v == null || v.trim().isEmpty
-                          ? 'Bitte einen Titel eingeben.'
-                          : null,
-                    ),
-                  ),
-                ],
-              ),
-              gap,
-              GoalColorSelector(
-                value: _color,
-                customThemes: widget.controller.snapshot.customThemes,
-                customThemeId: _customThemeId,
-                onCustomChanged: _saving
-                    ? null
-                    : (id) => setState(() => _customThemeId = id),
-                onCreate: _saving
-                    ? null
-                    : () async {
-                        final id = await Navigator.push<int>(
-                          context,
-                          MaterialPageRoute<int>(
-                            builder: (_) => ThemeEditor(
-                              controller: widget.controller,
-                              initialColors:
-                                  widget.controller.snapshot
-                                      .theme(_customThemeId)
-                                      ?.colors ??
-                                  _color.colors,
-                            ),
-                          ),
-                        );
-                        if (mounted) {
-                          setState(() {
-                            if (id != null) _customThemeId = id;
-                          });
-                        }
-                      },
-                onChanged: _saving
-                    ? null
-                    : (value) => setState(() {
-                        _color = value;
-                        _customThemeId = null;
-                      }),
-              ),
-              gap,
-              TextFormField(
-                controller: _motivation,
-                decoration: const InputDecoration(
-                  labelText: 'Warum ist dir das wichtig? (optional)',
                 ),
-                minLines: 3,
-                maxLines: 8,
-                textCapitalization: TextCapitalization.sentences,
-              ),
-              gap,
-              DueDateField(
-                value: _due,
-                onChanged: (date) => setState(() => _due = date),
-              ),
-              gap,
-              FilledButton(
-                onPressed: _saving || _picking ? null : _save,
-                child: Text(_saving ? 'Wird gespeichert …' : 'Speichern'),
-              ),
-            ],
+                gap,
+                TextFormField(
+                  key: const ValueKey('goal-why'),
+                  controller: _motivation,
+                  decoration: const InputDecoration(
+                    labelText: 'Warum ist dir dieses Ziel wichtig?',
+                    errorMaxLines: 3,
+                  ),
+                  validator: (value) =>
+                      widget.goal == null &&
+                          (value == null || value.trim().isEmpty)
+                      ? 'Bitte beschreibe, warum dir dieses Ziel wichtig ist.'
+                      : null,
+                  minLines: 3,
+                  maxLines: 8,
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+                gap,
+                DueDateField(
+                  value: _due,
+                  onChanged: (date) => setState(() => _due = date),
+                ),
+                gap,
+                FilledButton(
+                  onPressed: _saving || _picking ? null : _save,
+                  child: Text(_saving ? 'Wird gespeichert …' : 'Speichern'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

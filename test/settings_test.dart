@@ -26,7 +26,10 @@ void main() {
       var db = AppDatabase(NativeDatabase(file));
       try {
         final goals = GoalsRepository(db, now: () => fixedNow);
-        await goals.saveGoal(title: 'Bleibt erhalten');
+        await goals.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Bleibt erhalten',
+        );
         await goals.todos.save(
           title: 'Lesen',
           frequency: TodoFrequency.daily,
@@ -76,7 +79,10 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       try {
         final goals = GoalsRepository(db);
-        await goals.saveGoal(title: 'Gesundheit');
+        await goals.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Gesundheit',
+        );
         final id = (await goals.load()).goals.single.id;
         await goals.saveMilestone(
           motivation: 'Mein nächster Schritt zum Ziel',
@@ -133,7 +139,10 @@ void main() {
     (tester) async {
       final db = AppDatabase(NativeDatabase.memory());
       final goals = GoalsController(GoalsRepository(db));
-      await goals.repository.saveGoal(title: 'Mein Ziel');
+      await goals.repository.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Mein Ziel',
+      );
       await goals.load();
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;

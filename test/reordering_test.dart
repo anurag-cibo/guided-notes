@@ -24,7 +24,10 @@ void main() {
     var r = GoalsRepository(db);
     try {
       for (final title in ['Gesundheit', 'Lernen', 'Finanzen']) {
-        await r.saveGoal(title: title);
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: title,
+        );
       }
       await r.saveMilestone(
         motivation: 'Mein nächster Schritt zum Ziel',
@@ -93,7 +96,10 @@ void main() {
       expect(snapshot.milestone(1)!.progress, 20);
       expect(snapshot.milestone(1)!.goalId, 2);
       expect(snapshot.progressFor(2), 50);
-      await r.saveGoal(title: 'Neues Ziel');
+      await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Neues Ziel',
+      );
       expect((await r.load()).activeGoals.last.title, 'Neues Ziel');
       await r.setArchived(3, true);
       final unchanged = await r.exportBackup();
@@ -121,9 +127,21 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       try {
-        await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
-        await r.saveGoal(title: 'Lernen', emoji: '📚');
-        await r.saveGoal(title: 'Finanzen', emoji: '💰');
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Gesundheit',
+          emoji: '🌿',
+        );
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Lernen',
+          emoji: '📚',
+        );
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Finanzen',
+          emoji: '💰',
+        );
         await r.saveMilestone(
           motivation: 'Mein nächster Schritt zum Ziel',
           goalId: 1,
@@ -233,7 +251,10 @@ void main() {
       final r = GoalsRepository(db);
       final c = GoalsController(r);
       try {
-        await r.saveGoal(title: 'Gesundheit');
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Gesundheit',
+        );
         for (var i = 0; i < 20; i++) {
           await r.saveMilestone(
             motivation: 'Mein nächster Schritt zum Ziel',
@@ -280,7 +301,11 @@ void main() {
       final r = GoalsRepository(db);
       final c = GoalsController(r);
       try {
-        await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Gesundheit',
+          emoji: '🌿',
+        );
         for (var i = 0; i < 30; i++) {
           await r.saveMilestone(
             motivation: 'Mein nächster Schritt zum Ziel',
@@ -288,7 +313,11 @@ void main() {
             title: 'Schritt $i',
           );
         }
-        await r.saveGoal(title: 'Lernen', emoji: '📚');
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Lernen',
+          emoji: '📚',
+        );
         await r.saveMilestone(
           motivation: 'Mein nächster Schritt zum Ziel',
           goalId: 2,
