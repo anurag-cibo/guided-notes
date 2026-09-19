@@ -1,5 +1,21 @@
 # Projektübergabe · 19.09.2026
 
+## Verbindlicher Abschlussstand dieses Chats · 19.09.2026
+
+PR [#42](https://github.com/anurag-cibo/guided-notes/pull/42) ist nach erfolgreichem GitHub-Build und externem CodeRabbit-Review per Squash integriert: `2f42ea3ab8b928723a48f72752b2c2638a548e43`. Issue #43 ist geschlossen. Der identische Dateistand des Arbeitsbranches `codex/compact-fraction-wheel` wurde gegen main geprüft; der erledigte Branch kann lokal und auf GitHub entfernt werden. Ältere Abschnitte unten dokumentieren historische Zwischenstände, keine aktuell ausstehende Integration.
+
+Veröffentlicht: [Android-Testversion 0.3.1](https://github.com/anurag-cibo/guided-notes/releases/tag/v0.3.1), App-Version `0.3.1+7`. APK `the-guide-0.3.1.apk`, SHA256 `786499665433acac0d883436cf433f7456b51a5a88f2c6b35fe0a10be781d53a`. Der vorhandene private Release-Schlüssel wurde weiterverwendet. Schlüssel, `android/key.properties`, lokale Sicherungen und Emulator-Daten bei Aufräumarbeiten unbedingt erhalten.
+
+Enthalten sind die einheitlichen Nachkommastufen mit schmalerem rechtem Rad und der Zwischenziel-Editor mit Status/Frist nebeneinander sowie gemeinsam implementierten täglichen/wöchentlichen Todo-Karten. Todo-Aktionen speichern offene Zwischenziel-Änderungen vorab und halten den Fortschritt synchron. Neue Todos dort sind mit dem Zwischenziel und 2,5 % vorbelegt. Bei 100 % ist nur Nachkommastelle 0 erlaubt. Details stehen in README und den späteren Abschnitten unten.
+
+Prüfungen: Analyse ohne Befunde, 61 Unit-/Widgettests, nativer Android-Test in Hell/Dunkel einschließlich Beiträgen, Rücknahme und Dateineustart sowie Debug-/Release-Build erfolgreich. Zweiter visueller Reviewer: Zwischenziel-Ansicht 8/10 in beiden Modi. Der einzige externe Review-Hinweis zur expliziten Dokumentation der 100-%-Grenze wurde behoben; abschließendes Review und CI erfolgreich. Für künftige optische Änderungen gilt die Nutzerpräferenz aus AGENTS.md: unabhängige Screenshot-Bewertung, mindestens 6,5/10 anstreben.
+
+Die normale App ist auf emulator-5554 aktualisiert und geöffnet; keine Nutzerdaten ersetzt. Sicherung unmittelbar vor dem endgültigen Update: `outputs/before-milestone-todos.tar`. Datenbank-Prüfsumme vor/nach Installation identisch: `07eec52b544a7f4ba43177e34d9ebdf5e04644f56bfa92dc1ebbf9225a977b06`. Gerätetests ausschließlich mit Paket `de.anurag.guided_notes.integration`; normale Updates nur per `adb install -r`, bei Fehler abbrechen und niemals automatisch deinstallieren.
+
+Drei Testmotive (hell, dunkel, Hochformat) liegen im Emulator unter **Downloads/The-Guide-Testbilder**, außerdem lokal unter `outputs/testbilder`. Sie sind in Androids Medienübersicht registriert und über „Hintergrundbild auswählen“ zugänglich. Emulator und Testbilder bleiben für den Nutzer verfügbar.
+
+Zum Abschluss neu in GitHub vorgefunden und weiterhin offen: #44 Zielcover auf Zielkarten, #45 Zwischenziel aus Zieldetails bearbeiten, #46 beendete/gelöschte Todos sofort aus aktuellen Ansichten entfernen. Außerdem bleiben #4 Nutzererprobung, #20 Streak-Bewertung und #21 Erklärungsbedarf offen. Diese Folgethemen wurden in diesem Abschluss nicht umgesetzt; verbindlicher aktueller Aufgabenstand bleibt GitHub. Der Nutzer hat Dokumentation, Branch-Aufräumen und Archivierung dieses Chats beauftragt.
+
 ## Kompaktere Todos · 19.09.2026
 
 PR #36 ist integriert; APK 0.2.0 veröffentlicht. Der anschließende UI-Wunsch ersetzt die Prozentpunkte-Texteingabe durch ein begrenztes Scrollrad (1–100). Die Todo-Liste zeigt nur einen grünen Beitrag neben dem Titel; Zuordnung und Hinweise bleiben im Editor, Hinweise jetzt als Stichpunkte. Speicherung und Berechnung bleiben unverändert. Version 0.2.1+3 verwendet denselben privaten Release-Schlüssel. Aktuelle Emulator-Daten vor dem Update unter `outputs/before-todo-wheel.tar` gesichert; niemals durch Testdaten ersetzen.
