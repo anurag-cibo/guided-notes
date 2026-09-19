@@ -130,3 +130,11 @@ Review-Korrektur: Release-Schlüsselprüfung hängt direkt an Signier-/Packaging
 ## Kompakte Todo-Zeiträume · 19.09.2026
 
 Datum ohne Wochentag und Jahr neben der Zeitraumüberschrift, kleiner gesetzt. Wochen mit gleichem Monat kürzen den wiederholten Monat (z. B. 14.–20.9.). Bei großer Schrift darf die Kopfzeile umbrechen; der Plus-Button bleibt erreichbar. Wochenaufgaben zeigen einen Fortschrittsbalken zwischen Minus/Plus mit der Anzahl darüber. Bestehende Widgettests prüfen Datumsposition, Balkenwerte beim Erledigen/Rückgängigmachen und große Schrift. 54 Unit-/Widgettests und Analyse erfolgreich. Version 0.2.2+4; keine Änderungen an Speicherung oder Berechnung.
+
+## Stabile Fortschrittsaktualisierung · 19.09.2026
+
+Der Schreibschutz im GoalsController bleibt bestehen, erzeugt aber keinen eigenen UI-Zwischenstand mehr. Vorher wurden alle Checkboxen/Plus-Aktionen für jeden Klick kurz deaktiviert und der Bildschirm zweimal benachrichtigt. Jetzt wird einmal der bestätigte Stand veröffentlicht. Formulare behalten ihren eigenen Speicherzustand.
+
+Todo-Zähler verwenden eine gezielte Aktualisierung innerhalb derselben Transaktion: betroffener Zeitraum, dessen Beiträge und betroffene Zwischenziele. Zielbilder, Themes, Vorlagen und andere Zeiträume werden nicht erneut aus SQLite geladen. Undo berücksichtigt den früher zugeordneten Beitrag. Snapshot-Zugriffe auf Ziele, Zwischenziele und Todo-Vorlagen sind per ID indiziert. Volles Laden bleibt für Start, Zeitraumwechsel und strukturelle Änderungen bestehen; Historie ist weiterhin vollständig im Snapshot (keine Paginierung).
+
+56 Unit-/Widgettests und Analyse erfolgreich. Neue Nachweise: nur eine Benachrichtigung pro Mutation; fremde Checkboxen/Plus bei künstlich verzögertem Speichern unverändert aktiv; kein Voll-Reload beim Zählerklick; statische Objekte bleiben identisch; Ergebnis entspricht vollständigem Datenbankstand nach Deckelung, Zuordnungswechsel und Undo; Fehler rollen Daten und Snapshot zurück. Keine pauschale FPS-Aussage oder Hardware-Benchmark abgeleitet.

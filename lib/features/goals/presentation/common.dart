@@ -79,8 +79,13 @@ Future<bool> runMutation(
   BuildContext context,
   GoalsController controller,
   Future<void> Function(GoalsRepository) action,
+) => showMutationResult(context, controller.mutate(action));
+
+Future<bool> showMutationResult(
+  BuildContext context,
+  Future<String?> mutation,
 ) async {
-  final message = await controller.mutate(action);
+  final message = await mutation;
   if (!context.mounted) return false;
   if (message != null) {
     ScaffoldMessenger.of(context)

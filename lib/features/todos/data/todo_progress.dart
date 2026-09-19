@@ -85,11 +85,16 @@ class TodoProgress {
     );
   }
 
-  Future<List<TodoProgressCredit>> load() async => [
+  Future<List<TodoProgressCredit>> load({TodoEntry? entry}) async => [
     for (final r
         in await database
             .customSelect(
-              'SELECT * FROM todo_progress_credits ORDER BY template_id,period,ordinal',
+              'SELECT * FROM todo_progress_credits '
+              '${entry == null ? '' : 'WHERE template_id=? AND period=? '}'
+              'ORDER BY template_id,period,ordinal',
+              variables: entry == null
+                  ? []
+                  : [Variable(entry.templateId), Variable(entry.period)],
             )
             .get())
       TodoProgressCredit(
