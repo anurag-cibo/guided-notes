@@ -64,6 +64,7 @@ class _ProgressIncrementPickerState extends State<ProgressIncrementPicker> {
                 child: Row(
                   children: [
                     Expanded(
+                      flex: 3,
                       child: _NumberWheel(
                         key: const ValueKey('progress-whole'),
                         labels: [for (var i = 0; i <= 100; i++) '$i'],
@@ -76,11 +77,14 @@ class _ProgressIncrementPickerState extends State<ProgressIncrementPicker> {
                     ),
                     const Text(','),
                     Expanded(
+                      flex: 2,
                       child: _NumberWheel(
                         key: ValueKey('progress-fraction-$_whole'),
                         labels: [
                           for (final f in fractions)
-                            f.toString().padLeft(2, '0'),
+                            f % 10 == 0
+                                ? '${f ~/ 10}'
+                                : f.toString().padLeft(2, '0'),
                         ],
                         selected: fractions.indexOf(_fraction),
                         itemHeight: height,
