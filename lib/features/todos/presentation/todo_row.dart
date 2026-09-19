@@ -162,7 +162,6 @@ class TodoRow extends StatelessWidget {
                 ),
               ],
             ),
-          if (!template.active) const Text('Endet nach diesem Zeitraum.'),
           if (template.active &&
               (template.title != entry.title ||
                   template.target != entry.target))

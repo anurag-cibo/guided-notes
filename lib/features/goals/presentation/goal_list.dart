@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../application/goals_controller.dart';
-import '../domain/models.dart';
 import 'common.dart';
 import 'goal_detail.dart';
 import 'goal_editor.dart';
 import 'goal_theme.dart';
+import 'goal_card.dart';
 
 class GoalList extends StatelessWidget {
   const GoalList({super.key, required this.controller, this.archived = false});
@@ -46,80 +46,14 @@ class GoalList extends StatelessWidget {
           color: goal.color,
           colors: controller.snapshot.theme(goal.customThemeId)?.colors,
           child: Builder(
-            builder: (context) => Card(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (_) =>
-                        GoalDetail(controller: controller, goalId: goal.id),
-                  ),
-                ),
-                child: Padding(
-                  padding: pagePadding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Text(
-                              goal.emoji,
-                              style: const TextStyle(fontSize: 28),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  goal.title,
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.w700),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  controller.snapshot.forGoal(goal.id).isEmpty
-                                      ? 'Noch keine Zwischenziele'
-                                      : '${controller.snapshot.forGoal(goal.id).where((m) => m.status == MilestoneStatus.achieved).length}/${controller.snapshot.forGoal(goal.id).length} Zwischenziele erreicht',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Icon(Icons.chevron_right),
-                        ],
-                      ),
-                      if (controller.snapshot.progressFor(goal.id) != null) ...[
-                        gap,
-                        LinearProgressIndicator(
-                          value:
-                              controller.snapshot.progressFor(goal.id)! / 100,
-                          minHeight: 4,
-                          borderRadius: BorderRadius.circular(8),
-                          semanticsLabel: 'Zwischenzielfortschritt',
-                          semanticsValue:
-                              '${controller.snapshot.progressFor(goal.id)} %',
-                        ),
-                      ],
-                      if (goal.achieved || goal.dueDate != null) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          deadlineLabel(goal.dueDate, achieved: goal.achieved),
-                        ),
-                      ],
-                    ],
-                  ),
+            builder: (context) => GoalCard(
+              controller: controller,
+              goal: goal,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      GoalDetail(controller: controller, goalId: goal.id),
                 ),
               ),
             ),

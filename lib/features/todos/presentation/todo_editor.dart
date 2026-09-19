@@ -79,9 +79,9 @@ class _TodoEditorState extends State<TodoEditor> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Aufgabe beenden?'),
+        title: const Text('Aufgabe entfernen?'),
         content: const Text(
-          'Ab dem nächsten Zeitraum erscheint diese Aufgabe nicht mehr. Der aktuelle Stand und die Historie bleiben erhalten.',
+          'Diese Aufgabe verschwindet sofort aus den aktuellen Listen. Die Historie und bereits gutgeschriebene Fortschritte bleiben erhalten.',
         ),
         actions: [
           TextButton(
@@ -90,7 +90,7 @@ class _TodoEditorState extends State<TodoEditor> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Beenden'),
+            child: const Text('Entfernen'),
           ),
         ],
       ),
@@ -244,7 +244,7 @@ class _TodoEditorState extends State<TodoEditor> {
               gap,
               TextButton(
                 onPressed: _busy ? null : _stop,
-                child: const Text('Aufgabe beenden'),
+                child: const Text('Aufgabe entfernen'),
               ),
             ],
           ],

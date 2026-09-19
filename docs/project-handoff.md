@@ -1,5 +1,16 @@
 # Projektübergabe · 19.09.2026
 
+## Kompaktes Release 0.3.2 · 19.09.2026
+
+Issues #44–46 umgesetzt: Zielcover auf Karten, direkter Zwischenziel-Editor aus Zieldetails und sofortiges Entfernen von Todos aus beiden aktuellen Ansichten. Nutzerbestätigt bleiben Historie und bereits gutgeschriebene Beiträge erhalten. Mönchslogo beim Start kreisrund. Schema 9 und Backupformat 8 unverändert. Version 0.3.2+8, vorhandener Release-Schlüssel weiterverwendet.
+
+64 Tests, Analyse, isolierter Android-Darstellungs-/Neustarttest sowie Debug-/Release-Build erfolgreich. Zweiter visueller Reviewer: Zielkarten 8/10 in Hell und Dunkel. Großschrift/320 px durch Widgettest geprüft. Validierungsdetails in docs/validation.md.
+
+Normale App in emulator-5554 per Update geöffnet, Datenbank dabei bytegleich. Sicherung outputs/before-compact-release.tar erhalten. Keine Testdaten in den normalen Bestand geschrieben. APK outputs/the-guide-0.3.2.apk, SHA256 6bfde27a6f727f57fa52552377d3ba286ea6f0dced384bfeb0cb7fa1044b0592.
+
+Beauftragt sind Integration, GitHub-Release und Löschen des Arbeitsbranches codex/goal-covers-todo-removal nach Abschluss. Den aktuellen Integrations-/Veröffentlichungsstatus anhand GitHub prüfen; ältere Abschlussstände darunter sind historisch. #4, #20 und #21 bleiben außerhalb dieses Auftrags.
+
+
 ## Verbindlicher Abschlussstand dieses Chats · 19.09.2026
 
 PR [#42](https://github.com/anurag-cibo/guided-notes/pull/42) ist nach erfolgreichem GitHub-Build und externem CodeRabbit-Review per Squash integriert: `2f42ea3ab8b928723a48f72752b2c2638a548e43`. Issue #43 ist geschlossen. Der identische Dateistand des Arbeitsbranches `codex/compact-fraction-wheel` wurde gegen main geprüft; der erledigte Branch kann lokal und auf GitHub entfernt werden. Ältere Abschnitte unten dokumentieren historische Zwischenstände, keine aktuell ausstehende Integration.

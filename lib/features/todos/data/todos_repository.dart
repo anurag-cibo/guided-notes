@@ -187,6 +187,15 @@ class TodosRepository {
 
   Future<void> changeCount(TodoEntry entry, int delta) =>
       database.transaction(() async {
+        final template = await database
+            .customSelect(
+              'SELECT active FROM todo_templates WHERE id=?',
+              variables: [Variable(entry.templateId)],
+            )
+            .getSingleOrNull();
+        if (template == null || template.read<int>('active') == 0) {
+          throw const RuleViolation('Diese Aufgabe wurde entfernt.');
+        }
         if (!entry.isCurrent(now())) {
           throw const RuleViolation(
             'Der Zeitraum ist vorbei. Bitte den aktuellen Stand verwenden.',

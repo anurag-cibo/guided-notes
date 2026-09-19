@@ -2,7 +2,7 @@
 
 Eine ruhige Android-App für bis zu fünf aktive Ziele und ihre Zwischenziele. **The Guide** ist ein flexibler Arbeitsname; das Repository heißt weiterhin `guided-notes`.
 
-**Todos-Erweiterung (17.09.2026):** Der dritte Tab „Todos“ bietet wiederkehrende Tagesaufgaben und Wochenaufgaben mit Zielanzahl. Abhaken und Rückgängig werden offline gespeichert. Wochen beginnen montags, der lokale Kalender bestimmt den Zeitraum. Titel und Zielanzahl lassen sich für den nächsten Zeitraum ändern; „Aufgabe beenden“ erhält den aktuellen Stand und die Historie. Vergangene Zeiträume sind nur lesbar. Details: [Todo-Regeln](docs/product-decisions.md#todos-tages--und-wochenaufgaben).
+**Todos-Erweiterung (17.09.2026):** Der dritte Tab „Todos“ bietet wiederkehrende Tagesaufgaben und Wochenaufgaben mit Zielanzahl. Abhaken und Rückgängig werden offline gespeichert. Wochen beginnen montags, der lokale Kalender bestimmt den Zeitraum. Titel und Zielanzahl lassen sich für den nächsten Zeitraum ändern; „Aufgabe entfernen“ blendet ein Todo sofort aus allen aktuellen Listen aus und stoppt Wiederholungen. Historie und bereits gutgeschriebene Zwischenziel-Beiträge bleiben erhalten. Vergangene Zeiträume sind nur lesbar. Details: [Todo-Regeln](docs/product-decisions.md#todos-tages--und-wochenaufgaben).
 
 **Stand 17.09.2026:** Die Android-Version läuft. Ziele, Details und Zwischenziele wurden anhand der UI-Inspiration ruhiger gestaltet; Archivaktionen und Datensicherung sind geprüft. Die gestalterische Rückmeldung und mehrtägige Nutzererprobung bleiben in #4 offen. Kontext für weitere Chats: [Projektübergabe](docs/project-handoff.md).
 
@@ -28,11 +28,13 @@ Der Zwischenzielfortschritt steigt höchstens auf 100 %. Rückgängig zieht nur 
 
 „Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die kompaktere Zielauswahl im Zwischenziele-Tab blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
 
+Antippen eines Zwischenziels in den Zieldetails öffnet direkt seinen Editor; Speichern und Zurück führen zu diesen Zieldetails zurück.
+
 Im Zwischenziel-Editor stehen Status und Frist nebeneinander. Darunter lassen sich die aktuell verknüpften Todos in „Täglich“ und „Wöchentlich“ genau wie im Todos-Tab bedienen. Plus öffnet eine neue Aufgabe mit vorausgewähltem Zwischenziel und 2,5 % Beitrag. Todo-Aktionen speichern zuvor auch offene Änderungen am Zwischenziel; danach bleibt dessen Fortschritt synchron. Neue Zwischenziele zuerst speichern, anschließend können Todos zugeordnet werden.
 
 ## Hintergrundbild und Emoji
 
-Beim Anlegen oder Bearbeiten eines Ziels oben **Hintergrundbild auswählen** antippen. Android öffnet die Dateiauswahl; das Bild lässt sich ersetzen oder entfernen. Die App speichert eine lokale, verkleinerte Kopie (maximal 1280 Pixel an der längsten Seite und 256 KB); das Original bleibt unverändert. Eingabedateien dürfen höchstens 20 MB groß sein. Das Bild erscheint als Cover im Ziel und ist im Backup enthalten.
+Beim Anlegen oder Bearbeiten eines Ziels oben **Hintergrundbild auswählen** antippen. Android öffnet die Dateiauswahl; das Bild lässt sich ersetzen oder entfernen. Die App speichert eine lokale, verkleinerte Kopie (maximal 1280 Pixel an der längsten Seite und 256 KB); das Original bleibt unverändert. Eingabedateien dürfen höchstens 20 MB groß sein. Das Bild erscheint als Cover im Ziel und im oberen Bereich seiner Zielkarte. Fortschrittsbalken und Prozentangabe stehen auf einer ruhigen Fläche unter dem Bild. Das Bild ist im Backup enthalten.
 
 Das Emoji-Feld links neben dem Titel erlaubt ein sichtbares Zeichen, auch zusammengesetzte Emojis oder Flaggen. Ohne Eingabe wird das Standardsymbol verwendet.
 
