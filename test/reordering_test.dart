@@ -1,3 +1,5 @@
+import 'fixtures/legacy_todos.dart';
+
 import 'dart:io';
 import 'dart:convert';
 
@@ -24,9 +26,24 @@ void main() {
       for (final title in ['Gesundheit', 'Lernen', 'Finanzen']) {
         await r.saveGoal(title: title);
       }
-      await r.saveMilestone(goalId: 1, title: 'Erster', progress: 20);
-      await r.saveMilestone(goalId: 1, title: 'Zweiter', progress: 50);
-      await r.saveMilestone(goalId: 2, title: 'Dritter', progress: 80);
+      await r.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
+        goalId: 1,
+        title: 'Erster',
+        progress: 20,
+      );
+      await r.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
+        goalId: 1,
+        title: 'Zweiter',
+        progress: 50,
+      );
+      await r.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
+        goalId: 2,
+        title: 'Dritter',
+        progress: 80,
+      );
       await r.todos.save(
         title: 'Üben',
         frequency: TodoFrequency.daily,
@@ -35,9 +52,13 @@ void main() {
         progressIncrement: 2.5,
       );
       await r.todos.changeCount((await r.load()).todoEntries.single, 1);
-      final original = await r.exportBackup();
+      final original = (await r.exportBackup()).replaceAll(
+        'Mein nächster Schritt zum Ziel',
+        '',
+      );
       await db.close();
       final old = sqlite.sqlite3.open(file.path);
+      removeMetricScale(old);
       for (final table in ['goals', 'milestones']) {
         old.execute('ALTER TABLE $table DROP COLUMN sort_order');
       }
@@ -103,9 +124,21 @@ void main() {
         await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
         await r.saveGoal(title: 'Lernen', emoji: '📚');
         await r.saveGoal(title: 'Finanzen', emoji: '💰');
-        await r.saveMilestone(goalId: 1, title: 'Bewegen');
-        await r.saveMilestone(goalId: 1, title: 'Schlafen');
-        await r.saveMilestone(goalId: 2, title: 'Lesen');
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: 1,
+          title: 'Bewegen',
+        );
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: 1,
+          title: 'Schlafen',
+        );
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: 2,
+          title: 'Lesen',
+        );
         await c.load();
         await tester.pumpWidget(GuideApp(controller: c));
         await tester.pumpAndSettle();
@@ -202,7 +235,11 @@ void main() {
       try {
         await r.saveGoal(title: 'Gesundheit');
         for (var i = 0; i < 20; i++) {
-          await r.saveMilestone(goalId: 1, title: 'Schritt $i');
+          await r.saveMilestone(
+            motivation: 'Mein nächster Schritt zum Ziel',
+            goalId: 1,
+            title: 'Schritt $i',
+          );
         }
         await c.load();
         await tester.pumpWidget(GuideApp(controller: c));
@@ -245,10 +282,18 @@ void main() {
       try {
         await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
         for (var i = 0; i < 30; i++) {
-          await r.saveMilestone(goalId: 1, title: 'Schritt $i');
+          await r.saveMilestone(
+            motivation: 'Mein nächster Schritt zum Ziel',
+            goalId: 1,
+            title: 'Schritt $i',
+          );
         }
         await r.saveGoal(title: 'Lernen', emoji: '📚');
-        await r.saveMilestone(goalId: 2, title: 'Buch lesen');
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: 2,
+          title: 'Buch lesen',
+        );
         await c.load();
         await tester.pumpWidget(GuideApp(controller: c));
         await tester.pumpAndSettle();

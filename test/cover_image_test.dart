@@ -48,7 +48,12 @@ void main() {
           ),
         );
         final id = (await r.load()).goals.single.id;
-        await r.saveMilestone(goalId: id, title: 'Schritt', progress: 35.25);
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: id,
+          title: 'Schritt',
+          progress: 35.25,
+        );
         await c.load();
         tester.view.physicalSize = const Size(320, 900);
         tester.view.devicePixelRatio = 1;
@@ -108,7 +113,12 @@ void main() {
             ),
           );
           final id = (await r.load()).goals.single.id;
-          await r.saveMilestone(goalId: id, title: 'Schritt', progress: 42.5);
+          await r.saveMilestone(
+            motivation: 'Mein nächster Schritt zum Ziel',
+            goalId: id,
+            title: 'Schritt',
+            progress: 42.5,
+          );
           await c.load();
           tester.view.physicalSize = const Size(320, 900);
           tester.view.devicePixelRatio = 1;

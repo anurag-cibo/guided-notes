@@ -190,7 +190,7 @@ class _MilestonesViewState extends State<MilestonesView> {
                       children: [
                         const SizedBox(height: 8),
                         Text(
-                          '${milestone.status.label} · ${formatProgress(milestone.progress)} %',
+                          '${milestone.status.label} · ${milestone.measurementLabel}',
                         ),
                         const SizedBox(height: 8),
                         LinearProgressIndicator(

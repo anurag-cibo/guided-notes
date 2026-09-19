@@ -1,5 +1,16 @@
 # Speicherung und Migration
 
+## Schema 12 und Backupformat 11: Messskalen · 19.09.2026
+
+Zwischenziele ergänzen motivation, start_value, target_value, current_value und unit. Messwerte verwenden ganze Hundertstel. Das bisherige progress-Feld bleibt als normalisierter Prozentanteil für Status und Zielmittel erhalten und wird atomar mit dem Messwert aktualisiert. Ein nur gerundeter Wert nahe 100 wird nicht als Erreichen gewertet. Start/Ziel und Messwert unterstützen zwei Nachkommastellen, Auf-/Abwärtsrichtung sowie negative Werte; absolute Werte und die Gesamtstrecke sind auf eine Milliarde begrenzt. Einheit: maximal 30 Zeichen, leer bedeutet einheitenlos.
+
+Die Todo-Tabellen werden mit größeren Beitragsgrenzen neu aufgebaut. Alle IDs, Fremdschlüssel, Zeilen und der AUTOINCREMENT-Höchststand bleiben erhalten. Beiträge stehen weiterhin in progress_increment, nun als Menge der Zwischenziel-Einheit. Das neue value_amount im Beitragsjournal speichert die tatsächlich gebuchte Menge mit Vorzeichen; das alte amount bleibt als normalisierter Anteil erhalten. Rücknahme verwendet ausschließlich value_amount, unabhängig von späteren Beitrags-/Skalenänderungen, und begrenzt auf die aktuelle Skala.
+
+Migration: vorhandene Zwischenziele erhalten Start 0, Ziel 100, Einheit %, current_value=progress und leeres Warum. Frühere Beiträge übernehmen value_amount=amount. Bestehende Inhalte werden weder als Motivation umgedeutet noch umgerechnet. Neue und im Editor gespeicherte Zwischenziele verlangen ein eigenes nichtleeres Warum. Alte Daten und alte Backups ohne Warum bleiben lesbar und Todo-Buchungen weiterhin möglich.
+
+Backupformat 11 ergänzt Motivation, Start/Ziel/Messwert/Einheit und valueAmount je Beitrag. Import prüft Skala, Wertebereich, Zwei-Nachkommastellen-Präzision, Normalisierung, Status und Beziehungen. Formate 1–10 bleiben lesbar und erhalten die bisherige Prozentskala. Änderungen an der Einheit sind Umbenennungen ohne automatische Mengen-Umrechnung; frühere Buchungen behalten ihre numerische Menge und Richtung.
+
+
 ## Schema 11 und Backupformat 10: Reihenfolge und Zuordnung · 19.09.2026
 
 Die Spalte `sort_order` in `goals` und `milestones` speichert die Reihenfolge, unabhängig von stabilen IDs. Migrationen übernehmen die bisherige ID-Reihenfolge. Neue Einträge kommen ans Ende; bei Gleichstand dient die ID als stabile Zweitsortierung. Verschieben schreibt die Reihenfolge der betroffenen Liste atomar. Archivierte Ziele sind nicht verschiebbar.

@@ -66,6 +66,7 @@ void main() {
         );
         final id = (await r.load()).goals.single.id;
         await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: id,
           title: 'Regelmäßig bewegen',
           progress: 60,
@@ -73,18 +74,24 @@ void main() {
           dueDate: DateTime.now().add(const Duration(days: 30)),
         );
         await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: id,
           title: 'Bewusst essen',
           progress: 30,
           status: MilestoneStatus.offTrack,
         );
-        await r.saveMilestone(goalId: id, title: 'Erholsam schlafen');
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: id,
+          title: 'Erholsam schlafen',
+        );
         await r.saveGoal(
           title: 'Beruf & Karriere',
           emoji: '💻',
           color: GoalColor.lavender,
         );
         await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: (await r.load()).goals.last.id,
           title: 'Weiterlernen',
           progress: 45,
@@ -96,6 +103,7 @@ void main() {
           color: GoalColor.amber,
         );
         await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: (await r.load()).goals.last.id,
           title: 'Rücklage',
           progress: 25.5,

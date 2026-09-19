@@ -1,3 +1,5 @@
+import 'fixtures/legacy_todos.dart';
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -22,7 +24,12 @@ void main() {
     try {
       await r.saveGoal(title: 'Bestehendes Ziel');
       final id = (await r.load()).goals.single.id;
-      await r.saveMilestone(goalId: id, title: 'Schritt', progress: 12.5);
+      await r.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
+        goalId: id,
+        title: 'Schritt',
+        progress: 12.5,
+      );
       final milestone = (await r.load()).milestones.single;
       await r.todos.save(
         title: 'Todo',
@@ -33,8 +40,12 @@ void main() {
       );
       await r.todos.changeCount((await r.load()).todoEntries.single, 1);
       final before = jsonDecode(await r.exportBackup()) as Map<String, dynamic>;
+      for (final milestone in before['milestones']) {
+        milestone['motivation'] = '';
+      }
       await db.close();
       final legacy = sqlite.sqlite3.open(file.path);
+      removeMetricScale(legacy);
       legacy.execute('ALTER TABLE goals DROP COLUMN show_card_cover');
       legacy.execute('ALTER TABLE goals DROP COLUMN sort_order');
       legacy.execute('ALTER TABLE milestones DROP COLUMN sort_order');
@@ -93,7 +104,11 @@ void main() {
             emoji: i < 2 ? '🌿' : ['🌻', '📚', '🧘🏽‍♂️'][i - 2],
           );
           final goal = (await r.load()).goals.last;
-          await r.saveMilestone(goalId: goal.id, title: 'Schritt $i');
+          await r.saveMilestone(
+            motivation: 'Mein nächster Schritt zum Ziel',
+            goalId: goal.id,
+            title: 'Schritt $i',
+          );
         }
         await c.load();
         tester.view.physicalSize = const Size(320, 900);

@@ -29,3 +29,17 @@ void removeTodoLinks(Database db) {
     db.execute('ALTER TABLE $table DROP COLUMN progress_increment');
   }
 }
+
+/// Derive a schema-11 fixture; measurement fields did not exist then.
+void removeMetricScale(Database db) {
+  for (final column in [
+    'motivation',
+    'start_value',
+    'target_value',
+    'current_value',
+    'unit',
+  ]) {
+    db.execute('ALTER TABLE milestones DROP COLUMN $column');
+  }
+  db.execute('ALTER TABLE todo_progress_credits DROP COLUMN value_amount');
+}

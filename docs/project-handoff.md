@@ -1,5 +1,13 @@
 # Projektübergabe · 19.09.2026
 
+## Eigene Messskalen und Zwischenziel-Warum · 19.09.2026
+
+Folgeauftrag #51 ergänzt PR #49. Zwischenziele haben ein eigenes verpflichtendes Warum, Startwert, Zielwert, aktuellen Wert und eine voreingestellte/freie oder leere Einheit. Nutzerbestätigt sind beide Richtungen, etwa 100 → 80 kg. Bis zu zwei Nachkommastellen; aktueller Wert innerhalb der Skala. Zielfortschritt bleibt der normalisierte Durchschnitt. Todos buchen positive Beitragsgrößen automatisch in Richtung des Zielwerts; Anzeige z. B. −0,5 kg. Deckelung und Rücknahme verwenden den tatsächlich gebuchten Messwert. Standard 0–100 % behält das kompakte Beitragsrad, andere Skalen eine Zahleneingabe.
+
+Schema 12 und Backupformat 11; alte Backups 1–10 bleiben lesbar. Bestehende Zwischenziele bleiben bei 0–100 %, bisherige Werte und Beiträge erhalten. Ihr Warum bleibt leer, bis es beim nächsten Speichern ergänzt wird. Einheitenwechsel konvertiert keine Zahlenwerte; bei vorhandenen Todo-Beiträgen weist der Editor darauf hin. Bereichsänderungen bewahren historische Messwert-Beiträge für Undo.
+
+80 Unit-/Widgettests, Analyse, Format und native Android-Prüfung in Hell/Dunkel erfolgreich, einschließlich Dateineustart/Backup. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10. Normaler Debug-Build 0.3.3+9 aktualisiert und geöffnet. Sicherung outputs/before-metrics.tar; sämtliche bisherigen Datenbankzeilen/-spalten nach Migration unverändert, Schema 12 und Fremdschlüssel geprüft. Kein zusätzliches Release; Arbeitsbranch codex/emoji-navigation-card-covers und PR #49. Aktuellen Integrationsstand in GitHub prüfen.
+
 ## Kurzer Emoji-Impuls und Überschriften-Navigation · 19.09.2026
 
 Neuester Nutzerwunsch ersetzt die zeitgesteuerte Fade-Markierung: Emoji-Hintergrund blinkt 180 ms ohne Fade auf und verschwindet direkt. Die gesamte Leiste behält ihren 320-ms-Fade beim Scrollen. Zielüberschriften im Zwischenziele-Tab öffnen Zieldetails. Dort wechselt die Überschrift Zwischenziele zum bestehenden Haupttab und fokussiert die passende Zielgruppe; keine gestapelten Detailseiten. Plus-Buttons bleiben getrennt bedienbar. Archivierte Ziele sind weiterhin nicht im aktiven Zwischenziele-Tab enthalten.

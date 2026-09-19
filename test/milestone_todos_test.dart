@@ -21,6 +21,7 @@ void main() {
       await repository.saveGoal(title: 'Gesundheit');
       final goal = (await repository.load()).goals.single;
       await repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: goal.id,
         title: 'Bewegen',
         progress: 20,
@@ -96,7 +97,7 @@ void main() {
         ),
       );
       await tester.enterText(
-        find.byType(TextFormField),
+        find.byType(TextFormField).first,
         'Bewegen und entspannen',
       );
       tester.widget<Slider>(find.byType(Slider)).onChanged!(30);

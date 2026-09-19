@@ -81,11 +81,13 @@ class TodoProgressCredit {
     required this.milestoneId,
     required this.amount,
     required this.previousStatus,
-  });
+    double? valueAmount,
+  }) : valueAmount = valueAmount ?? amount;
   final int templateId;
   final String period;
   final int ordinal;
   final int? milestoneId;
   final double amount;
+  final double valueAmount;
   final String previousStatus;
 }

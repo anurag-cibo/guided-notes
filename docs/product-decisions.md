@@ -12,13 +12,13 @@ The Guide bleibt ein austauschbarer Arbeitsname. Die erste Version führt vom le
 | Ein kleines Buch schreiben | Gliederung; erster Entwurf; Überarbeitung | 100 %, 25 %, 0 % ergeben gerundet 42 % |
 | Balkon begrünen | Pflanzen auswählen; Kästen aufstellen; einpflanzen | Drei erreichte Zwischenziele ergeben 100 % |
 
-Erste Nutzungsstrecke: „Ziel hinzufügen“ → Titel, optional Emoji/Motivation/Frist → Zieldetail → „Zwischenziel hinzufügen“ → Titel → Eintrag öffnen → Status „Erreicht“ → Fortschritt im Ziel sehen. Änderungen werden lokal gespeichert. Der Zustand muss einen vollständigen App-Neustart überstehen.
+Erste Nutzungsstrecke: „Ziel hinzufügen“ → Titel, optional Emoji/Motivation/Frist → Zieldetail → „Zwischenziel hinzufügen“ → Titel, eigenes Warum und Messskala → Eintrag öffnen → Status „Erreicht“ → Fortschritt im Ziel sehen. Änderungen werden lokal gespeichert. Der Zustand muss einen vollständigen App-Neustart überstehen.
 
 ## Fachregeln (#5)
 
 - Höchstens **fünf nicht archivierte Ziele**. Erreichte Ziele zählen mit, bis sie ausdrücklich archiviert werden. Archivierte Ziele haben kein Mengenlimit. Wiederherstellen bei fünf aktiven Zielen wird mit einer verständlichen Meldung abgelehnt, ohne Daten zu ändern.
-- Zwischenziele haben einen ganzzahligen Fortschritt von 0 bis 100. „Noch nicht begonnen“ bedeutet 0 %, „Erreicht“ 100 %. Die übrigen Zustände erlauben 0–99 %. Beim Wechsel weg von „Erreicht“ muss wieder ein Wert unter 100 gewählt werden. Bei 100 % wird der Status „Erreicht“ gesetzt; bei einem positiven Wert wechselt „Noch nicht begonnen“ zu „Im Plan“.
-- Zielfortschritt ist das ungewichtete arithmetische Mittel seiner Zwischenziele, zur Anzeige auf ganze Prozent gerundet. Ohne Zwischenziele: „Noch keine Zwischenziele“, kein erfundener Fortschritt. Hinzufügen/Ändern/Löschen eines Zwischenziels berechnet das Mittel neu; dadurch darf es sinken.
+- Zwischenziele haben eine frei definierte auf- oder absteigende Skala aus Start, Ziel und aktuellem Messwert, eine optionale Einheit (leer ist einheitenlos) und ein verpflichtendes eigenes Warum. Der normalisierte Anteil liegt zwischen 0 und 100 %. Am Start ist der Anteil 0 %, am Ziel 100 % und der Status Erreicht. Positive Strecke wechselt Noch nicht begonnen zu Im Plan. Messwerte unterstützen zwei Nachkommastellen.
+- Zielfortschritt ist das ungewichtete arithmetische Mittel seiner Zwischenziele, zur Anzeige auf zwei Nachkommastellen gerundet. Ohne Zwischenziele: „Noch keine Zwischenziele“, kein erfundener Fortschritt. Hinzufügen/Ändern/Löschen eines Zwischenziels berechnet das Mittel neu; dadurch darf es sinken.
 - Zielerfolg ist eine bewusste, separate Markierung. 100 % Zwischenzielfortschritt markiert das große Ziel nicht automatisch als erreicht. Ein Ziel kann auch ohne Zwischenziele erreicht sein; sein inhaltlicher Erfolg ist nicht dieselbe Größe wie der berechnete Zwischenzielfortschritt.
 - Es gibt eine optionale **Frist als lokales Kalenderdatum**, keinen Zeitkreis und kein Startdatum. Anzeige: „Ohne Frist“, „Heute fällig“, „Noch … Tage“ oder „… Tage überfällig“. Der ganze Fälligkeitstag zählt; Sommerzeit wird durch Kalenderdatumsarithmetik berücksichtigt. Bei erreichten Einträgen steht „Erreicht“ statt eines Überfälligkeitsdrucks. Frist und Fortschritt stehen getrennt.
 

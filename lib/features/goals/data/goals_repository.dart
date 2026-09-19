@@ -73,7 +73,7 @@ class GoalsRepository {
       }
       for (final m in snapshot.milestones) {
         await database.customStatement(
-          'INSERT INTO milestones(id,goal_id,title,progress,status,due_date,sort_order) VALUES (?,?,?,?,?,?,?)',
+          'INSERT INTO milestones(id,goal_id,title,progress,status,due_date,sort_order,motivation,start_value,target_value,current_value,unit) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
           [
             m.id,
             m.goalId,
@@ -82,6 +82,11 @@ class GoalsRepository {
             m.status.name,
             BackupCodec.date(m.dueDate),
             snapshot.milestones.indexOf(m),
+            m.motivation,
+            m.scale.startUnits,
+            m.scale.targetUnits,
+            metricUnits(m.currentValue),
+            m.scale.unit,
           ],
         );
       }
@@ -95,7 +100,7 @@ class GoalsRepository {
             t.target,
             t.active ? 1 : 0,
             t.milestoneId,
-            progressUnits(t.progressIncrement),
+            metricUnits(t.progressIncrement),
             t.progressMode.name,
           ],
         );
@@ -111,14 +116,14 @@ class GoalsRepository {
             e.target,
             e.completed,
             e.milestoneId,
-            progressUnits(e.progressIncrement),
+            metricUnits(e.progressIncrement),
             e.progressMode.name,
           ],
         );
       }
       for (final c in snapshot.todoCredits) {
         await database.customStatement(
-          'INSERT INTO todo_progress_credits(template_id,period,ordinal,milestone_id,amount,previous_status) VALUES(?,?,?,?,?,?)',
+          'INSERT INTO todo_progress_credits(template_id,period,ordinal,milestone_id,amount,previous_status,value_amount) VALUES(?,?,?,?,?,?,?)',
           [
             c.templateId,
             c.period,
@@ -126,6 +131,7 @@ class GoalsRepository {
             c.milestoneId,
             progressUnits(c.amount),
             c.previousStatus,
+            metricUnits(c.valueAmount),
           ],
         );
       }
@@ -201,6 +207,13 @@ class GoalsRepository {
     progress: progressPercent(r.read<int>('progress')),
     status: MilestoneStatus.values.byName(r.read<String>('status')),
     dueDate: _date(r.readNullable<String>('due_date')),
+    motivation: r.read<String>('motivation'),
+    currentValue: r.read<int>('current_value') / 100,
+    scale: MetricScale(
+      start: r.read<int>('start_value') / 100,
+      target: r.read<int>('target_value') / 100,
+      unit: r.read<String>('unit'),
+    ),
   );
 
   Future<GoalSnapshot> load() => database.transaction(() async {
@@ -358,10 +371,43 @@ class GoalsRepository {
     num progress = 0,
     MilestoneStatus status = MilestoneStatus.notStarted,
     DateTime? dueDate,
+    String? motivation,
+    MetricScale? scale,
+    num? currentValue,
   }) => database.transaction(() async {
     await _requireGoal(goalId, active: true);
     final name = requiredTitle(title);
-    final normalized = normalizeProgress(progress, status);
+    final previousRow = id == null
+        ? null
+        : await database
+              .customSelect(
+                'SELECT * FROM milestones WHERE id=? AND goal_id=?',
+                variables: [Variable(id), Variable(goalId)],
+              )
+              .getSingleOrNull();
+    if (id != null && previousRow == null) {
+      throw const RuleViolation('Dieses Zwischenziel existiert nicht mehr.');
+    }
+    final previous = previousRow == null ? null : _readMilestone(previousRow);
+    final reason = (motivation ?? previous?.motivation ?? '').trim();
+    if (reason.isEmpty) {
+      throw const RuleViolation(
+        'Bitte beschreibe, warum dir dieses Zwischenziel wichtig ist.',
+      );
+    }
+    final metric = scale ?? previous?.scale ?? const MetricScale();
+    int value;
+    try {
+      metric.validate();
+      value = metricUnits(currentValue ?? metric.valueForPercent(progress));
+      if (metric.clampUnits(value) != value) throw ArgumentError();
+    } on ArgumentError {
+      throw const RuleViolation(
+        'Bitte eine gültige Skala und einen aktuellen Wert zwischen Start und Ziel eingeben (maximal zwei Nachkommastellen).',
+      );
+    }
+    if (status == MilestoneStatus.achieved) value = metric.targetUnits;
+    final normalized = normalizeProgress(metric.percent(value / 100), status);
     final values = [
       name,
       progressUnits(normalized.progress),
@@ -388,6 +434,23 @@ class GoalsRepository {
         [...values, id, goalId],
       );
     }
+    final savedId =
+        id ??
+        (await database
+                .customSelect('SELECT last_insert_rowid() AS id')
+                .getSingle())
+            .read<int>('id');
+    await database.customStatement(
+      'UPDATE milestones SET motivation=?,start_value=?,target_value=?,unit=?,current_value=? WHERE id=?',
+      [
+        reason,
+        metric.startUnits,
+        metric.targetUnits,
+        metric.unit.trim(),
+        value,
+        savedId,
+      ],
+    );
   });
 
   /// Move relative to a stable ID, so stale UI indices cannot reorder other rows.

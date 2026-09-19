@@ -37,6 +37,7 @@ void main() {
         );
         final id = (await controller.repository.load()).goals.single.id;
         await controller.repository.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: id,
           title: 'Schritt',
           progress: 100,
@@ -75,8 +76,15 @@ void main() {
         var repo = GoalsRepository(db, now: () => fixedNow);
         await repo.saveGoal(title: 'Vorhandenes Ziel', motivation: 'Bleibt');
         final id = (await repo.load()).goals.single.id;
-        await repo.saveMilestone(goalId: id, title: 'Ein Schritt');
-        final before = await repo.exportBackup();
+        await repo.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: id,
+          title: 'Ein Schritt',
+        );
+        final before = (await repo.exportBackup()).replaceAll(
+          'Mein nächster Schritt zum Ziel',
+          '',
+        );
         await db.close();
         final old = sqlite.sqlite3.open(file.path);
         old.execute('ALTER TABLE goals DROP COLUMN color');
@@ -138,6 +146,7 @@ void main() {
         await controller.repository.saveGoal(title: 'Gesundheit');
         final id = (await controller.repository.load()).goals.single.id;
         await controller.repository.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: id,
           title: 'Bewegen',
           progress: 30,

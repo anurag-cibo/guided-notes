@@ -24,9 +24,24 @@ void main() {
       emoji: '📚',
       color: GoalColor.lavender,
     );
-    await r.saveMilestone(goalId: 1, title: 'Regelmäßig bewegen', progress: 40);
-    await r.saveMilestone(goalId: 1, title: 'Erholsam schlafen', progress: 65);
-    await r.saveMilestone(goalId: 2, title: 'Etwas Neues lernen', progress: 20);
+    await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: 1,
+      title: 'Regelmäßig bewegen',
+      progress: 40,
+    );
+    await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: 1,
+      title: 'Erholsam schlafen',
+      progress: 65,
+    );
+    await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: 2,
+      title: 'Etwas Neues lernen',
+      progress: 20,
+    );
     await SettingsRepository(db).saveAppearance(AppAppearance.light);
     await c.load();
     await tester.pumpWidget(GuideApp(controller: c));
@@ -87,7 +102,11 @@ void main() {
     // Long list gives the navigation bar room to hide and reappear.
     await c.mutate((r) async {
       for (var i = 0; i < 10; i++) {
-        await r.saveMilestone(goalId: 2, title: 'Nächster Schritt ${i + 1}');
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: 2,
+          title: 'Nächster Schritt ${i + 1}',
+        );
       }
     });
     await tester.pumpAndSettle();

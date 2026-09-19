@@ -20,7 +20,11 @@ void main() {
       try {
         await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
         for (var i = 0; i < 20; i++) {
-          await r.saveMilestone(goalId: 1, title: 'Schritt ${i + 1}');
+          await r.saveMilestone(
+            motivation: 'Mein nächster Schritt zum Ziel',
+            goalId: 1,
+            title: 'Schritt ${i + 1}',
+          );
         }
         await r.saveGoal(
           title: 'Beruf & Lernen',
@@ -28,6 +32,7 @@ void main() {
           color: GoalColor.lavender,
         );
         await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: 2,
           title: 'Etwas Neues lernen',
           progress: 35,

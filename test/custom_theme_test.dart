@@ -34,6 +34,7 @@ void main() {
         final id = (await controller.repository.load()).goals.single.id;
         for (var i = 0; i < 15; i++) {
           await controller.repository.saveMilestone(
+            motivation: 'Mein nächster Schritt zum Ziel',
             goalId: id,
             title: 'Schritt $i',
           );

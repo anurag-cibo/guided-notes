@@ -78,7 +78,11 @@ void main() {
         final goals = GoalsRepository(db);
         await goals.saveGoal(title: 'Gesundheit');
         final id = (await goals.load()).goals.single.id;
-        await goals.saveMilestone(goalId: id, title: 'Bewegen');
+        await goals.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: id,
+          title: 'Bewegen',
+        );
         await goals.todos.save(
           title: 'Lesen',
           frequency: TodoFrequency.daily,

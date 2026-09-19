@@ -20,6 +20,7 @@ void main() {
     try {
       await r.saveGoal(title: 'Ziel');
       await r.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: (await r.load()).goals.single.id,
         title: 'Schritt',
       );
@@ -77,6 +78,7 @@ void main() {
         final goal = (await r.load()).goals.last;
         for (final name in ['Eins', 'Zwei']) {
           await r.saveMilestone(
+            motivation: 'Mein nächster Schritt zum Ziel',
             goalId: goal.id,
             title: '$title $name',
             progress: name == 'Zwei' ? 30 : 10,

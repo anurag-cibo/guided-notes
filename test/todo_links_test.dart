@@ -29,6 +29,7 @@ void main() {
     await r.saveGoal(title: 'Gesundheit');
     goalId = (await r.load()).goals.single.id;
     await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
       goalId: goalId,
       title: 'Bewegen',
       progress: 90,
@@ -94,7 +95,12 @@ void main() {
       entry,
       1,
     ); // Reads the updated configuration, not the stale widget.
-    await r.saveMilestone(goalId: goalId, title: 'Schlafen', progress: 10);
+    await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: goalId,
+      title: 'Schlafen',
+      progress: 10,
+    );
     final otherId = (await r.load()).milestones.last.id;
     await r.todos.save(
       id: entry.templateId,
@@ -148,6 +154,7 @@ void main() {
     final entry = await create(increment: 5);
     await r.todos.changeCount(entry, 1);
     await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
       id: milestoneId,
       goalId: goalId,
       title: 'Bewegen',
@@ -207,7 +214,12 @@ void main() {
       r = GoalsRepository(db, now: () => fixedNow);
       await r.saveGoal(title: 'Alt');
       final g = (await r.load()).goals.single;
-      await r.saveMilestone(goalId: g.id, title: 'Alt', progress: 20);
+      await r.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
+        goalId: g.id,
+        title: 'Alt',
+        progress: 20,
+      );
       milestoneId = (await r.load()).milestones.single.id;
       await r.todos.save(
         title: 'Alt',
@@ -249,7 +261,7 @@ void main() {
       expect(await r.exportBackup(), backup);
       for (final mutate in <void Function(Map<String, dynamic>)>[
         (v) => v['todoTemplates'][0]['milestoneId'] = 9999,
-        (v) => v['todoEntries'][0]['progressIncrement'] = 101,
+        (v) => v['todoEntries'][0]['progressIncrement'] = maxMetricValue + 1,
         (v) => v['todoCredits'][0]['ordinal'] = 999,
         (v) => v['todoCredits'].add(v['todoCredits'][0]),
       ]) {
@@ -359,7 +371,11 @@ void main() {
     (tester) async {
       await r.saveGoal(title: 'Zweites Ziel');
       for (var i = 0; i < 20; i++) {
-        await r.saveMilestone(goalId: goalId, title: 'Schritt $i');
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: goalId,
+          title: 'Schritt $i',
+        );
       }
       final c = GoalsController(r);
       await c.load();

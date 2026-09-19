@@ -13,7 +13,7 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 10,
+        'version': 11,
         'todoCredits': [
           for (final c in snapshot.todoCredits)
             {
@@ -23,6 +23,7 @@ class BackupCodec {
               'milestoneId': c.milestoneId,
               'amount': c.amount,
               'previousStatus': c.previousStatus,
+              'valueAmount': c.valueAmount,
             },
         ],
         'customThemes': [
@@ -87,6 +88,11 @@ class BackupCodec {
             {
               'id': m.id,
               'goalId': m.goalId,
+              'motivation': m.motivation,
+              'startValue': m.scale.start,
+              'targetValue': m.scale.target,
+              'currentValue': m.currentValue,
+              'unit': m.scale.unit,
               'title': m.title,
               'progress': m.progress,
               'status': m.status.name,
@@ -105,7 +111,7 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          ![1, 2, 3, 4, 5, 6, 7, 8, 9, 10].contains(root['version'])) {
+          ![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].contains(root['version'])) {
         throw const FormatException();
       }
       final themes = <CustomGoalTheme>[];
@@ -173,7 +179,25 @@ class BackupCodec {
             !ids.contains(m['goalId'])) {
           throw const FormatException();
         }
+        final scale = root['version'] >= 11
+            ? MetricScale(
+                start: _metric(m['startValue']),
+                target: _metric(m['targetValue']),
+                unit: m['unit'] as String,
+              )
+            : const MetricScale();
+        scale.validate();
+        final current = root['version'] >= 11
+            ? _metric(m['currentValue'])
+            : progress;
+        if (scale.clampUnits(metricUnits(current)) != metricUnits(current) ||
+            scale.percent(current) != progress) {
+          throw const FormatException();
+        }
         return Milestone(
+          motivation: root['version'] >= 11 ? m['motivation'] as String : '',
+          scale: scale,
+          currentValue: current,
           id: _id(m['id']),
           goalId: _id(m['goalId']),
           title: _title(m['title']),
@@ -211,7 +235,7 @@ class BackupCodec {
               milestoneId: linkId(t),
               progressMode: _mode(t, root['version'] as int, frequency),
               progressIncrement: root['version'] >= 7
-                  ? _percent(t['progressIncrement'])
+                  ? _increment(t['progressIncrement'], root['version'] as int)
                   : 0,
             ),
           );
@@ -247,7 +271,7 @@ class BackupCodec {
               milestoneId: linkId(e),
               progressMode: _mode(e, root['version'] as int, frequency),
               progressIncrement: root['version'] >= 7
-                  ? _percent(e['progressIncrement'])
+                  ? _increment(e['progressIncrement'], root['version'] as int)
                   : 0,
             ),
           );
@@ -277,6 +301,9 @@ class BackupCodec {
               ordinal: ordinal,
               milestoneId: linkId(c),
               amount: _percent(c['amount']),
+              valueAmount: root['version'] >= 11
+                  ? _metric(c['valueAmount'])
+                  : _percent(c['amount']),
               previousStatus: MilestoneStatus.values
                   .byName(c['previousStatus'] as String)
                   .name,
@@ -294,7 +321,7 @@ class BackupCodec {
       );
     } catch (_) {
       throw const RuleViolation(
-        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–8, höchstens 10 MB).',
+        'Diese Datei ist keine gültige, unterstützte The-Guide-Sicherung (Version 1–11, höchstens 10 MB).',
       );
     }
   }
@@ -320,6 +347,17 @@ class BackupCodec {
       throw const FormatException();
     }
     return value;
+  }
+
+  static double _metric(dynamic value) {
+    if (value is! num) throw const FormatException();
+    return metricUnits(value) / 100;
+  }
+
+  static double _increment(dynamic value, int version) {
+    final number = version < 11 ? _percent(value) : _metric(value);
+    if (number < 0) throw const FormatException();
+    return number;
   }
 
   static double _percent(dynamic value) {
