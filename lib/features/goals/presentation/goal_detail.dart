@@ -11,9 +11,15 @@ import 'goal_theme.dart';
 import 'milestone_editor.dart';
 
 class GoalDetail extends StatelessWidget {
-  const GoalDetail({super.key, required this.controller, required this.goalId});
+  const GoalDetail({
+    super.key,
+    required this.controller,
+    required this.goalId,
+    this.onOpenMilestones,
+  });
   final GoalsController controller;
   final int goalId;
+  final ValueChanged<int>? onOpenMilestones;
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: controller,
@@ -124,6 +130,9 @@ class GoalDetail extends StatelessWidget {
                 gap,
                 SectionHeading(
                   title: 'Zwischenziele',
+                  onTap: goal.archived || onOpenMilestones == null
+                      ? null
+                      : () => onOpenMilestones!(goalId),
                   addLabel: goal.archived ? null : 'Zwischenziel hinzufügen',
                   onAdd: controller.saving
                       ? null

@@ -26,7 +26,9 @@ Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenzi
 
 Der Zwischenzielfortschritt steigt höchstens auf 100 %. Rückgängig zieht nur den tatsächlich gutgeschriebenen Beitrag ab – auch nach Neustart, Backup oder einem Wechsel der Zuordnung. Beispiel: 97 % + 10 Prozentpunkte ergibt 100 %, Rückgängig wieder 97 %. Änderungen an Zuordnung und Beitrag gelten sofort für neue Erledigungen; alte Erledigungen werden nicht nachträglich gewertet. Titel und Wochenanzahl ändern sich weiterhin erst ab dem nächsten Zeitraum. Archivierte Ziele erhalten keine neuen Beiträge. Löschen eines Zwischenziels erhält die Todos und löst ihre Zuordnung.
 
-„Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die einzeilige Emoji-Leiste im Zwischenziele-Tab springt beim Antippen direkt zum jeweiligen Ziel. Zielnamen sind per langem Drücken und für Screenreader verfügbar. Nach einem Emoji-Tipp blendet die Markierung ein und nach 1,5 Sekunden automatisch wieder aus. Die Leiste blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
+„Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die einzeilige Emoji-Leiste im Zwischenziele-Tab springt beim Antippen direkt zum jeweiligen Ziel. Zielnamen sind per langem Drücken und für Screenreader verfügbar. Nach einem Emoji-Tipp blinkt die Markierung für 180 ms auf und verschwindet direkt, ohne Fade. Die Leiste blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
+
+Die Zielüberschriften im Zwischenziele-Tab öffnen die jeweiligen Zieldetails. Die Überschrift „Zwischenziele“ in den aktiven Zieldetails wechselt zum bestehenden Zwischenziele-Tab und springt zur passenden Zielgruppe; wiederholtes Wechseln stapelt keine Detailseiten. Die Plus-Buttons bleiben eigenständige Aktionen.
 
 Antippen eines Zwischenziels in den Zieldetails öffnet direkt seinen Editor; Speichern und Zurück führen zu diesen Zieldetails zurück.
 
@@ -56,7 +58,7 @@ Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberf
 
 Ziele lassen sich durch langes Drücken und Ziehen sortieren. Dasselbe gilt für Zwischenziele in den Zieldetails und im Zwischenziele-Tab. Dort kann ein Zwischenziel auch auf die Überschrift eines anderen Ziels oder zwischen dessen Zwischenziele gezogen werden. Todo-Verknüpfungen und bisherige Fortschrittsgutschriften bleiben erhalten; beide Ziel-Fortschritte werden neu berechnet. Die Reihenfolge übersteht Neustarts und Datensicherungen. Am Listenrand wird beim Ziehen automatisch gescrollt; ein eigener Bearbeitungsmodus ist nicht nötig.
 
-Die Emoji-Markierung blendet beim Tippen ein und nach 1,5 Sekunden automatisch aus. Beim Scrollen wird die gesamte Sprungleiste weich aus- beziehungsweise eingeblendet.
+Die Emoji-Markierung blinkt beim Tippen für 180 ms auf und verschwindet direkt, ohne Fade. Beim Scrollen wird die gesamte Sprungleiste weich aus- beziehungsweise eingeblendet.
 
 ## Daten sichern
 

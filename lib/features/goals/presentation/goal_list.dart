@@ -9,9 +9,15 @@ import 'goal_theme.dart';
 import 'goal_card.dart';
 
 class GoalList extends StatelessWidget {
-  const GoalList({super.key, required this.controller, this.archived = false});
+  const GoalList({
+    super.key,
+    required this.controller,
+    this.archived = false,
+    this.onOpenMilestones,
+  });
   final GoalsController controller;
   final bool archived;
+  final ValueChanged<int>? onOpenMilestones;
   @override
   Widget build(BuildContext context) {
     final goals = controller.snapshot.goals
@@ -63,8 +69,11 @@ class GoalList extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (_) =>
-                        GoalDetail(controller: controller, goalId: goal.id),
+                    builder: (_) => GoalDetail(
+                      controller: controller,
+                      goalId: goal.id,
+                      onOpenMilestones: onOpenMilestones,
+                    ),
                   ),
                 ),
               ),

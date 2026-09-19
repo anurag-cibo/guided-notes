@@ -155,15 +155,14 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Zwischenziele').last);
         await tester.pumpAndSettle();
-        // The selection timer rebuilds the list while this drag is held.
         await tester.tap(find.byKey(const ValueKey('goal-jump-2')));
-        await tester.pump(const Duration(milliseconds: 300));
+        await tester.pump(const Duration(milliseconds: 70));
         await move('drag-milestone-1', 'drag-milestone-3');
         expect(c.snapshot.forGoal(2).map((m) => m.id), [1, 3]);
         await move('drag-milestone-1', 'drop-goal-3');
         expect(c.snapshot.forGoal(3).single.id, 1);
         await tester.tap(find.byKey(const ValueKey('goal-jump-2')));
-        await tester.pump(const Duration(milliseconds: 300));
+        await tester.pump(const Duration(milliseconds: 70));
         expect(
           tester
               .widget<GoalEmojiSelector>(find.byType(GoalEmojiSelector))
@@ -172,14 +171,14 @@ void main() {
         );
         await tester.pump(const Duration(milliseconds: 900));
         await tester.tap(find.byKey(const ValueKey('goal-jump-1')));
-        await tester.pump(const Duration(milliseconds: 400));
+        await tester.pump(const Duration(milliseconds: 70));
         expect(
           tester
               .widget<GoalEmojiSelector>(find.byType(GoalEmojiSelector))
               .selectedId,
           1,
         );
-        await tester.pump(const Duration(milliseconds: 1200));
+        await tester.pump(const Duration(milliseconds: 120));
         expect(
           tester
               .widget<GoalEmojiSelector>(find.byType(GoalEmojiSelector))
@@ -229,6 +228,64 @@ void main() {
         await gesture.up();
         await tester.pumpAndSettle();
         expect(c.snapshot.forGoal(1).first.id, isNot(1));
+        expect(tester.takeException(), isNull);
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        c.dispose();
+        await db.close();
+      }
+    },
+  );
+  testWidgets(
+    'headings navigate to details and back to the actual focused tab',
+    (tester) async {
+      final db = AppDatabase(NativeDatabase.memory());
+      final r = GoalsRepository(db);
+      final c = GoalsController(r);
+      try {
+        await r.saveGoal(title: 'Gesundheit', emoji: '🌿');
+        for (var i = 0; i < 30; i++) {
+          await r.saveMilestone(goalId: 1, title: 'Schritt $i');
+        }
+        await r.saveGoal(title: 'Lernen', emoji: '📚');
+        await r.saveMilestone(goalId: 2, title: 'Buch lesen');
+        await c.load();
+        await tester.pumpWidget(GuideApp(controller: c));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Lernen'));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Zwischenziele'));
+        await tester.tap(find.text('Zwischenziele'));
+        await tester.pumpAndSettle();
+        expect(find.byType(GoalDetail), findsNothing);
+        expect(
+          tester
+              .widget<NavigationBar>(find.byType(NavigationBar))
+              .selectedIndex,
+          1,
+        );
+        expect(find.text('📚 Lernen').hitTestable(), findsOneWidget);
+        for (var i = 0; i < 3; i++) {
+          await tester.tap(find.text('📚 Lernen'));
+          await tester.pumpAndSettle();
+          expect(tester.widget<GoalDetail>(find.byType(GoalDetail)).goalId, 2);
+          await tester.ensureVisible(find.text('Zwischenziele'));
+          await tester.tap(find.text('Zwischenziele'));
+          await tester.pumpAndSettle();
+          expect(find.byType(GoalDetail), findsNothing);
+          expect(find.text('📚 Lernen').hitTestable(), findsOneWidget);
+          expect(
+            tester
+                .widget<NavigationBar>(find.byType(NavigationBar))
+                .selectedIndex,
+            1,
+          );
+        }
+        await tester.tap(
+          find.byTooltip('Zwischenziel hinzufügen').hitTestable().first,
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Neues Zwischenziel'), findsOneWidget);
         expect(tester.takeException(), isNull);
       } finally {
         await tester.pumpWidget(const SizedBox());

@@ -1,5 +1,12 @@
 # Validierung
 
+## Kurzer Emoji-Impuls und Überschriften-Navigation · 19.09.2026
+
+Neuester Nutzerwunsch ersetzt die zeitgesteuerte Fade-Markierung: Emoji-Hintergrund blinkt 180 ms ohne Fade auf und verschwindet direkt. Die gesamte Leiste behält ihren 320-ms-Fade beim Scrollen. Zielüberschriften im Zwischenziele-Tab öffnen Zieldetails. Dort wechselt die Überschrift Zwischenziele zum bestehenden Haupttab und fokussiert die passende Zielgruppe; keine gestapelten Detailseiten. Plus-Buttons bleiben getrennt bedienbar. Archivierte Ziele sind weiterhin nicht im aktiven Zwischenziele-Tab enthalten.
+
+72 Tests und Analyse erfolgreich; native Android-Prüfung heading_navigation_test.dart bestätigt Wechsel, korrekten Haupttab und Zielgruppe. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10, keine auffälligen Layout-/Kontrastprobleme. Screenshots outputs/navigation-focused-group.png, navigation-goal-detail.png und navigation-after-flash.png. Speicherung/Schema unverändert. Normales Emulator-Update mit vorheriger Sicherung; kein zusätzliches Release.
+
+
 ## Sortieren, Zielwechsel und Animationen · 19.09.2026
 
 - Finale Formatierung und Analyse ohne Befunde; 71 Unit-/Widgettests bestanden.

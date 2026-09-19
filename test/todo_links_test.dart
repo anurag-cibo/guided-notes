@@ -378,7 +378,7 @@ void main() {
           )
           .where((widget) => widget.properties.selected == true);
       await tester.tap(selector);
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 70));
       expect(selectedEmojis(), hasLength(1));
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
       await tester.pump();
@@ -395,7 +395,7 @@ void main() {
       expect(selector.hitTestable(), findsOneWidget);
       expect(selectedEmojis(), isEmpty);
       await tester.tap(selector);
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 70));
       expect(selectedEmojis(), hasLength(1));
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());

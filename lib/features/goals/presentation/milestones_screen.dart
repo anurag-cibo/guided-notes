@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'goal_theme.dart';
+import 'goal_detail.dart';
 import 'goal_emoji_selector.dart';
 
 import '../application/goals_controller.dart';
@@ -44,10 +45,12 @@ class MilestonesView extends StatefulWidget {
     required this.controller,
     this.focusGoalId,
     this.focusMilestoneId,
+    this.onOpenMilestones,
   });
   final GoalsController controller;
   final int? focusGoalId;
   final int? focusMilestoneId;
+  final ValueChanged<int>? onOpenMilestones;
   @override
   State<MilestonesView> createState() => _MilestonesViewState();
 }
@@ -101,6 +104,18 @@ class _MilestonesViewState extends State<MilestonesView> {
               colors: snapshot.theme(goal.customThemeId)?.colors,
               child: SectionHeading(
                 title: '${goal.emoji} ${goal.title}',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => GoalDetail(
+                      controller: widget.controller,
+                      goalId: goal.id,
+                      onOpenMilestones:
+                          widget.onOpenMilestones ??
+                          (_) => Navigator.pop(context),
+                    ),
+                  ),
+                ),
                 addLabel: 'Zwischenziel hinzufügen',
                 onAdd: widget.controller.saving
                     ? null
@@ -248,7 +263,7 @@ class _MilestonesViewState extends State<MilestonesView> {
                   _jump++;
                   _showSelector = true;
                 });
-                _selectionTimer = Timer(const Duration(milliseconds: 1500), () {
+                _selectionTimer = Timer(const Duration(milliseconds: 180), () {
                   if (mounted) setState(() => _selectedGoal = null);
                 });
               },

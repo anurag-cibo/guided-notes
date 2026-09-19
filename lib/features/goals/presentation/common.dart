@@ -44,15 +44,35 @@ class SectionHeading extends StatelessWidget {
     required this.title,
     this.addLabel,
     this.onAdd,
+    this.onTap,
   });
   final String title;
   final String? addLabel;
   final VoidCallback? onAdd;
+  final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) => Row(
     children: [
       Expanded(
-        child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+        child: onTap == null
+            ? Text(title, style: Theme.of(context).textTheme.titleLarge)
+            : Semantics(
+                button: true,
+                child: InkWell(
+                  onTap: onTap,
+                  borderRadius: BorderRadius.circular(8),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 48),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
       ),
       if (addLabel != null) ...[
         const SizedBox(width: 12),

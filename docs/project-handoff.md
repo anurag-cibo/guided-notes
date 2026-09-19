@@ -1,5 +1,12 @@
 # Projektübergabe · 19.09.2026
 
+## Kurzer Emoji-Impuls und Überschriften-Navigation · 19.09.2026
+
+Neuester Nutzerwunsch ersetzt die zeitgesteuerte Fade-Markierung: Emoji-Hintergrund blinkt 180 ms ohne Fade auf und verschwindet direkt. Die gesamte Leiste behält ihren 320-ms-Fade beim Scrollen. Zielüberschriften im Zwischenziele-Tab öffnen Zieldetails. Dort wechselt die Überschrift Zwischenziele zum bestehenden Haupttab und fokussiert die passende Zielgruppe; keine gestapelten Detailseiten. Plus-Buttons bleiben getrennt bedienbar. Archivierte Ziele sind weiterhin nicht im aktiven Zwischenziele-Tab enthalten.
+
+72 Tests und Analyse erfolgreich; native Android-Prüfung heading_navigation_test.dart bestätigt Wechsel, korrekten Haupttab und Zielgruppe. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10, keine auffälligen Layout-/Kontrastprobleme. Screenshots outputs/navigation-focused-group.png, navigation-goal-detail.png und navigation-after-flash.png. Speicherung/Schema unverändert. Normales Emulator-Update mit vorheriger Sicherung; kein zusätzliches Release.
+
+
 ## Sortieren und zeitgesteuerte Emoji-Markierung · 19.09.2026
 
 Folgeauftrag #50 ergänzt den offenen PR #49: Ziele und Zwischenziele per langem Drücken (600 ms) und vertikalem Ziehen sortieren, ohne Bearbeitungsmodus. Im Zwischenziele-Tab ist Wechsel zwischen aktiven Zielgruppen möglich; Überschriften und leere Gruppen sind Ablageziele. Eine Linie zeigt davor/dahinter, am Rand scrollt die Liste weiter, auch bei stillstehendem Finger. Die gezogene Karte hat einen deckenden Hintergrund. Ein aktiver Drag bleibt bei Listen-Rebuilds/Scrollen erhalten; Abbruch ändert keine Reihenfolge.

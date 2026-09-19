@@ -38,9 +38,10 @@ class GoalEmojiSelector extends StatelessWidget {
                     child: InkWell(
                       key: ValueKey('goal-jump-${goal.id}'),
                       borderRadius: BorderRadius.circular(16),
+                      splashFactory: NoSplash.splashFactory,
+                      highlightColor: Colors.transparent,
                       onTap: () => onSelected(goal.id),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 280),
+                      child: Container(
                         width: 48,
                         height: 48,
                         alignment: Alignment.center,
