@@ -33,46 +33,60 @@ void main() {
   testWidgets(
     'goal card clips cover above progress and updates at large text',
     (tester) async {
-      final db = AppDatabase(NativeDatabase.memory());
-      final r = GoalsRepository(db);
-      final c = GoalsController(r);
-      await tester.runAsync(
-        () => r.saveGoal(
-          title: 'Ein langes persönliches Ziel mit vielen kleinen Schritten',
-          coverImage: picture,
-        ),
-      );
-      final id = (await r.load()).goals.single.id;
-      await r.saveMilestone(goalId: id, title: 'Schritt', progress: 35);
-      await c.load();
-      tester.view.physicalSize = const Size(320, 900);
-      tester.view.devicePixelRatio = 1;
-      tester.platformDispatcher.textScaleFactorTestValue = 2;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-      await tester.pumpWidget(GuideApp(controller: c));
-      await tester.pumpAndSettle();
-      expect(find.byType(Image), findsOneWidget);
-      expect(
-        tester.getBottomLeft(find.byType(Image)).dy,
-        lessThan(tester.getTopLeft(find.byType(LinearProgressIndicator)).dy),
-      );
-      expect(find.text('35 %'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-      await r.saveGoal(id: id, title: 'Ohne Bild', removeCoverImage: true);
-      await c.load();
-      await tester.pumpAndSettle();
-      expect(find.byType(Image), findsNothing);
-      await tester.runAsync(
-        () => r.saveGoal(id: id, title: 'Wieder mit Bild', coverImage: picture),
-      );
-      await c.load();
-      await tester.pumpAndSettle();
-      expect(find.byType(Image), findsOneWidget);
-      await tester.pumpWidget(const SizedBox());
-      c.dispose();
-      await db.close();
+      final semantics = tester.ensureSemantics();
+      try {
+        final db = AppDatabase(NativeDatabase.memory());
+        final r = GoalsRepository(db);
+        final c = GoalsController(r);
+        await tester.runAsync(
+          () => r.saveGoal(
+            title: 'Ein langes persönliches Ziel mit vielen kleinen Schritten',
+            coverImage: picture,
+          ),
+        );
+        final id = (await r.load()).goals.single.id;
+        await r.saveMilestone(goalId: id, title: 'Schritt', progress: 35.25);
+        await c.load();
+        tester.view.physicalSize = const Size(320, 900);
+        tester.view.devicePixelRatio = 1;
+        tester.platformDispatcher.textScaleFactorTestValue = 2;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+        await tester.pumpWidget(GuideApp(controller: c));
+        await tester.pumpAndSettle();
+        expect(find.byType(Image), findsOneWidget);
+        expect(
+          tester.getBottomLeft(find.byType(Image)).dy,
+          lessThan(tester.getTopLeft(find.byType(LinearProgressIndicator)).dy),
+        );
+        expect(find.text('35,25 %'), findsOneWidget);
+        expect(
+          tester
+              .widget<LinearProgressIndicator>(
+                find.byType(LinearProgressIndicator),
+              )
+              .semanticsValue,
+          '35.25 %',
+        );
+        expect(tester.takeException(), isNull);
+        await r.saveGoal(id: id, title: 'Ohne Bild', removeCoverImage: true);
+        await c.load();
+        await tester.pumpAndSettle();
+        expect(find.byType(Image), findsNothing);
+        await tester.runAsync(
+          () =>
+              r.saveGoal(id: id, title: 'Wieder mit Bild', coverImage: picture),
+        );
+        await c.load();
+        await tester.pumpAndSettle();
+        expect(find.byType(Image), findsOneWidget);
+        await tester.pumpWidget(const SizedBox());
+        c.dispose();
+        await db.close();
+      } finally {
+        semantics.dispose();
+      }
     },
   );
 

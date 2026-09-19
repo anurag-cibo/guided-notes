@@ -116,7 +116,9 @@ class GoalCard extends StatelessWidget {
                         minHeight: 4,
                         borderRadius: BorderRadius.circular(8),
                         semanticsLabel: 'Zwischenzielfortschritt',
-                        semanticsValue: '${formatProgress(progress)} %',
+                        // Flutter's progressBar role requires a parseable number.
+                        semanticsValue:
+                            '${formatProgress(progress).replaceAll(',', '.')} %',
                       ),
                     ],
                     if (goal.achieved || goal.dueDate != null) ...[
