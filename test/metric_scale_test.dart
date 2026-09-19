@@ -248,6 +248,77 @@ void main() {
   });
 
   testWidgets(
+    'bounds clamp immediately and Todo units preview without saving',
+    (tester) async {
+      await r.saveMilestone(goalId: 1, title: 'Messung', currentValue: 100);
+      await r.todos.save(
+        title: 'Ein Schritt',
+        frequency: TodoFrequency.daily,
+        target: 1,
+        milestoneId: 1,
+        progressIncrement: 2,
+      );
+      final c = GoalsController(r);
+      await c.load();
+      try {
+        await tester.pumpWidget(GuideApp(controller: c));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Lernen'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Messung'));
+        await tester.pumpAndSettle();
+        final current = find.byKey(const ValueKey('metric-current'));
+        final target = find.byKey(const ValueKey('metric-target'));
+        final start = find.byKey(const ValueKey('metric-start'));
+        String value() =>
+            tester.widget<TextFormField>(current).controller!.text;
+        await tester.enterText(target, '80');
+        await tester.pumpAndSettle();
+        expect(value(), '80');
+        expect(
+          tester
+              .widget<Text>(find.byKey(const ValueKey('metric-slider-value')))
+              .data,
+          '80',
+        );
+        await tester.enterText(start, '100');
+        await tester.enterText(current, '85');
+        await tester.enterText(target, '90');
+        await tester.pumpAndSettle();
+        expect(value(), '90');
+        await tester.tap(find.byKey(const ValueKey('metric-unit-false')));
+        await tester.pumpAndSettle();
+        expect(find.text('Kilogramm (kg)'), findsNothing);
+        await tester.tap(find.text('Eigene Einheit').last);
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const ValueKey('metric-custom-unit')),
+          'Gläser',
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('−2 Gläser'), findsOneWidget);
+        expect(c.snapshot.milestone(1)!.scale.unit, '%');
+        expect(c.snapshot.milestone(1)!.currentValue, 100);
+        final slider = find.byKey(const ValueKey('metric-slider'));
+        final label = find.byKey(const ValueKey('metric-slider-value'));
+        final right = tester.getCenter(label).dx;
+        tester.widget<Slider>(slider).onChanged!(0);
+        await tester.pumpAndSettle();
+        expect(value(), '100');
+        expect(tester.getCenter(label).dx, lessThan(right));
+        await tester.tap(find.byType(BackButton));
+        await tester.pumpAndSettle();
+        expect(c.snapshot.milestone(1)!.scale.unit, '%');
+        expect(c.snapshot.milestone(1)!.scale.target, 100);
+        expect(tester.takeException(), isNull);
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        c.dispose();
+      }
+    },
+  );
+
+  testWidgets(
     'create measurement without why, set unit and contribute using the linked unit',
     (tester) async {
       final c = GoalsController(r);
@@ -270,7 +341,12 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(units);
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Bücher').last);
+        await tester.tap(find.text('Eigene Einheit').last);
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const ValueKey('metric-custom-unit')),
+          'Bücher',
+        );
         await tester.pumpAndSettle();
         await tester.enterText(
           find.byKey(const ValueKey('metric-target')),

@@ -1,5 +1,11 @@
 # Projektübergabe · 19.09.2026
 
+## Kleine Zeitkreise und kompakter Messwert-Editor · 19.09.2026
+
+Neuester Folgeauftrag: Zielkarten ersetzen die Restzeitformulierung durch einen 18-px-Zeitkreis plus z. B. „103 Tage“, mit derselben Zeitberechnung wie in den Details und praktisch gleicher Kartenhöhe. Heute/überfällige Fristen bleiben ausdrücklich benannt. Zwischenziel-Editor: Einheit und aktueller Wert nebeneinander; Regler zwischen Start-/Zielwert mit dauerhaft mitlaufender Zahl, bei schmaler Ansicht/großer Schrift vertikal. Einheitenliste auf Prozent, Ohne Einheit und Eigene Einheit reduziert. Gültige Grenzänderungen begrenzen den aktuellen Wert sofort in beiden Richtungen. Todo-Anzeige übernimmt die Entwurfseinheit/-richtung direkt; Abbrechen verwirft den Entwurf, Todo-Aktionen speichern wie bisher vorher. Schema und Backup unverändert.
+
+83 Unit-/Widgettests, Analyse, Format und nativer Android-Test in Hell/Dunkel erfolgreich. Grenzen, sofortige Todo-Vorschau, Abbrechen sowie die Position der Reglerzahl sind geprüft. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10, keine optischen Blocker; statische Bilder belegen den Zustand, die mitlaufende Position ist per Widgettest geprüft. Normaler Debug-Build 0.3.3+9 nach Sicherung outputs/before-compact-metrics.tar per Update geöffnet, Datenbank bytegleich (SHA256 ebf33a0e6de45b8c46bfb817e114001557858f4f8654b1ea9c56c89072dc6296).
+
 ## Korrektur: Warum nur beim großen Ziel · 19.09.2026
 
 Die neueste Nutzerkorrektur ersetzt die vorherige Zwischenziel-Warum-Anforderung vollständig: kein Warum-Feld und keine Pflichtprüfung bei Zwischenzielen. Beim Erstellen großer Ziele ist das bestehende Warum jetzt verpflichtend; leere/Whitespace-Eingaben verhindern das Anlegen, mit mehrzeiligem Hinweis direkt am Feld. Formular und Repository prüfen die Regel. Bestehende Ziele ohne Warum bleiben bearbeitbar. Bereits gespeicherte Zwischenziel-Motivationen bleiben lediglich für verlustfreie Backups in Schema 12 erhalten; keine erneute Migration. Alle Messskalen bleiben unverändert.

@@ -26,6 +26,7 @@ void main() {
       await r.saveGoal(
         motivation: 'Meine persönliche Richtung',
         title: 'Wissen & Alltag',
+        dueDate: DateTime.now().add(const Duration(days: 103)),
         emoji: '📚',
         color: GoalColor.lavender,
       );
@@ -95,6 +96,7 @@ void main() {
         }
         await tester.tap(find.text('Ziele').last);
         await tester.pumpAndSettle();
+        await binding.takeScreenshot('compact-$mode-goals');
         await tester.tap(find.byTooltip('Ziel hinzufügen'));
         await tester.pumpAndSettle();
         await tester.enterText(
@@ -133,6 +135,33 @@ void main() {
         );
         await tester.pumpAndSettle();
         await binding.takeScreenshot('metrics-$mode-editor-values');
+        await tester.enterText(
+          find.byKey(const ValueKey('metric-custom-unit')),
+          'Gläser',
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('+1 Gläser'), findsOneWidget);
+        expect(c.snapshot.milestone(1)!.scale.unit, 'Bücher');
+        await tester.enterText(
+          find.byKey(const ValueKey('metric-target')),
+          '2',
+        );
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<TextFormField>(
+                find.byKey(const ValueKey('metric-current')),
+              )
+              .controller!
+              .text,
+          '2',
+        );
+        final slider = find.byKey(const ValueKey('metric-slider'));
+        await tester.ensureVisible(slider);
+        await tester.pumpAndSettle();
+        await tester.tapAt(tester.getCenter(slider));
+        await tester.pumpAndSettle();
+        await binding.takeScreenshot('compact-$mode-live-draft');
         await tester.tap(find.byType(BackButton));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Todos').last);

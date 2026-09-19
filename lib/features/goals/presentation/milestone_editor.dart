@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../application/goals_controller.dart';
 import '../domain/models.dart';
 import 'common.dart';
+import 'measurement_slider.dart';
 import '../../todos/domain/todo_models.dart';
 import '../../todos/presentation/todo_group.dart';
 
@@ -35,15 +36,7 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
   late final _unit = TextEditingController(
     text: widget.milestone?.scale.unit ?? '%',
   );
-  static const _units = {
-    '%': 'Prozent (%)',
-    '': 'Ohne Einheit',
-    'kg': 'Kilogramm (kg)',
-    'Seiten': 'Seiten',
-    'cm': 'Zentimeter (cm)',
-    'Gläser': 'Gläser',
-    'Bücher': 'Bücher',
-  };
+  static const _units = {'%': 'Prozent (%)', '': 'Ohne Einheit'};
   late bool _customUnit = !_units.containsKey(_unit.text);
 
   MetricScale? get _scale {
@@ -72,10 +65,19 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
   }
 
   void _setCurrent(num value) => _current.text = formatProgress(value);
-  void _measurementChanged() {
+  void _measurementChanged({bool clamp = false}) {
     final scale = _scale;
-    final value = parseMetric(_current.text);
+    var value = parseMetric(_current.text);
     if (scale == null || value == null) return;
+    if (clamp) {
+      try {
+        final bounded = scale.clampUnits(metricUnits(value)) / 100;
+        if (bounded != value) _setCurrent(bounded);
+        value = bounded;
+      } on ArgumentError {
+        return;
+      }
+    }
     if (value == scale.target) {
       _status = MilestoneStatus.achieved;
     } else if (_status == MilestoneStatus.achieved ||
@@ -180,9 +182,10 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
     ),
     decoration: InputDecoration(
       labelText: label,
-      suffixText: _unit.text.isEmpty ? null : _unit.text,
+      errorMaxLines: 3,
+      suffixText: !current || _unit.text.isEmpty ? null : _unit.text,
     ),
-    onChanged: (_) => setState(_measurementChanged),
+    onChanged: (_) => setState(() => _measurementChanged(clamp: !current)),
     validator: (text) {
       final value = parseMetric(text ?? '');
       try {
@@ -201,88 +204,106 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
     },
   );
 
-  Widget _measurementFields(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      DropdownButtonFormField<String>(
-        key: ValueKey('metric-unit-$_customUnit'),
-        initialValue: _customUnit ? '__custom' : _unit.text,
-        isExpanded: true,
-        decoration: const InputDecoration(labelText: 'Einheit'),
-        items: [
-          for (final entry in _units.entries)
-            DropdownMenuItem(value: entry.key, child: Text(entry.value)),
-          const DropdownMenuItem(
-            value: '__custom',
-            child: Text('Eigene Einheit …'),
-          ),
-        ],
-        onChanged: (value) => setState(() {
-          _customUnit = value == '__custom';
-          _unit.text = _customUnit ? '' : value!;
-        }),
-      ),
-      if (_customUnit) ...[
-        gap,
-        TextFormField(
-          key: const ValueKey('metric-custom-unit'),
-          controller: _unit,
-          maxLength: 30,
-          decoration: const InputDecoration(
-            labelText: 'Eigene Einheit',
-            hintText: 'z. B. Kilometer oder Tassen',
-          ),
-          onChanged: (_) => setState(() {}),
+  Widget _measurementFields(BuildContext context) {
+    final unit = DropdownButtonFormField<String>(
+      key: ValueKey('metric-unit-$_customUnit'),
+      initialValue: _customUnit ? '__custom' : _unit.text,
+      isExpanded: true,
+      decoration: const InputDecoration(labelText: 'Einheit'),
+      items: [
+        for (final entry in _units.entries)
+          DropdownMenuItem(value: entry.key, child: Text(entry.value)),
+        const DropdownMenuItem(
+          value: '__custom',
+          child: Text('Eigene Einheit'),
         ),
       ],
-      gap,
-      LayoutBuilder(
-        builder: (context, constraints) {
-          final start = _numberField('Startwert', 'metric-start', _start);
-          final target = _numberField('Zielwert', 'metric-target', _target);
-          if (constraints.maxWidth < 300 ||
-              MediaQuery.textScalerOf(context).scale(16) > 22) {
-            return Column(children: [start, gap, target]);
-          }
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: start),
-              const SizedBox(width: 12),
-              Expanded(child: target),
-            ],
-          );
-        },
-      ),
-      gap,
-      _numberField('Aktueller Wert', 'metric-current', _current, current: true),
-      const SizedBox(height: 8),
-      Text('${formatProgress(_progress)} % des Zwischenziels erreicht'),
-      Slider(
-        value: _progress,
-        min: 0,
-        max: 100,
-        divisions: 100,
-        label: _scale?.format(parseMetric(_current.text) ?? 0),
-        onChanged: _scale == null
-            ? null
-            : (value) => setState(() {
-                _setCurrent(_scale!.valueForPercent(value));
-                _measurementChanged();
-              }),
-      ),
-      if (widget.milestone != null &&
-          (_unit.text != widget.milestone!.scale.unit ||
-              parseMetric(_start.text) != widget.milestone!.scale.start ||
-              parseMetric(_target.text) != widget.milestone!.scale.target) &&
-          widget.controller.snapshot.todoTemplates.any(
-            (t) => t.active && t.milestoneId == widget.milestone!.id,
-          ))
-        const Text(
-          'Todo-Beiträge verwenden diese Einheit. Bei einer Änderung der Einheit bleiben die Zahlenwerte erhalten.',
+      onChanged: (value) => setState(() {
+        _customUnit = value == '__custom';
+        _unit.text = _customUnit ? '' : value!;
+      }),
+    );
+    final current = _numberField(
+      'Aktueller Wert',
+      'metric-current',
+      _current,
+      current: true,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 300 ||
+                MediaQuery.textScalerOf(context).scale(16) > 22) {
+              return Column(children: [unit, gap, current]);
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: unit),
+                const SizedBox(width: 12),
+                Expanded(child: current),
+              ],
+            );
+          },
         ),
-    ],
-  );
+        if (_customUnit) ...[
+          gap,
+          TextFormField(
+            key: const ValueKey('metric-custom-unit'),
+            controller: _unit,
+            maxLength: 30,
+            decoration: const InputDecoration(
+              labelText: 'Eigene Einheit',
+              hintText: 'z. B. Gläser',
+              counterText: '',
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+        ],
+        gap,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final start = _numberField('Startwert', 'metric-start', _start);
+            final target = _numberField('Zielwert', 'metric-target', _target);
+            final slider = MeasurementSlider(
+              progress: _progress,
+              valueLabel: formatProgress(parseMetric(_current.text) ?? 0),
+              onChanged: _scale == null
+                  ? null
+                  : (value) => setState(() {
+                      _setCurrent(_scale!.valueForPercent(value));
+                      _measurementChanged();
+                    }),
+            );
+            if (constraints.maxWidth < 330 ||
+                MediaQuery.textScalerOf(context).scale(16) > 22) {
+              return Column(children: [start, slider, target]);
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(width: 92, child: start),
+                Expanded(child: slider),
+                SizedBox(width: 92, child: target),
+              ],
+            );
+          },
+        ),
+        if (widget.milestone != null &&
+            (_unit.text != widget.milestone!.scale.unit ||
+                parseMetric(_start.text) != widget.milestone!.scale.start ||
+                parseMetric(_target.text) != widget.milestone!.scale.target) &&
+            widget.controller.snapshot.todoTemplates.any(
+              (t) => t.active && t.milestoneId == widget.milestone!.id,
+            ))
+          const Text(
+            'Todo-Beiträge verwenden diese Einheit. Bei einer Änderung der Einheit bleiben die Zahlenwerte erhalten.',
+          ),
+      ],
+    );
+  }
 
   Widget _statusAndDue(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
@@ -387,6 +408,13 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
                   frequency: frequency,
                   milestoneId: widget.milestone!.id,
                   beforeAction: _beforeTodoAction,
+                  previewScale:
+                      _scale ??
+                      MetricScale(
+                        start: widget.milestone!.scale.start,
+                        target: widget.milestone!.scale.target,
+                        unit: _unit.text.trim(),
+                      ),
                 ),
               gap,
               TextButton(
