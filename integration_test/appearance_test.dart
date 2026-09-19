@@ -157,6 +157,20 @@ void main() {
           await tester.tap(find.text('Zwischenziele').last);
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-milestones');
+          await tester.tap(find.byKey(ValueKey('goal-jump-$id')));
+          await tester.pumpAndSettle();
+          await tester.drag(
+            find.byType(CustomScrollView),
+            const Offset(0, -180),
+          );
+          await tester.pumpAndSettle();
+          await tester.drag(find.byType(CustomScrollView), const Offset(0, 80));
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot(
+            'appearance-$mode-milestones-free-scroll',
+          );
+          await tester.tap(find.byKey(ValueKey('goal-jump-$id')));
+          await tester.pumpAndSettle();
           await tester.tap(find.text('Regelmäßig bewegen'));
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-milestone-editor');

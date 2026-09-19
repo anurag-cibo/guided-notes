@@ -2,7 +2,7 @@
 
 ## Emoji-Leiste und Karten-Cover · 19.09.2026
 
-Folgeauftrag #48 umgesetzt: einzeilige Emoji-Zielsprünge im Zwischenziele-Tab, Prozentzahl rechts neben dem Zielbalken, Standardmotiv auf Zielkarten ohne eigenes Bild. Rechts neben der Bildauswahl/Papierkorb im Ziel-Editor steuert ein kleiner Schalter ausschließlich das Karten-Cover. Foto und Detailcover bleiben erhalten. Schema 10/Backup 9 speichern showCardCover; ältere Daten erhalten true. Die Migration aus Schema 9 skaliert Fortschritte nicht erneut.
+Folgeauftrag #48 umgesetzt: einzeilige Emoji-Zielsprünge im Zwischenziele-Tab, Prozentzahl rechts neben dem Zielbalken, Standardmotiv auf Zielkarten ohne eigenes Bild. Die Restzeit steht direkt unter dem Zwischenziel-Status im Cover. Freies Scrollen lässt die Emoji-Markierung ausfaden, ohne den Sprunganker zu verändern; erneutes Antippen markiert wieder das gewählte Ziel. Rechts neben der Bildauswahl/Papierkorb im Ziel-Editor steuert ein kleiner Schalter ausschließlich das Karten-Cover. Foto und Detailcover bleiben erhalten. Schema 10/Backup 9 speichern showCardCover; ältere Daten erhalten true. Die Migration aus Schema 9 skaliert Fortschritte nicht erneut.
 
 68 Tests, Analyse und Android-Darstellungs-/Neustarttest erfolgreich. Visuelles Review: Karten 8/10, Emoji-Leiste 8,5/10, Editor 7,5/10 in Hell/Dunkel. Emulator enthält den Debug-Stand 0.3.3+9. Bestehende Daten vor/nach Migration vollständig verglichen und unverändert erhalten; Sicherung outputs/before-emoji-covers.tar. Arbeitsbranch codex/emoji-navigation-card-covers; Integration anhand GitHub prüfen. Für diesen Folgeauftrag wurde kein neues Release veröffentlicht.
 

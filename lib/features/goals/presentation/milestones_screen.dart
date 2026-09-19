@@ -51,6 +51,9 @@ class MilestonesView extends StatefulWidget {
 
 class _MilestonesViewState extends State<MilestonesView> {
   late int? _focusGoal = widget.focusGoalId;
+  late int? _selectedGoal =
+      widget.focusGoalId ??
+      widget.controller.snapshot.activeGoals.firstOrNull?.id;
   late int? _focusMilestone = widget.focusMilestoneId;
   int _jump = 0;
   final _center = GlobalKey();
@@ -186,9 +189,10 @@ class _MilestonesViewState extends State<MilestonesView> {
                 heightFactor: _showSelector ? 1 : 0,
                 child: GoalEmojiSelector(
                   snapshot: snapshot,
-                  selectedId: _focusGoal,
+                  selectedId: _selectedGoal,
                   onSelected: (id) => setState(() {
                     _focusGoal = id;
+                    _selectedGoal = id;
                     _focusMilestone = null;
                     _jump++;
                     _showSelector = true;
@@ -205,7 +209,12 @@ class _MilestonesViewState extends State<MilestonesView> {
                 return false;
               }
               final show = notification.direction == ScrollDirection.forward;
-              if (show != _showSelector) setState(() => _showSelector = show);
+              if (show != _showSelector || _selectedGoal != null) {
+                setState(() {
+                  _showSelector = show;
+                  _selectedGoal = null;
+                });
+              }
               return false;
             },
             child: CustomScrollView(

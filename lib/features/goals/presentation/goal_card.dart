@@ -89,6 +89,18 @@ class GoalCard extends StatelessWidget {
                                 color: foreground,
                               ),
                             ),
+                            if (goal.achieved || goal.dueDate != null) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                deadlineLabel(
+                                  goal.dueDate,
+                                  achieved: goal.achieved,
+                                ),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: foreground,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -98,7 +110,7 @@ class GoalCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (progress != null || goal.achieved || goal.dueDate != null)
+            if (progress != null)
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   20,
@@ -109,33 +121,26 @@ class GoalCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (progress != null)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: LinearProgressIndicator(
-                              value: progress / 100,
-                              minHeight: 4,
-                              borderRadius: BorderRadius.circular(8),
-                              semanticsLabel: 'Zwischenzielfortschritt',
-                              // Flutter's progressBar role requires a parseable number.
-                              semanticsValue:
-                                  '${formatProgress(progress).replaceAll(',', '.')} %',
-                            ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            value: progress / 100,
+                            minHeight: 4,
+                            borderRadius: BorderRadius.circular(8),
+                            semanticsLabel: 'Zwischenzielfortschritt',
+                            // Flutter's progressBar role requires a parseable number.
+                            semanticsValue:
+                                '${formatProgress(progress).replaceAll(',', '.')} %',
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '${formatProgress(progress)} %',
-                            style: theme.textTheme.labelMedium,
-                          ),
-                        ],
-                      ),
-                    if (goal.achieved || goal.dueDate != null) ...[
-                      if (progress != null) const SizedBox(height: 8),
-                      Text(
-                        deadlineLabel(goal.dueDate, achieved: goal.achieved),
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '${formatProgress(progress)} %',
+                          style: theme.textTheme.labelMedium,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

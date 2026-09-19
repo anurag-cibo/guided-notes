@@ -27,8 +27,7 @@ class GoalEmojiSelector extends StatelessWidget {
             colors: snapshot.theme(goal.customThemeId)?.colors,
             child: Builder(
               builder: (context) {
-                final selected =
-                    goal.id == (selectedId ?? snapshot.activeGoals.first.id);
+                final selected = goal.id == selectedId;
                 return Semantics(
                   selected: selected,
                   button: true,

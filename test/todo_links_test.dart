@@ -369,12 +369,27 @@ void main() {
       await tester.pumpAndSettle();
       final selector = find.byKey(ValueKey('goal-jump-$goalId'));
       expect(selector.hitTestable(), findsOneWidget);
+      Iterable<Semantics> selectedEmojis() => tester
+          .widgetList<Semantics>(
+            find.descendant(
+              of: find.byKey(const ValueKey('goal-emoji-selector')),
+              matching: find.byType(Semantics),
+            ),
+          )
+          .where((widget) => widget.properties.selected == true);
+      await tester.tap(selector);
+      await tester.pumpAndSettle();
+      expect(selectedEmojis(), hasLength(1));
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
       await tester.pumpAndSettle();
       expect(selector.hitTestable(), findsNothing);
       await tester.drag(find.byType(CustomScrollView), const Offset(0, 80));
       await tester.pumpAndSettle();
       expect(selector.hitTestable(), findsOneWidget);
+      expect(selectedEmojis(), isEmpty);
+      await tester.tap(selector);
+      await tester.pumpAndSettle();
+      expect(selectedEmojis(), hasLength(1));
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
       c.dispose();
