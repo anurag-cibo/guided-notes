@@ -39,6 +39,7 @@ class Goal {
     this.achieved = false,
     this.archived = false,
     this.coverImage,
+    this.showCardCover = true,
     this.color = GoalColor.forest,
     this.customThemeId,
   });
@@ -51,6 +52,7 @@ class Goal {
   final bool achieved;
   final bool archived;
   final Uint8List? coverImage;
+  final bool showCardCover;
   final GoalColor color;
   final int? customThemeId;
 }

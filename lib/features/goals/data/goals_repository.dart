@@ -53,7 +53,7 @@ class GoalsRepository {
       }
       for (final g in snapshot.goals) {
         await database.customStatement(
-          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id,started_on) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id,started_on,show_card_cover) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
           [
             g.id,
             g.title,
@@ -66,6 +66,7 @@ class GoalsRepository {
             g.color.name,
             g.customThemeId,
             _encodeDate(g.startedOn ?? now()),
+            g.showCardCover ? 1 : 0,
           ],
         );
       }
@@ -291,6 +292,7 @@ class GoalsRepository {
     DateTime? dueDate,
     Uint8List? coverImage,
     bool removeCoverImage = false,
+    bool? showCardCover,
     GoalColor? color,
     int? customThemeId,
     bool clearCustomTheme = false,
@@ -308,7 +310,7 @@ class GoalsRepository {
     if (id == null) {
       await _checkCapacity();
       await database.customStatement(
-        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id, started_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id, started_on, show_card_cover) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           name,
           symbol,
@@ -318,6 +320,7 @@ class GoalsRepository {
           (color ?? GoalColor.forest).name,
           customThemeId,
           _encodeDate(now()),
+          (showCardCover ?? true) ? 1 : 0,
         ],
       );
     } else {
@@ -329,7 +332,7 @@ class GoalsRepository {
         );
       }
       await database.customStatement(
-        'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ?, color = ?, custom_theme_id = ? WHERE id = ?',
+        'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ?, color = ?, custom_theme_id = ?, show_card_cover = ? WHERE id = ?',
         [
           name,
           symbol,
@@ -337,6 +340,7 @@ class GoalsRepository {
           _encodeDate(dueDate),
           (color ?? existing.color).name,
           customThemeId ?? (clearCustomTheme ? null : existing.customThemeId),
+          (showCardCover ?? existing.showCardCover) ? 1 : 0,
           id,
         ],
       );
@@ -458,6 +462,7 @@ class GoalsRepository {
     achieved: row.read<int>('achieved') == 1,
     archived: row.read<int>('archived') == 1,
     coverImage: row.readNullable<Uint8List>('cover_image'),
+    showCardCover: row.read<int>('show_card_cover') == 1,
     customThemeId: row.readNullable<int>('custom_theme_id'),
     color:
         GoalColor.values

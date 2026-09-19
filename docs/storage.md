@@ -1,5 +1,12 @@
 # Speicherung und Migration
 
+## Schema 10 und Backupformat 9: Cover-Sichtbarkeit · 19.09.2026
+
+Ein boolesches Feld goals.show_card_cover (0/1, Standard 1) steuert ausschließlich das Cover auf Zielkarten. Ausgeschaltete Cover behalten ihre Bildbytes. Die Migration 9 → 10 ergänzt nur diese Spalte; vorhandene Fortschritte, Beiträge, IDs, Bilder und Einstellungen bleiben unverändert. Migrationen aus 1–8 führen zunächst ihre bisherigen Schritte bis Schema 9 aus. Die Hundertstelumrechnung erfolgt ausschließlich bei Ausgangsversionen unter 9.
+
+Backupformat 9 enthält showCardCover pro Ziel als erforderlichen booleschen Wert. Formate 1–8 bleiben lesbar und erhalten aktivierte Cover. Import und reguläres Speichern erhalten den Schalter, auch bei Änderungen anderer Zielfelder. Das Standardmotiv wird aus dem Zieltheme gezeichnet und muss nicht als Bilddatei gespeichert werden.
+
+
 ## Schema 8 und Backupformat 7: Todo-Verknüpfungen
 
 `todo_templates` und `todo_entries` ergänzen `milestone_id` (optional, ON DELETE SET NULL) und `progress_increment` (0–100, 0 deaktiviert Tracking). Neue Zeiträume übernehmen die Vorlage. Eine Änderung der Zuordnung aktualisiert auch den aktuellen Zeitraum, ohne bisherige Erledigungen nachträglich zu buchen.

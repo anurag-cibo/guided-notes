@@ -16,6 +16,9 @@ import 'package:guided_notes/features/goals/domain/models.dart';
 
 import 'fixtures/legacy_todos.dart';
 
+import 'package:guided_notes/features/goals/presentation/goal_card.dart';
+import 'package:guided_notes/features/goals/presentation/goal_cover.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Uint8List picture;
@@ -89,6 +92,84 @@ void main() {
       }
     },
   );
+
+  for (final ownImage in [false, true]) {
+    testWidgets(
+      'card cover switch preserves image and detail cover: $ownImage',
+      (tester) async {
+        final db = AppDatabase(NativeDatabase.memory());
+        final r = GoalsRepository(db);
+        final c = GoalsController(r);
+        try {
+          await tester.runAsync(
+            () => r.saveGoal(
+              title: 'Mein Ziel',
+              coverImage: ownImage ? picture : null,
+            ),
+          );
+          final id = (await r.load()).goals.single.id;
+          await r.saveMilestone(goalId: id, title: 'Schritt', progress: 42.5);
+          await c.load();
+          tester.view.physicalSize = const Size(320, 900);
+          tester.view.devicePixelRatio = 1;
+          tester.platformDispatcher.textScaleFactorTestValue = 2;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+          addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+          await tester.pumpWidget(GuideApp(controller: c));
+          await tester.pumpAndSettle();
+          final cardCover = find.descendant(
+            of: find.byType(GoalCard),
+            matching: find.byType(GoalCoverContent),
+          );
+          expect(cardCover, findsOneWidget);
+          expect(
+            tester.getCenter(find.text('42,5 %')).dy,
+            closeTo(
+              tester.getCenter(find.byType(LinearProgressIndicator)).dy,
+              0.1,
+            ),
+          );
+          for (final enabled in [false, true]) {
+            await tester.tap(find.text('Mein Ziel'));
+            await tester.pumpAndSettle();
+            await tester.tap(find.byTooltip('Ziel bearbeiten'));
+            await tester.pumpAndSettle();
+            final toggle = find.byKey(const ValueKey('show-card-cover'));
+            expect(tester.getCenter(toggle).dx, greaterThan(240));
+            await tester.tap(toggle);
+            await tester.pumpAndSettle();
+            expect(tester.widget<Switch>(toggle).value, enabled);
+            expect(find.byType(GoalCover), findsOneWidget);
+            await tester.scrollUntilVisible(
+              find.text('Speichern'),
+              200,
+              scrollable: find.byType(Scrollable).first,
+            );
+            await tester.runAsync(() async {
+              await tester.tap(find.text('Speichern'));
+              await Future<void>.delayed(const Duration(milliseconds: 100));
+            });
+            await tester.pumpAndSettle();
+            expect(c.snapshot.goals.single.showCardCover, enabled);
+            expect(
+              c.snapshot.goals.single.coverImage,
+              ownImage ? picture : null,
+            );
+            expect(find.byType(GoalCover), findsOneWidget);
+            await tester.tap(find.byType(BackButton));
+            await tester.pumpAndSettle();
+            expect(cardCover, enabled ? findsOneWidget : findsNothing);
+            expect(tester.takeException(), isNull);
+          }
+        } finally {
+          await tester.pumpWidget(const SizedBox());
+          c.dispose();
+          await db.close();
+        }
+      },
+    );
+  }
 
   test(
     'v3 migration, image restart, backup, removal and deletion preserve data',

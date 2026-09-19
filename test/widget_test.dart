@@ -298,9 +298,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Schritt 79').hitTestable(), findsOneWidget);
-    await tester.tap(find.byType(DropdownButtonFormField<int>));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('◎ Zweites Ziel').last);
+    await tester.tap(find.byKey(ValueKey('goal-jump-${goals.last.id}')));
     await tester.pumpAndSettle();
     expect(find.text('Noch keine Zwischenziele').hitTestable(), findsOneWidget);
     expect(tester.takeException(), isNull);

@@ -29,6 +29,7 @@ class _GoalEditorState extends State<GoalEditor> {
   bool _saving = false;
   bool _picking = false;
   late Uint8List? _cover = widget.goal?.coverImage;
+  late bool _showCardCover = widget.goal?.showCardCover ?? true;
   late GoalColor _color = widget.goal?.color ?? GoalColor.forest;
   late int? _customThemeId = widget.goal?.customThemeId;
   @override
@@ -52,6 +53,7 @@ class _GoalEditorState extends State<GoalEditor> {
         motivation: _motivation.text,
         dueDate: _due,
         coverImage: _cover,
+        showCardCover: _showCardCover,
         removeCoverImage: _cover == null,
         color: _color,
         customThemeId: _customThemeId,
@@ -109,18 +111,19 @@ class _GoalEditorState extends State<GoalEditor> {
                 child: GoalCover(image: _cover, height: 120),
               ),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
+              Row(
                 children: [
-                  OutlinedButton.icon(
-                    onPressed: _saving || _picking ? null : _pickCover,
-                    icon: const Icon(Icons.add_photo_alternate_outlined),
-                    label: Text(
-                      _picking
-                          ? 'Bild wird geladen …'
-                          : _cover == null
-                          ? 'Hintergrundbild auswählen'
-                          : 'Hintergrundbild ändern',
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _saving || _picking ? null : _pickCover,
+                      icon: const Icon(Icons.add_photo_alternate_outlined),
+                      label: Text(
+                        _picking
+                            ? 'Bild wird geladen …'
+                            : _cover == null
+                            ? 'Hintergrundbild auswählen'
+                            : 'Hintergrundbild ändern',
+                      ),
                     ),
                   ),
                   if (_cover != null)
@@ -131,6 +134,21 @@ class _GoalEditorState extends State<GoalEditor> {
                           : () => setState(() => _cover = null),
                       icon: const Icon(Icons.delete_outline),
                     ),
+                  const SizedBox(width: 4),
+                  Tooltip(
+                    message: 'Hintergrund auf Zielkarte anzeigen',
+                    child: Semantics(
+                      label: 'Hintergrund auf Zielkarte anzeigen',
+                      child: Switch(
+                        key: const ValueKey('show-card-cover'),
+                        value: _showCardCover,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        onChanged: _saving || _picking
+                            ? null
+                            : (value) => setState(() => _showCardCover = value),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               gap,

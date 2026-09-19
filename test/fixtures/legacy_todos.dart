@@ -1,8 +1,9 @@
 import 'package:sqlite3/sqlite3.dart';
 
-/// Remove schema-8 additions when deriving legacy fixtures from a fresh store.
+/// Remove newer goal fields and schema-8/9 todo additions when deriving legacy fixtures from a fresh store.
 void removeTodoLinks(Database db) {
   db.execute('PRAGMA foreign_keys=OFF');
+  db.execute('ALTER TABLE goals DROP COLUMN show_card_cover');
   db.execute('CREATE TEMP TABLE old_milestones AS SELECT * FROM milestones');
   db.execute('DROP TABLE milestones');
   db.execute('''CREATE TABLE milestones (

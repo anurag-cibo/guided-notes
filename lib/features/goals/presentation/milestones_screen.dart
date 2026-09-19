@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'goal_theme.dart';
+import 'goal_emoji_selector.dart';
 
 import '../application/goals_controller.dart';
 import '../domain/models.dart';
@@ -183,43 +184,15 @@ class _MilestonesViewState extends State<MilestonesView> {
             child: ClipRect(
               child: Align(
                 heightFactor: _showSelector ? 1 : 0,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 380),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(32, 4, 32, 0),
-                    child: DropdownButtonFormField<int>(
-                      key: ValueKey('selector-$_jump'),
-                      isExpanded: true,
-                      initialValue: goals.any((g) => g.id == _focusGoal)
-                          ? _focusGoal
-                          : null,
-                      decoration: const InputDecoration(
-                        labelText: 'Zu Ziel springen',
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                      ),
-                      items: goals
-                          .map(
-                            (g) => DropdownMenuItem(
-                              value: g.id,
-                              child: Text(
-                                '${g.emoji} ${g.title}',
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (id) => setState(() {
-                        _focusGoal = id;
-                        _focusMilestone = null;
-                        _jump++;
-                        _showSelector = true;
-                      }),
-                    ),
-                  ),
+                child: GoalEmojiSelector(
+                  snapshot: snapshot,
+                  selectedId: _focusGoal,
+                  onSelected: (id) => setState(() {
+                    _focusGoal = id;
+                    _focusMilestone = null;
+                    _jump++;
+                    _showSelector = true;
+                  }),
                 ),
               ),
             ),

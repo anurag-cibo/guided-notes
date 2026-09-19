@@ -367,7 +367,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Zwischenziele').last);
       await tester.pumpAndSettle();
-      final selector = find.byType(DropdownButtonFormField<int>);
+      final selector = find.byKey(ValueKey('goal-jump-$goalId'));
       expect(selector.hitTestable(), findsOneWidget);
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
       await tester.pumpAndSettle();

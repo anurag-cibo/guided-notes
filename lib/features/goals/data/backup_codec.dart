@@ -13,7 +13,7 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 8,
+        'version': 9,
         'todoCredits': [
           for (final c in snapshot.todoCredits)
             {
@@ -76,6 +76,7 @@ class BackupCodec {
               'startedOn': date(g.startedOn),
               'achieved': g.achieved,
               'archived': g.archived,
+              'showCardCover': g.showCardCover,
               'coverImage': g.coverImage == null
                   ? null
                   : base64Encode(g.coverImage!),
@@ -104,7 +105,7 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          ![1, 2, 3, 4, 5, 6, 7, 8].contains(root['version'])) {
+          ![1, 2, 3, 4, 5, 6, 7, 8, 9].contains(root['version'])) {
         throw const FormatException();
       }
       final themes = <CustomGoalTheme>[];
@@ -147,6 +148,9 @@ class BackupCodec {
           startedOn: root['version'] >= 6 ? _date(g['startedOn']) : null,
           achieved: g['achieved'] as bool,
           archived: g['archived'] as bool,
+          showCardCover: root['version'] >= 9
+              ? g['showCardCover'] as bool
+              : true,
           coverImage: root['version'] >= 3 ? _cover(g['coverImage']) : null,
           color: root['version'] >= 4
               ? GoalColor.values.byName(g['color'] as String)

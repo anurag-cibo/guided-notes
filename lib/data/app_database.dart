@@ -19,7 +19,7 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   Future<void> _addTodoLinks({int scale = 1}) async {
     for (final table in ['todo_templates', 'todo_entries']) {
@@ -172,6 +172,7 @@ class AppDatabase extends GeneratedDatabase {
         achieved INTEGER NOT NULL DEFAULT 0 CHECK(achieved IN (0, 1)),
         archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0, 1)),
         cover_image BLOB,
+        show_card_cover INTEGER NOT NULL DEFAULT 1 CHECK(show_card_cover IN (0, 1)),
         color TEXT NOT NULL DEFAULT 'forest',
         custom_theme_id INTEGER REFERENCES goal_themes(id)
       )''');
@@ -190,7 +191,7 @@ class AppDatabase extends GeneratedDatabase {
       await _createSettings();
     },
     onUpgrade: (_, from, to) async {
-      if (from < 1 || from > 8 || to != 9) {
+      if (from < 1 || from > 9 || to != 10) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
@@ -215,7 +216,10 @@ class AppDatabase extends GeneratedDatabase {
         await customStatement('ALTER TABLE goals ADD COLUMN started_on TEXT');
       }
       if (from < 8) await _addTodoLinks();
-      await _migrateProgressUnits();
+      if (from < 9) await _migrateProgressUnits();
+      await customStatement(
+        'ALTER TABLE goals ADD COLUMN show_card_cover INTEGER NOT NULL DEFAULT 1 CHECK(show_card_cover IN (0, 1))',
+      );
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

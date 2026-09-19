@@ -84,10 +84,21 @@ void main() {
           emoji: '💻',
           color: GoalColor.lavender,
         );
+        await r.saveMilestone(
+          goalId: (await r.load()).goals.last.id,
+          title: 'Weiterlernen',
+          progress: 45,
+        );
         await r.saveGoal(
           title: 'Finanzen',
+          showCardCover: false,
           emoji: '💰',
           color: GoalColor.amber,
+        );
+        await r.saveMilestone(
+          goalId: (await r.load()).goals.last.id,
+          title: 'Rücklage',
+          progress: 25.5,
         );
         await r.saveGoal(
           title: 'Beziehungen',

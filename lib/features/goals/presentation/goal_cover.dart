@@ -8,25 +8,35 @@ class GoalCover extends StatelessWidget {
   final double height;
   @override
   Widget build(BuildContext context) {
-    final fallback = CustomPaint(
-      painter: _CoverPainter(Theme.of(context).colorScheme),
-    );
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: SizedBox(
         height: height,
         width: double.infinity,
-        child: image == null
-            ? fallback
-            : Image.memory(
-                image!,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => fallback,
-                gaplessPlayback: true,
-                excludeFromSemantics: true,
-              ),
+        child: GoalCoverContent(image: image),
       ),
     );
+  }
+}
+
+/// Shared image or standard motif; its parent owns size and clipping.
+class GoalCoverContent extends StatelessWidget {
+  const GoalCoverContent({super.key, this.image});
+  final Uint8List? image;
+  @override
+  Widget build(BuildContext context) {
+    final fallback = CustomPaint(
+      painter: _CoverPainter(Theme.of(context).colorScheme),
+    );
+    return image == null
+        ? fallback
+        : Image.memory(
+            image!,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => fallback,
+            gaplessPlayback: true,
+            excludeFromSemantics: true,
+          );
   }
 }
 
