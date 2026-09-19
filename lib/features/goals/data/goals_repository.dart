@@ -53,7 +53,7 @@ class GoalsRepository {
       }
       for (final g in snapshot.goals) {
         await database.customStatement(
-          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id,started_on) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id,started_on,show_card_cover,sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
           [
             g.id,
             g.title,
@@ -66,12 +66,14 @@ class GoalsRepository {
             g.color.name,
             g.customThemeId,
             _encodeDate(g.startedOn ?? now()),
+            g.showCardCover ? 1 : 0,
+            snapshot.goals.indexOf(g),
           ],
         );
       }
       for (final m in snapshot.milestones) {
         await database.customStatement(
-          'INSERT INTO milestones(id,goal_id,title,progress,status,due_date) VALUES (?,?,?,?,?,?)',
+          'INSERT INTO milestones(id,goal_id,title,progress,status,due_date,sort_order,motivation,start_value,target_value,current_value,unit) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
           [
             m.id,
             m.goalId,
@@ -79,6 +81,12 @@ class GoalsRepository {
             progressUnits(m.progress),
             m.status.name,
             BackupCodec.date(m.dueDate),
+            snapshot.milestones.indexOf(m),
+            m.motivation,
+            m.scale.startUnits,
+            m.scale.targetUnits,
+            metricUnits(m.currentValue),
+            m.scale.unit,
           ],
         );
       }
@@ -92,7 +100,7 @@ class GoalsRepository {
             t.target,
             t.active ? 1 : 0,
             t.milestoneId,
-            progressUnits(t.progressIncrement),
+            metricUnits(t.progressIncrement),
             t.progressMode.name,
           ],
         );
@@ -108,14 +116,14 @@ class GoalsRepository {
             e.target,
             e.completed,
             e.milestoneId,
-            progressUnits(e.progressIncrement),
+            metricUnits(e.progressIncrement),
             e.progressMode.name,
           ],
         );
       }
       for (final c in snapshot.todoCredits) {
         await database.customStatement(
-          'INSERT INTO todo_progress_credits(template_id,period,ordinal,milestone_id,amount,previous_status) VALUES(?,?,?,?,?,?)',
+          'INSERT INTO todo_progress_credits(template_id,period,ordinal,milestone_id,amount,previous_status,value_amount) VALUES(?,?,?,?,?,?,?)',
           [
             c.templateId,
             c.period,
@@ -123,6 +131,7 @@ class GoalsRepository {
             c.milestoneId,
             progressUnits(c.amount),
             c.previousStatus,
+            metricUnits(c.valueAmount),
           ],
         );
       }
@@ -198,6 +207,13 @@ class GoalsRepository {
     progress: progressPercent(r.read<int>('progress')),
     status: MilestoneStatus.values.byName(r.read<String>('status')),
     dueDate: _date(r.readNullable<String>('due_date')),
+    motivation: r.read<String>('motivation'),
+    currentValue: r.read<int>('current_value') / 100,
+    scale: MetricScale(
+      start: r.read<int>('start_value') / 100,
+      target: r.read<int>('target_value') / 100,
+      unit: r.read<String>('unit'),
+    ),
   );
 
   Future<GoalSnapshot> load() => database.transaction(() async {
@@ -208,10 +224,12 @@ class GoalsRepository {
     );
     await todos.ensureCurrentPeriods();
     final goals = await database
-        .customSelect('SELECT * FROM goals ORDER BY id')
+        .customSelect('SELECT * FROM goals ORDER BY sort_order, id')
         .get();
     final milestones = await database
-        .customSelect('SELECT * FROM milestones ORDER BY goal_id, id')
+        .customSelect(
+          'SELECT * FROM milestones ORDER BY goal_id, sort_order, id',
+        )
         .get();
     return GoalSnapshot(
       goals.map(_readGoal),
@@ -291,6 +309,7 @@ class GoalsRepository {
     DateTime? dueDate,
     Uint8List? coverImage,
     bool removeCoverImage = false,
+    bool? showCardCover,
     GoalColor? color,
     int? customThemeId,
     bool clearCustomTheme = false,
@@ -308,7 +327,7 @@ class GoalsRepository {
     if (id == null) {
       await _checkCapacity();
       await database.customStatement(
-        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id, started_on) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id, started_on, show_card_cover, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT COALESCE(MAX(sort_order),0)+1 FROM goals))',
         [
           name,
           symbol,
@@ -318,6 +337,7 @@ class GoalsRepository {
           (color ?? GoalColor.forest).name,
           customThemeId,
           _encodeDate(now()),
+          (showCardCover ?? true) ? 1 : 0,
         ],
       );
     } else {
@@ -329,7 +349,7 @@ class GoalsRepository {
         );
       }
       await database.customStatement(
-        'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ?, color = ?, custom_theme_id = ? WHERE id = ?',
+        'UPDATE goals SET title = ?, emoji = ?, motivation = ?, due_date = ?, color = ?, custom_theme_id = ?, show_card_cover = ? WHERE id = ?',
         [
           name,
           symbol,
@@ -337,6 +357,7 @@ class GoalsRepository {
           _encodeDate(dueDate),
           (color ?? existing.color).name,
           customThemeId ?? (clearCustomTheme ? null : existing.customThemeId),
+          (showCardCover ?? existing.showCardCover) ? 1 : 0,
           id,
         ],
       );
@@ -350,10 +371,43 @@ class GoalsRepository {
     num progress = 0,
     MilestoneStatus status = MilestoneStatus.notStarted,
     DateTime? dueDate,
+    String? motivation,
+    MetricScale? scale,
+    num? currentValue,
   }) => database.transaction(() async {
     await _requireGoal(goalId, active: true);
     final name = requiredTitle(title);
-    final normalized = normalizeProgress(progress, status);
+    final previousRow = id == null
+        ? null
+        : await database
+              .customSelect(
+                'SELECT * FROM milestones WHERE id=? AND goal_id=?',
+                variables: [Variable(id), Variable(goalId)],
+              )
+              .getSingleOrNull();
+    if (id != null && previousRow == null) {
+      throw const RuleViolation('Dieses Zwischenziel existiert nicht mehr.');
+    }
+    final previous = previousRow == null ? null : _readMilestone(previousRow);
+    final reason = (motivation ?? previous?.motivation ?? '').trim();
+    if (reason.isEmpty) {
+      throw const RuleViolation(
+        'Bitte beschreibe, warum dir dieses Zwischenziel wichtig ist.',
+      );
+    }
+    final metric = scale ?? previous?.scale ?? const MetricScale();
+    int value;
+    try {
+      metric.validate();
+      value = metricUnits(currentValue ?? metric.valueForPercent(progress));
+      if (metric.clampUnits(value) != value) throw ArgumentError();
+    } on ArgumentError {
+      throw const RuleViolation(
+        'Bitte eine gültige Skala und einen aktuellen Wert zwischen Start und Ziel eingeben (maximal zwei Nachkommastellen).',
+      );
+    }
+    if (status == MilestoneStatus.achieved) value = metric.targetUnits;
+    final normalized = normalizeProgress(metric.percent(value / 100), status);
     final values = [
       name,
       progressUnits(normalized.progress),
@@ -362,7 +416,7 @@ class GoalsRepository {
     ];
     if (id == null) {
       await database.customStatement(
-        'INSERT INTO milestones(title, progress, status, due_date, goal_id) VALUES (?, ?, ?, ?, ?)',
+        'INSERT INTO milestones(title, progress, status, due_date, goal_id, sort_order) VALUES (?, ?, ?, ?, ?, (SELECT COALESCE(MAX(sort_order),0)+1 FROM milestones))',
         [...values, goalId],
       );
     } else {
@@ -380,7 +434,76 @@ class GoalsRepository {
         [...values, id, goalId],
       );
     }
+    final savedId =
+        id ??
+        (await database
+                .customSelect('SELECT last_insert_rowid() AS id')
+                .getSingle())
+            .read<int>('id');
+    await database.customStatement(
+      'UPDATE milestones SET motivation=?,start_value=?,target_value=?,unit=?,current_value=? WHERE id=?',
+      [
+        reason,
+        metric.startUnits,
+        metric.targetUnits,
+        metric.unit.trim(),
+        value,
+        savedId,
+      ],
+    );
   });
+
+  /// Move relative to a stable ID, so stale UI indices cannot reorder other rows.
+  Future<void> moveGoal(int id, int targetId, {required bool after}) =>
+      database.transaction(() async {
+        await _requireGoal(id, active: true);
+        await _requireGoal(targetId, active: true);
+        if (id == targetId) return;
+        final ids = (await load()).activeGoals.map((g) => g.id).toList();
+        ids.remove(id);
+        ids.insert(ids.indexOf(targetId) + (after ? 1 : 0), id);
+        await _writeOrder('goals', ids);
+      });
+
+  Future<void> moveMilestone(
+    int id,
+    int goalId, {
+    int? targetId,
+    bool after = false,
+  }) => database.transaction(() async {
+    final snapshot = await load();
+    final milestone = snapshot.milestone(id);
+    if (milestone == null) {
+      throw const RuleViolation('Dieses Zwischenziel existiert nicht mehr.');
+    }
+    await _requireGoal(milestone.goalId, active: true);
+    await _requireGoal(goalId, active: true);
+    if (targetId == id) return;
+    final ids = snapshot.forGoal(goalId).map((m) => m.id).toList()..remove(id);
+    if (targetId != null && !ids.contains(targetId)) {
+      throw const RuleViolation(
+        'Die Zielposition hat sich geändert. Bitte erneut versuchen.',
+      );
+    }
+    ids.insert(
+      targetId == null ? ids.length : ids.indexOf(targetId) + (after ? 1 : 0),
+      id,
+    );
+    await database.customStatement(
+      'UPDATE milestones SET goal_id = ? WHERE id = ?',
+      [goalId, id],
+    );
+    await _writeOrder('milestones', ids);
+  });
+
+  Future<void> _writeOrder(String table, List<int> ids) async {
+    for (var i = 0; i < ids.length; i++) {
+      await database.customStatement(
+        'UPDATE $table SET sort_order = ? WHERE id = ?',
+        [i, ids[i]],
+      );
+    }
+  }
 
   Future<void> setArchived(int id, bool archived) =>
       database.transaction(() async {
@@ -458,6 +581,7 @@ class GoalsRepository {
     achieved: row.read<int>('achieved') == 1,
     archived: row.read<int>('archived') == 1,
     coverImage: row.readNullable<Uint8List>('cover_image'),
+    showCardCover: row.read<int>('show_card_cover') == 1,
     customThemeId: row.readNullable<int>('custom_theme_id'),
     color:
         GoalColor.values

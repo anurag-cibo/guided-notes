@@ -27,6 +27,7 @@ void main() {
     final id = (await repository.load()).goals.single.id;
     for (final status in MilestoneStatus.values) {
       await repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: id,
         title: status.label,
         status: status,

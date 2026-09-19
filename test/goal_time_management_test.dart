@@ -122,6 +122,7 @@ void main() {
       final goals = (await repo.load()).goals;
       await repo.setArchived(goals.last.id, true);
       await repo.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: goals.first.id,
         title: 'Bleibt',
         progress: 30,

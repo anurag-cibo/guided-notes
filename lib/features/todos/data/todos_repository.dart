@@ -45,7 +45,7 @@ class TodosRepository {
           t.frequency.name,
           t.target,
           t.milestoneId,
-          progressUnits(t.progressIncrement),
+          metricUnits(t.progressIncrement),
           t.progressMode.name,
         ],
       );
@@ -97,10 +97,10 @@ class TodosRepository {
     final name = requiredTitle(title);
     if (!progressIncrement.isFinite ||
         progressIncrement < 0 ||
-        progressIncrement > 100 ||
+        progressIncrement > maxMetricValue ||
         (milestoneId == null && progressIncrement != 0)) {
       throw const RuleViolation(
-        'Bitte einen Fortschritt von 1 bis 100 Prozentpunkten und ein Zwischenziel wählen.',
+        'Bitte einen gültigen Beitrag und ein Zwischenziel wählen.',
       );
     }
     if (milestoneId != null) {
@@ -126,7 +126,7 @@ class TodosRepository {
         'Bitte eine Wochenanzahl zwischen 1 und 999 eingeben.',
       );
     }
-    final incrementUnits = progressUnits(progressIncrement);
+    final incrementUnits = metricUnits(progressIncrement);
     if (frequency == TodoFrequency.daily) {
       progressMode = TodoProgressMode.perCompletion;
     }

@@ -1,5 +1,21 @@
 # Validierung
 
+## Kurzer Emoji-Impuls und Überschriften-Navigation · 19.09.2026
+
+Neuester Nutzerwunsch ersetzt die zeitgesteuerte Fade-Markierung: Emoji-Hintergrund blinkt 180 ms ohne Fade auf und verschwindet direkt. Die gesamte Leiste behält ihren 320-ms-Fade beim Scrollen. Zielüberschriften im Zwischenziele-Tab öffnen Zieldetails. Dort wechselt die Überschrift Zwischenziele zum bestehenden Haupttab und fokussiert die passende Zielgruppe; keine gestapelten Detailseiten. Plus-Buttons bleiben getrennt bedienbar. Archivierte Ziele sind weiterhin nicht im aktiven Zwischenziele-Tab enthalten.
+
+72 Tests und Analyse erfolgreich; native Android-Prüfung heading_navigation_test.dart bestätigt Wechsel, korrekten Haupttab und Zielgruppe. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10, keine auffälligen Layout-/Kontrastprobleme. Screenshots outputs/navigation-focused-group.png, navigation-goal-detail.png und navigation-after-flash.png. Speicherung/Schema unverändert. Normales Emulator-Update mit vorheriger Sicherung; kein zusätzliches Release.
+
+
+## Sortieren, Zielwechsel und Animationen · 19.09.2026
+
+- Finale Formatierung und Analyse ohne Befunde; 71 Unit-/Widgettests bestanden.
+- Reale Schema-10-Datei nach Schema 11 migriert; sämtliche Inhalte erhalten. Reihenfolge nach Datei-Neustart und Backup-Rundlauf identisch. Todo-Gutschriften und Rücknahme nach Wechsel des Zwischenziels erhalten; ungültige/archivierte Zielpositionen ändern keine Daten.
+- Gesten: Ziele vor/nach einem Ziel, Zwischenziele in Zieldetails, Wechsel zu anderer/leerem Ziel, Abbruch, Autoscroll mit stillstehendem Finger und Timer-Rebuild während eines Drags geprüft. Zeitgesteuertes Aufheben und Zurücksetzen der Emoji-Markierung sowie teiltransparenter Zwischenzustand der ganzen Leiste geprüft.
+- Native Android-Prüfung integration_test/reorder_motion_test.dart im separaten Testpaket erfolgreich: Ziehen in allen drei Ansichten, Zielwechsel, leere Gruppe, Emoji- und Leistenanimation. Debug-Build der normalen App erfolgreich, ausschließlich per adb install -r aktualisiert. Vor Installation Sicherung outputs/before-reorder.tar; bestehende Daten nach echter Migration im normalen App-Prozess spalten-/zeilenweise unverändert, Fremdschlüssel intakt.
+- Kurze Demo-Aufnahme outputs/ziele-ziehen-und-animationen.mp4. Unabhängiges Review mit gpt-5.6-luna: 7,5/10 anhand zeitmarkierter Frames. Nachgebessert: keine durchscheinenden Texte und kein seitliches Abschneiden der gezogenen Karte. Reviewer konnte die MP4 nicht direkt abspielen; die genaue Animationsdauer ist durch Widgettests, nicht durch dessen visuelles Urteil belegt. Einfügelinie kann von der darübergezogenen Karte teilweise verdeckt werden.
+
+
 ## Todos-Erweiterung · 17.09.2026
 
 - `flutter analyze --no-pub lib test integration_test`: keine Befunde.
@@ -163,3 +179,21 @@ Android-Darstellungs-/Neustarttest mit separat geprüftem Paket de.anurag.guided
 Abschlussprüfung: alle 64 Unit-/Widgettests erfolgreich, statische Analyse ohne Befunde, Format und git diff --check erfolgreich. Debug- und signierter universeller Release-Build erfolgreich; apksigner bestätigt die gültige Signatur mit dem bisherigen Zertifikat. Normale Emulator-App ausschließlich per adb install -r aktualisiert. Datenbank vor/nach Installation bytegleich (SHA256 0c325c7a782cbd4db77eab7e87a667391941d91ee8d5ebc0e81452a2d998c708); lokale Sicherung outputs/before-compact-release.tar. Kreisrundes Logo beim tatsächlichen Android-Start unter outputs/round-start-logo.png geprüft. Keine erneute Release-Geräteinstallation auf separatem AVD in diesem Durchlauf; Emulatornachweis mit Debug-Build.
 
 Review-Nachtrag: Screenreader-Prozentwert entfernt wie die sichtbare Anzeige unnötige Nachkommastellen. Flutter 3.47 verlangt für die progressBar-Rolle jedoch einen maschinenlesbaren Dezimalpunkt; die direkte Übernahme des deutschen Kommas wurde von CI erkannt und korrigiert. Ein Test mit 35,25 % und aktivierter Semantik sichert diesen Unterschied ab. Der Entfernungstest bestätigt zusätzlich, dass ein anderes aktives Todo in beiden Ansichten erhalten bleibt. Beide betroffenen Testdateien (6 Tests) erneut erfolgreich. Das Startlogo wurde unabhängig mit 9/10 bewertet; Screenshot belegt den hellen Android-Start.
+
+## Emoji-Zielsprünge und schaltbare Karten-Cover · 19.09.2026
+
+68 Unit-/Widgettests und Analyse erfolgreich, Format und git diff --check ohne Befund. Neue Tests decken fünf Ziele bei 320 px und doppelter Schrift, identische Emojis mit eindeutigen Ziel-IDs, horizontale Balken-/Prozentanordnung sowie Cover-An/Aus für Standardmotiv und eigenes Bild ab. Editor und Detailcover behalten Bilddaten; Einstellung bleibt bei anderen Änderungen, Dateineustart und Backup erhalten. Echte Schema-9-Fixture erhält sämtliche exportierten Inhalte einschließlich gebuchter Hundertstel-Beiträge; kein zweites Skalieren. Alte Migrationen und Backups bleiben geprüft.
+
+Isolierter Android-Darstellungs-/Neustarttest erfolgreich; Screenshots unter outputs/appearance-{light,dark}-{goals,milestones,editor}.png. Zweiter Reviewer: Ziele 8/10, Zwischenziele 8,5/10, Editor 7,5/10 in beiden Modi. Screenshots zeigen eigenes grafisches Bild, Standardmotiv und ausgeschaltetes Karten-Cover; große Schrift und fünf Emojis sind zusätzlich durch Widgettests abgedeckt. Kleine Einschränkungen: Zahlbreite verändert die Balkenlänge leicht; der kleine Editor-Schalter erklärt seinen Zweck per Tooltip/Screenreader.
+
+Normaler Debug-Build 0.3.3+9 per adb install -r aktualisiert, keine Deinstallation. Sicherung outputs/before-emoji-covers.tar. Nach abgeschlossenem App-Start vor/nach Migration sämtliche bisherigen Tabellen, Zeilen und Spalten verglichen: unverändert; Schema 10, neue Cover-Schalter aktiviert, Fremdschlüsselprüfung ohne Befund. Der erste Snapshot wurde vor Abschluss des Starts genommen; der erneute Vergleich bestätigt die vollständige Migration. Keine Testdaten im normalen Datenbestand.
+
+Nachfolgende Nutzerwünsche: Restzeit direkt unter dem Zwischenziel-Status innerhalb des Covers, unten ausschließlich Fortschrittsbalken und Prozent. Die Emoji-Markierung blendet bei echtem Benutzerscrollen aus; Sprunganker bleibt erhalten, erneutes Antippen markiert wieder. Alle 68 Tests und Analyse erneut erfolgreich, einschließlich Markierung vor/nach Scrollen/erneutem Tippen. Android-Darstellungs-/Neustarttest wiederholt erfolgreich. Zweitreview der aktuellen Zielkarten und des Zustands nach freiem Scrollen: jeweils 8,5/10 in beiden Modi. Statische Screenshots belegen den Endzustand, keine Bewertung der Animation. Letztes normales Emulator-Update per adb install -r mit bytegleicher Datenbank, Sicherung outputs/before-emoji-scroll-update.tar.
+
+## Eigene Messskalen, Einheiten und verpflichtendes Warum · 19.09.2026
+
+80 Unit-/Widgettests und statische Analyse erfolgreich. Neue Tests prüfen auf-/absteigende Skalen, Dezimalwerte, eigene/leere Einheiten, Pflicht-Warum, Wertebereich und Rundung ohne vorzeitiges Erreichen. Todo-Beiträge über 100, Zieldeckelung, Wochenbonus, exakte Rücknahme nach Bereichsänderung/Zielwechsel und Backup-Rundlauf sind abgedeckt. Echte Schema-11-Dateimigration erhält alte Prozentwerte, Todo-Historie, Beiträge, IDs und ID-Zähler; frühere Migrationstests bleiben erfolgreich. Bestehende Zwischenziele brauchen erst beim nächsten Speichern ein Warum.
+
+Widgettests prüfen Bücher 0–12, Beitrag +1, Pflichtfeldfehler und freien/entfernten Einheitentext bei 320 px und doppelter Schrift. Ein vorhandener Beitrag über 100 bleibt auch nach Wechsel auf eine Standardskala bearbeitbar. Native Android-Prüfung mit isoliertem Paket de.anurag.guided_notes.integration erfolgreich: Hell/Dunkel, 100 → 80 kg, Beitrag −0,5 kg und Rücknahme, Datenbank-Neustart und Backup. Screenshots outputs/metrics-{light,dark}-{overview,editor-top,editor-values,todo-contribution}.png. Unabhängiges Review mit gpt-5.6-luna: 8/10; kleinere Schwäche ist die Länge des Editors und der erklärenden Todo-Hinweise. Keine blockierenden Layoutprobleme.
+
+Normaler Debug-Build 0.3.3+9 erfolgreich; Update ausschließlich per adb install -r. Vorherige Sicherung outputs/before-metrics.tar, Datenbank während Installation bytegleich (SHA256 9f1d52c0f84ab181f86cba8136b0b3dead68f9324667c8c4c069e90545b573ed). Nach App-Start sämtliche vorherigen Tabellen, Zeilen und Spalten unverändert; neue Skalen entsprechen 0–100 %, aktueller Messwert dem bisherigen Fortschritt, historische Messwert-Beiträge den bisherigen Prozentbeiträgen. Schema 12 und Fremdschlüssel geprüft. Normale App geöffnet, keine Testdaten eingebracht. Backupformat 11 liest weiterhin Versionen 1–10.

@@ -26,6 +26,18 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   int _tab = 0;
+  int? _milestoneGoal;
+  int _milestoneJump = 0;
+
+  void _openMilestones(int goalId) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    setState(() {
+      _tab = 1;
+      _milestoneGoal = goalId;
+      _milestoneJump++;
+    });
+  }
+
   Timer? _timer;
   late String _day;
   @override
@@ -104,13 +116,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   ],
                 )
               : _tab == 0
-              ? GoalList(controller: c)
+              ? GoalList(controller: c, onOpenMilestones: _openMilestones)
               : _tab == 1
-              ? MilestonesView(controller: c)
+              ? MilestonesView(
+                  key: ValueKey(_milestoneJump),
+                  controller: c,
+                  focusGoalId: _milestoneGoal,
+                  onOpenMilestones: _openMilestones,
+                )
               : TodosView(controller: c),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _tab,
-            onDestinationSelected: (index) => setState(() => _tab = index),
+            onDestinationSelected: (index) => setState(() {
+              _tab = index;
+              _milestoneGoal = null;
+            }),
             destinations: const [
               NavigationDestination(
                 icon: Icon(Icons.flag_outlined),

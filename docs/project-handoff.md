@@ -1,5 +1,38 @@
 # Projektübergabe · 19.09.2026
 
+## Eigene Messskalen und Zwischenziel-Warum · 19.09.2026
+
+Folgeauftrag #51 ergänzt PR #49. Zwischenziele haben ein eigenes verpflichtendes Warum, Startwert, Zielwert, aktuellen Wert und eine voreingestellte/freie oder leere Einheit. Nutzerbestätigt sind beide Richtungen, etwa 100 → 80 kg. Bis zu zwei Nachkommastellen; aktueller Wert innerhalb der Skala. Zielfortschritt bleibt der normalisierte Durchschnitt. Todos buchen positive Beitragsgrößen automatisch in Richtung des Zielwerts; Anzeige z. B. −0,5 kg. Deckelung und Rücknahme verwenden den tatsächlich gebuchten Messwert. Standard 0–100 % behält das kompakte Beitragsrad, andere Skalen eine Zahleneingabe.
+
+Schema 12 und Backupformat 11; alte Backups 1–10 bleiben lesbar. Bestehende Zwischenziele bleiben bei 0–100 %, bisherige Werte und Beiträge erhalten. Ihr Warum bleibt leer, bis es beim nächsten Speichern ergänzt wird. Einheitenwechsel konvertiert keine Zahlenwerte; bei vorhandenen Todo-Beiträgen weist der Editor darauf hin. Bereichsänderungen bewahren historische Messwert-Beiträge für Undo.
+
+80 Unit-/Widgettests, Analyse, Format und native Android-Prüfung in Hell/Dunkel erfolgreich, einschließlich Dateineustart/Backup. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10. Normaler Debug-Build 0.3.3+9 aktualisiert und geöffnet. Sicherung outputs/before-metrics.tar; sämtliche bisherigen Datenbankzeilen/-spalten nach Migration unverändert, Schema 12 und Fremdschlüssel geprüft. Kein zusätzliches Release; Arbeitsbranch codex/emoji-navigation-card-covers und PR #49. Aktuellen Integrationsstand in GitHub prüfen.
+
+## Kurzer Emoji-Impuls und Überschriften-Navigation · 19.09.2026
+
+Neuester Nutzerwunsch ersetzt die zeitgesteuerte Fade-Markierung: Emoji-Hintergrund blinkt 180 ms ohne Fade auf und verschwindet direkt. Die gesamte Leiste behält ihren 320-ms-Fade beim Scrollen. Zielüberschriften im Zwischenziele-Tab öffnen Zieldetails. Dort wechselt die Überschrift Zwischenziele zum bestehenden Haupttab und fokussiert die passende Zielgruppe; keine gestapelten Detailseiten. Plus-Buttons bleiben getrennt bedienbar. Archivierte Ziele sind weiterhin nicht im aktiven Zwischenziele-Tab enthalten.
+
+72 Tests und Analyse erfolgreich; native Android-Prüfung heading_navigation_test.dart bestätigt Wechsel, korrekten Haupttab und Zielgruppe. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10, keine auffälligen Layout-/Kontrastprobleme. Screenshots outputs/navigation-focused-group.png, navigation-goal-detail.png und navigation-after-flash.png. Speicherung/Schema unverändert. Normales Emulator-Update mit vorheriger Sicherung; kein zusätzliches Release.
+
+
+## Sortieren und zeitgesteuerte Emoji-Markierung · 19.09.2026
+
+Folgeauftrag #50 ergänzt den offenen PR #49: Ziele und Zwischenziele per langem Drücken (600 ms) und vertikalem Ziehen sortieren, ohne Bearbeitungsmodus. Im Zwischenziele-Tab ist Wechsel zwischen aktiven Zielgruppen möglich; Überschriften und leere Gruppen sind Ablageziele. Eine Linie zeigt davor/dahinter, am Rand scrollt die Liste weiter, auch bei stillstehendem Finger. Die gezogene Karte hat einen deckenden Hintergrund. Ein aktiver Drag bleibt bei Listen-Rebuilds/Scrollen erhalten; Abbruch ändert keine Reihenfolge.
+
+Emoji-Markierungen blenden jetzt nach Tippen ein und nach 1,5 Sekunden automatisch aus (280-ms-Übergang). Die ganze Leiste blendet beim Scrollen mit 320 ms weich aus/ein. Das ersetzt das frühere Aufheben der Markierung beim Scrollbeginn.
+
+Schema 11 ergänzt sort_order in goals/milestones; Backupformat 10 erhält die Array-Reihenfolge. Zwischenzielwechsel erhält IDs, Status, Fortschritt, Frist, Todos und historische Beiträge. Zielfortschritte werden aus der Zuordnung abgeleitet, bewusster Zielerfolg bleibt bestehen. 71 Tests, Analyse, Format und native Android-Gestenprüfung bestanden. Review durch gpt-5.6-luna anhand zeitmarkierter Video-Frames: 7,5/10 nach Behebung von Durchscheinen/seitlichem Abschneiden; keine direkte MP4-Wiedergabe beim Reviewer. Timing und Fade-Zwischenzustand zusätzlich per Widgettest geprüft.
+
+Normale Emulator-App auf 0.3.3+9 aktualisiert und geöffnet. Sicherung outputs/before-reorder.tar; vor/nach Migration alle vorherigen Datenbankzeilen/-spalten unverändert, Schema 11 und Fremdschlüssel geprüft. Demo-Video outputs/ziele-ziehen-und-animationen.mp4. Arbeitsbranch weiterhin codex/emoji-navigation-card-covers, PR #49 offen; für diese Folgeaufträge kein weiteres Release oder Merge. Aktuellen GitHub-Stand prüfen.
+
+
+## Emoji-Leiste und Karten-Cover · 19.09.2026
+
+Folgeauftrag #48 umgesetzt: einzeilige Emoji-Zielsprünge im Zwischenziele-Tab, Prozentzahl rechts neben dem Zielbalken, Standardmotiv auf Zielkarten ohne eigenes Bild. Die Restzeit steht direkt unter dem Zwischenziel-Status im Cover. Freies Scrollen lässt die Emoji-Markierung ausfaden, ohne den Sprunganker zu verändern; erneutes Antippen markiert wieder das gewählte Ziel. Rechts neben der Bildauswahl/Papierkorb im Ziel-Editor steuert ein kleiner Schalter ausschließlich das Karten-Cover. Foto und Detailcover bleiben erhalten. Schema 10/Backup 9 speichern showCardCover; ältere Daten erhalten true. Die Migration aus Schema 9 skaliert Fortschritte nicht erneut.
+
+68 Tests, Analyse und Android-Darstellungs-/Neustarttest erfolgreich. Visuelles Review: Karten 8/10, Emoji-Leiste 8,5/10, Editor 7,5/10 in Hell/Dunkel. Emulator enthält den Debug-Stand 0.3.3+9. Bestehende Daten vor/nach Migration vollständig verglichen und unverändert erhalten; Sicherung outputs/before-emoji-covers.tar. Arbeitsbranch codex/emoji-navigation-card-covers; Integration anhand GitHub prüfen. Für diesen Folgeauftrag wurde kein neues Release veröffentlicht.
+
+
 ## Kompaktes Release 0.3.2 · 19.09.2026
 
 Issues #44–46 umgesetzt: Zielcover auf Karten, direkter Zwischenziel-Editor aus Zieldetails und sofortiges Entfernen von Todos aus beiden aktuellen Ansichten. Nutzerbestätigt bleiben Historie und bereits gutgeschriebene Beiträge erhalten. Mönchslogo beim Start kreisrund. Schema 9 und Backupformat 8 unverändert. Version 0.3.2+8, vorhandener Release-Schlüssel weiterverwendet.

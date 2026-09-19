@@ -66,6 +66,7 @@ void main() {
         );
         final id = (await r.load()).goals.single.id;
         await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: id,
           title: 'Regelmäßig bewegen',
           progress: 60,
@@ -73,21 +74,39 @@ void main() {
           dueDate: DateTime.now().add(const Duration(days: 30)),
         );
         await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
           goalId: id,
           title: 'Bewusst essen',
           progress: 30,
           status: MilestoneStatus.offTrack,
         );
-        await r.saveMilestone(goalId: id, title: 'Erholsam schlafen');
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: id,
+          title: 'Erholsam schlafen',
+        );
         await r.saveGoal(
           title: 'Beruf & Karriere',
           emoji: '💻',
           color: GoalColor.lavender,
         );
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: (await r.load()).goals.last.id,
+          title: 'Weiterlernen',
+          progress: 45,
+        );
         await r.saveGoal(
           title: 'Finanzen',
+          showCardCover: false,
           emoji: '💰',
           color: GoalColor.amber,
+        );
+        await r.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: (await r.load()).goals.last.id,
+          title: 'Rücklage',
+          progress: 25.5,
         );
         await r.saveGoal(
           title: 'Beziehungen',
@@ -146,6 +165,20 @@ void main() {
           await tester.tap(find.text('Zwischenziele').last);
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-milestones');
+          await tester.tap(find.byKey(ValueKey('goal-jump-$id')));
+          await tester.pumpAndSettle();
+          await tester.drag(
+            find.byType(CustomScrollView),
+            const Offset(0, -180),
+          );
+          await tester.pumpAndSettle();
+          await tester.drag(find.byType(CustomScrollView), const Offset(0, 80));
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot(
+            'appearance-$mode-milestones-free-scroll',
+          );
+          await tester.tap(find.byKey(ValueKey('goal-jump-$id')));
+          await tester.pumpAndSettle();
           await tester.tap(find.text('Regelmäßig bewegen'));
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-milestone-editor');

@@ -1,5 +1,32 @@
 # Speicherung und Migration
 
+## Schema 12 und Backupformat 11: Messskalen · 19.09.2026
+
+Zwischenziele ergänzen motivation, start_value, target_value, current_value und unit. Messwerte verwenden ganze Hundertstel. Das bisherige progress-Feld bleibt als normalisierter Prozentanteil für Status und Zielmittel erhalten und wird atomar mit dem Messwert aktualisiert. Ein nur gerundeter Wert nahe 100 wird nicht als Erreichen gewertet. Start/Ziel und Messwert unterstützen zwei Nachkommastellen, Auf-/Abwärtsrichtung sowie negative Werte; absolute Werte und die Gesamtstrecke sind auf eine Milliarde begrenzt. Einheit: maximal 30 Zeichen, leer bedeutet einheitenlos.
+
+Die Todo-Tabellen werden mit größeren Beitragsgrenzen neu aufgebaut. Alle IDs, Fremdschlüssel, Zeilen und der AUTOINCREMENT-Höchststand bleiben erhalten. Beiträge stehen weiterhin in progress_increment, nun als Menge der Zwischenziel-Einheit. Das neue value_amount im Beitragsjournal speichert die tatsächlich gebuchte Menge mit Vorzeichen; das alte amount bleibt als normalisierter Anteil erhalten. Rücknahme verwendet ausschließlich value_amount, unabhängig von späteren Beitrags-/Skalenänderungen, und begrenzt auf die aktuelle Skala.
+
+Migration: vorhandene Zwischenziele erhalten Start 0, Ziel 100, Einheit %, current_value=progress und leeres Warum. Frühere Beiträge übernehmen value_amount=amount. Bestehende Inhalte werden weder als Motivation umgedeutet noch umgerechnet. Neue und im Editor gespeicherte Zwischenziele verlangen ein eigenes nichtleeres Warum. Alte Daten und alte Backups ohne Warum bleiben lesbar und Todo-Buchungen weiterhin möglich.
+
+Backupformat 11 ergänzt Motivation, Start/Ziel/Messwert/Einheit und valueAmount je Beitrag. Import prüft Skala, Wertebereich, Zwei-Nachkommastellen-Präzision, Normalisierung, Status und Beziehungen. Formate 1–10 bleiben lesbar und erhalten die bisherige Prozentskala. Änderungen an der Einheit sind Umbenennungen ohne automatische Mengen-Umrechnung; frühere Buchungen behalten ihre numerische Menge und Richtung.
+
+
+## Schema 11 und Backupformat 10: Reihenfolge und Zuordnung · 19.09.2026
+
+Die Spalte `sort_order` in `goals` und `milestones` speichert die Reihenfolge, unabhängig von stabilen IDs. Migrationen übernehmen die bisherige ID-Reihenfolge. Neue Einträge kommen ans Ende; bei Gleichstand dient die ID als stabile Zweitsortierung. Verschieben schreibt die Reihenfolge der betroffenen Liste atomar. Archivierte Ziele sind nicht verschiebbar.
+
+Beim Wechsel eines Zwischenziels ändert sich nur seine Zielzuordnung und Position, nicht seine ID, Fortschritt, Status, Frist, Todo-Verknüpfungen oder historischen Beiträge. Der durchschnittliche Zielfortschritt wird weiterhin aus der aktuellen Zuordnung abgeleitet. Der bewusst gesetzte Zielerfolg bleibt unverändert. Rücknahme einer früheren Todo-Erledigung wirkt weiterhin auf dasselbe Zwischenziel.
+
+Backupformat 10 definiert die Position in den Ziel- und Zwischenziel-Arrays als Reihenfolge. Der Import übernimmt diese Positionen; zusätzliche technische Rangfelder sind im JSON nicht nötig. Formate 1–9 bleiben lesbar. Tests decken Migration aus Schema 10, Dateineustart, Backup-Rundlauf, Wechsel in ein anderes Ziel, Todo-Rücknahme und unveränderte Daten bei ungültigen Ablagezielen ab.
+
+
+## Schema 10 und Backupformat 9: Cover-Sichtbarkeit · 19.09.2026
+
+Ein boolesches Feld goals.show_card_cover (0/1, Standard 1) steuert ausschließlich das Cover auf Zielkarten. Ausgeschaltete Cover behalten ihre Bildbytes. Die Migration 9 → 10 ergänzt nur diese Spalte; vorhandene Fortschritte, Beiträge, IDs, Bilder und Einstellungen bleiben unverändert. Migrationen aus 1–8 führen zunächst ihre bisherigen Schritte bis Schema 9 aus. Die Hundertstelumrechnung erfolgt ausschließlich bei Ausgangsversionen unter 9.
+
+Backupformat 9 enthält showCardCover pro Ziel als erforderlichen booleschen Wert. Formate 1–8 bleiben lesbar und erhalten aktivierte Cover. Import und reguläres Speichern erhalten den Schalter, auch bei Änderungen anderer Zielfelder. Das Standardmotiv wird aus dem Zieltheme gezeichnet und muss nicht als Bilddatei gespeichert werden.
+
+
 ## Schema 8 und Backupformat 7: Todo-Verknüpfungen
 
 `todo_templates` und `todo_entries` ergänzen `milestone_id` (optional, ON DELETE SET NULL) und `progress_increment` (0–100, 0 deaktiviert Tracking). Neue Zeiträume übernehmen die Vorlage. Eine Änderung der Zuordnung aktualisiert auch den aktuellen Zeitraum, ohne bisherige Erledigungen nachträglich zu buchen.

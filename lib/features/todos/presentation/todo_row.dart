@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../goals/application/goals_controller.dart';
-import '../../goals/domain/progress_amount.dart';
 import '../../goals/presentation/common.dart';
 import '../domain/todo_models.dart';
 import 'todo_editor.dart';
@@ -69,15 +68,18 @@ class TodoRow extends StatelessWidget {
                                   : null,
                             ),
                       ),
-                      if (goal != null &&
+                      if (milestone != null &&
+                          goal != null &&
                           !goal.archived &&
                           entry.progressIncrement > 0)
                         Semantics(
                           label:
-                              '${formatProgress(entry.progressIncrement)} Prozentpunkte ${entry.progressMode == TodoProgressMode.onTarget ? 'bei vollständiger Wochenaufgabe' : 'pro Erledigung'}',
+                              '${milestone.scale.contribution(entry.progressIncrement)} ${entry.progressMode == TodoProgressMode.onTarget ? 'bei vollständiger Wochenaufgabe' : 'pro Erledigung'}',
                           excludeSemantics: true,
                           child: Text(
-                            '+${formatProgress(entry.progressIncrement)} %',
+                            milestone.scale.contribution(
+                              entry.progressIncrement,
+                            ),
                             style: Theme.of(context).textTheme.labelLarge
                                 ?.copyWith(
                                   color:

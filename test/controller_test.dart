@@ -64,8 +64,18 @@ void main() {
     });
     await repository.saveGoal(title: 'Ziel');
     final goalId = (await repository.load()).goals.single.id;
-    await repository.saveMilestone(goalId: goalId, title: 'A', progress: 95);
-    await repository.saveMilestone(goalId: goalId, title: 'B', progress: 20);
+    await repository.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: goalId,
+      title: 'A',
+      progress: 95,
+    );
+    await repository.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: goalId,
+      title: 'B',
+      progress: 20,
+    );
     final milestones = (await repository.load()).milestones;
     await repository.todos.save(
       title: 'Wochenaufgabe',

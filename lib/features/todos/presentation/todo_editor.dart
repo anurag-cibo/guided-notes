@@ -1,3 +1,5 @@
+import '../../goals/domain/models.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../goals/application/goals_controller.dart';
@@ -37,18 +39,48 @@ class _TodoEditorState extends State<TodoEditor> {
       (widget.template == null || widget.template!.progressIncrement > 0);
   late double _increment = (widget.template?.progressIncrement ?? 0) > 0
       ? widget.template!.progressIncrement
-      : 2.5;
+      : _defaultIncrement(_milestoneId);
+  late final _amount = TextEditingController(text: formatProgress(_increment));
+  MetricScale get _scale =>
+      widget.controller.snapshot.milestone(_milestoneId ?? -1)?.scale ??
+      const MetricScale();
+  bool get _useAmountField =>
+      !_scale.isStandardPercent ||
+      (widget.template?.progressIncrement ?? 0) > 100;
+  double _defaultIncrement(int? id) {
+    final scale =
+        widget.controller.snapshot.milestone(id ?? -1)?.scale ??
+        const MetricScale();
+    return scale.isStandardPercent ? 2.5 : scale.span.clamp(.01, 1).toDouble();
+  }
+
   late TodoProgressMode _progressMode =
       widget.template?.progressMode ?? TodoProgressMode.perCompletion;
   @override
   void dispose() {
     _title.dispose();
     _target.dispose();
+    _amount.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     if (!_form.currentState!.validate()) return;
+    if (_trackProgress && _useAmountField) {
+      final amount = parseMetric(_amount.text);
+      try {
+        if (amount == null || amount <= 0) throw ArgumentError();
+        metricUnits(amount);
+        _increment = amount;
+      } on ArgumentError {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Bitte einen gültigen positiven Beitrag eingeben.'),
+          ),
+        );
+        return;
+      }
+    }
     setState(() => _busy = true);
     final saved = await runMutation(
       context,
@@ -185,7 +217,8 @@ class _TodoEditorState extends State<TodoEditor> {
                         if (_milestoneId == null) _trackProgress = false;
                         if (newlyLinked) {
                           _trackProgress = true;
-                          _increment = 2.5;
+                          _increment = _defaultIncrement(_milestoneId);
+                          _amount.text = formatProgress(_increment);
                         }
                       });
                     },
@@ -218,14 +251,45 @@ class _TodoEditorState extends State<TodoEditor> {
                   ),
                   gap,
                 ],
-                ProgressIncrementPicker(
-                  key: const ValueKey('todo-progress-increment'),
-                  value: _increment,
-                  onChanged: _busy ? null : (value) => _increment = value,
-                ),
+                if (_useAmountField)
+                  TextFormField(
+                    key: const ValueKey('todo-value-increment'),
+                    controller: _amount,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: _progressMode == TodoProgressMode.onTarget
+                          ? 'Beitrag beim Wochenziel'
+                          : 'Beitrag je Erledigung',
+                      suffixText: _scale.unit.isEmpty ? null : _scale.unit,
+                    ),
+                    onChanged: (text) {
+                      final value = parseMetric(text);
+                      if (value != null) setState(() => _increment = value);
+                    },
+                    validator: (text) {
+                      final value = parseMetric(text ?? '');
+                      try {
+                        if (value == null || value <= 0) throw ArgumentError();
+                        metricUnits(value);
+                        return null;
+                      } on ArgumentError {
+                        return 'Positive Zahl mit maximal 2 Nachkommastellen eingeben.';
+                      }
+                    },
+                  )
+                else
+                  ProgressIncrementPicker(
+                    key: const ValueKey('todo-progress-increment'),
+                    value: _increment,
+                    onChanged: _busy ? null : (value) => _increment = value,
+                  ),
                 const SizedBox(height: 8),
+                if (_useAmountField)
+                  Text('Messwert: ${_scale.contribution(_increment)}'),
                 Text(
-                  '${_progressMode == TodoProgressMode.onTarget ? '• Beitrag sobald alle Wiederholungen geschafft sind' : '• Beitrag je Erledigung'}\n• Fortschritt bis maximal 100 %\n• Rückgängig nimmt den Beitrag zurück',
+                  '${_progressMode == TodoProgressMode.onTarget ? '• Beitrag sobald alle Wiederholungen geschafft sind' : '• Beitrag je Erledigung'}\n• Bis zum Zielwert ${_scale.format(_scale.target)}\n• Rückgängig nimmt den Beitrag zurück',
                 ),
               ],
             ],

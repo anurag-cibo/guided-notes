@@ -11,7 +11,7 @@ Eine ruhige Android-App für bis zu fünf aktive Ziele und ihre Zwischenziele. *
 Ziel anlegen → Motivation festhalten → Zwischenziele hinzufügen → Fortschritt und Status pflegen. Ziele, Zwischenziele, Todos und Archive werden offline in SQLite gespeichert, ohne Konto. Drei Hauptbereiche und klare Zurück-Navigation halten den Ablauf klein.
 
 - Maximal fünf aktive, also nicht archivierte Ziele. Erreichte Ziele zählen bis zum Archivieren mit.
-- Beliebig viele Zwischenziele, nach Ziel gruppiert, mit Status, 0–100 % Fortschritt und optionaler Frist.
+- Beliebig viele Zwischenziele, nach Ziel gruppiert, mit verpflichtendem Warum, eigener Messskala, Status und optionaler Frist.
 - Zielfortschritt ist das gleichgewichtete Mittel seiner Zwischenziele. Zielerfolg ist eine separate bewusste Markierung.
 - Archivieren erhält alle Inhalte; Wiederherstellen prüft die Fünf-Ziele-Grenze. Endgültiges Löschen verlangt eine Bestätigung und entfernt die zugehörigen Zwischenziele atomar.
 - Motivation genügt zunächst als Freitext. Ein eigener Bereich für freie Notizen ist nicht Teil dieses Starts.
@@ -20,21 +20,31 @@ Beispiele, genaue Status-/Zeitregeln und der reduzierte Screenflow stehen in [Pr
 
 Streaks und Einführung bleiben spätere Ergänzungen. Cloud, Accounts, KI, Kalenderintegration und Zusammenarbeit gehören nicht zum aktuellen Kern.
 
+## Messwerte und Einheiten
+
+Ein Zwischenziel hat ein eigenes verpflichtendes **Warum**, eine **Einheit**, **Startwert**, **Zielwert** und **aktuellen Wert**. Vorgegeben sind Prozent, Kilogramm, Seiten, Zentimeter, Gläser und Bücher; eigene Einheiten und **Ohne Einheit** sind möglich. Beide Richtungen werden unterstützt, etwa 80 → 100 Seiten oder 100 → 80 kg. Zahlen erlauben zwei Nachkommastellen. Der aktuelle Wert liegt zwischen Start und Ziel; Start und Ziel müssen verschieden sein.
+
+Die Zwischenziellisten zeigen den Messwert und das Ziel, beispielsweise **3 / 12 Bücher**. Der Balken und der Gesamtfortschritt des großen Ziels verwenden den erreichten Anteil der Strecke: 90 auf einer Skala von 80 bis 100 entspricht 50 %. Ein Erreichen des Zielwerts setzt den Status Erreicht. Bestehende Zwischenziele behalten zunächst 0–100 %; ein fehlendes Warum muss beim nächsten Speichern im Editor ergänzt werden, ohne alte Inhalte zu löschen.
+
 ## Todos und Zwischenziel-Fortschritt
 
-Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenziel über eine durchsuchbare, nach Zielen gruppierte Auswahl zuordnen. Der zusätzliche Schalter **Fortschritt automatisch erhöhen** aktiviert einen Beitrag von 0,1–100 Prozentpunkten, auswählbar über zwei Scrollräder für ganze Prozent und Nachkommastufen. Die Nachkommastufen sind für alle ganzen Prozentwerte gleich: 0, 0,1, 0,2, 0,25, 0,3, 0,4, 0,5, 0,6, 0,7, 0,75, 0,8 und 0,9. Beim Wechsel der Ganzzahl bleibt die Nachkommastelle erhalten. Ausnahme: Bei 100 % ist nur die Nachkommastelle 0 möglich; aus 99,25 % wird beim Hochdrehen deshalb 100 %. Bei neuer Zuordnung ist der Beitrag mit 2,5 % aktiviert. Wochenaufgaben können je Wiederholung oder einmal beim Erreichen aller Wiederholungen Fortschritt erhalten. Rücknahme der letzten Wiederholung nimmt auch diesen Abschlussbeitrag zurück. Ohne Schalter bleibt es bei der Zuordnung, ohne Zuordnung bleibt das Todo unabhängig. In der Liste steht nur der aktive Beitrag als grüne Zahl (z. B. **+5 %**); die Zuordnung ist im Aufgaben-Editor sichtbar.
+Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenziel über eine durchsuchbare, nach Zielen gruppierte Auswahl zuordnen. **Fortschritt automatisch erhöhen** aktiviert einen Beitrag in dessen Einheit: etwa +1 Buch, +20 Seiten oder bei absteigender Skala −0,5 kg. Die Eingabe ist eine positive Menge; die Skala bestimmt die Richtung. Für die bisherige Skala 0–100 % bleiben die kompakten Prozent-Scrollräder mit ihren Nachkommastufen bestehen. Andere Skalen verwenden ein Zahlenfeld mit Einheit. Vorgabe ist 2,5 bei Standardprozent, sonst 1 beziehungsweise die kleinere Gesamtstrecke.
 
-Der Zwischenzielfortschritt steigt höchstens auf 100 %. Rückgängig zieht nur den tatsächlich gutgeschriebenen Beitrag ab – auch nach Neustart, Backup oder einem Wechsel der Zuordnung. Beispiel: 97 % + 10 Prozentpunkte ergibt 100 %, Rückgängig wieder 97 %. Änderungen an Zuordnung und Beitrag gelten sofort für neue Erledigungen; alte Erledigungen werden nicht nachträglich gewertet. Titel und Wochenanzahl ändern sich weiterhin erst ab dem nächsten Zeitraum. Archivierte Ziele erhalten keine neuen Beiträge. Löschen eines Zwischenziels erhält die Todos und löst ihre Zuordnung.
+Wochenaufgaben können je Wiederholung oder erst beim Erreichen aller Wiederholungen beitragen. Der Messwert stoppt am Ziel. Rückgängig entfernt exakt die tatsächlich gebuchte Menge mit ihrer damaligen Richtung, auch nach Neustart, Backup, geänderter Skala oder Zuordnung; das Ergebnis bleibt innerhalb der aktuellen Skala. Beispiel: Bei Ziel 80 kg wird aus 81 kg mit einem Beitrag von 2,5 kg der Wert 80 kg; Rückgängig stellt 81 kg her.
 
-„Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die kompaktere Zielauswahl im Zwischenziele-Tab blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
+Änderungen an Einheit oder Skala rechnen vorhandene Zahlen und Todo-Beiträge nicht in eine andere Maßeinheit um. Ein Hinweis im Zwischenziel-Editor erinnert bei betroffenen aktiven Todos daran. Bereits gebuchte Mengen bleiben unverändert; neue Erledigungen verwenden die aktuelle Richtung. Titel und Wochenanzahl ändern sich weiterhin erst ab dem nächsten Zeitraum. Archivierte Ziele erhalten keine neuen Beiträge. Löschen eines Zwischenziels erhält die Todos und löst ihre Zuordnung.
+
+„Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die einzeilige Emoji-Leiste im Zwischenziele-Tab springt beim Antippen direkt zum jeweiligen Ziel. Zielnamen sind per langem Drücken und für Screenreader verfügbar. Nach einem Emoji-Tipp blinkt die Markierung für 180 ms auf und verschwindet direkt, ohne Fade. Die Leiste blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
+
+Die Zielüberschriften im Zwischenziele-Tab öffnen die jeweiligen Zieldetails. Die Überschrift „Zwischenziele“ in den aktiven Zieldetails wechselt zum bestehenden Zwischenziele-Tab und springt zur passenden Zielgruppe; wiederholtes Wechseln stapelt keine Detailseiten. Die Plus-Buttons bleiben eigenständige Aktionen.
 
 Antippen eines Zwischenziels in den Zieldetails öffnet direkt seinen Editor; Speichern und Zurück führen zu diesen Zieldetails zurück.
 
-Im Zwischenziel-Editor stehen Status und Frist nebeneinander. Darunter lassen sich die aktuell verknüpften Todos in „Täglich“ und „Wöchentlich“ genau wie im Todos-Tab bedienen. Plus öffnet eine neue Aufgabe mit vorausgewähltem Zwischenziel und 2,5 % Beitrag. Todo-Aktionen speichern zuvor auch offene Änderungen am Zwischenziel; danach bleibt dessen Fortschritt synchron. Neue Zwischenziele zuerst speichern, anschließend können Todos zugeordnet werden.
+Im Zwischenziel-Editor stehen Status und Frist nebeneinander. Darunter lassen sich die aktuell verknüpften Todos in „Täglich“ und „Wöchentlich“ genau wie im Todos-Tab bedienen. Plus öffnet eine neue Aufgabe mit vorausgewähltem Zwischenziel und passendem Standardbeitrag. Todo-Aktionen speichern zuvor auch offene Änderungen am Zwischenziel; danach bleibt dessen Fortschritt synchron. Neue Zwischenziele zuerst speichern, anschließend können Todos zugeordnet werden.
 
 ## Hintergrundbild und Emoji
 
-Beim Anlegen oder Bearbeiten eines Ziels oben **Hintergrundbild auswählen** antippen. Android öffnet die Dateiauswahl; das Bild lässt sich ersetzen oder entfernen. Die App speichert eine lokale, verkleinerte Kopie (maximal 1280 Pixel an der längsten Seite und 256 KB); das Original bleibt unverändert. Eingabedateien dürfen höchstens 20 MB groß sein. Das Bild erscheint als Cover im Ziel und im oberen Bereich seiner Zielkarte. Fortschrittsbalken und Prozentangabe stehen auf einer ruhigen Fläche unter dem Bild. Das Bild ist im Backup enthalten.
+Beim Anlegen oder Bearbeiten eines Ziels oben **Hintergrundbild auswählen** antippen. Android öffnet die Dateiauswahl; das Bild lässt sich ersetzen oder entfernen. Die App speichert eine lokale, verkleinerte Kopie (maximal 1280 Pixel an der längsten Seite und 256 KB); das Original bleibt unverändert. Eingabedateien dürfen höchstens 20 MB groß sein. Das Bild erscheint als Cover im Ziel und im oberen Bereich seiner Zielkarte. Ohne eigenes Bild wird das vorhandene Standardmotiv im Zieltheme verwendet. Die verbleibenden Tage stehen im Cover-Bereich direkt unter dem Zwischenziel-Status. Auf der ruhigen Fläche darunter stehen nur Fortschrittsbalken und Prozentangabe in einer Zeile, die Prozentzahl rechts. Der Schalter rechts neben Bildauswahl und Papierkorb blendet das Cover ausschließlich auf der Zielkarte ein oder aus; eigenes Bild und Detailcover bleiben erhalten. Die Einstellung wird pro Ziel gespeichert und mitgesichert. Das Bild ist im Backup enthalten.
 
 Das Emoji-Feld links neben dem Titel erlaubt ein sichtbares Zeichen, auch zusammengesetzte Emojis oder Flaggen. Ohne Eingabe wird das Standardsymbol verwendet.
 
@@ -52,13 +62,17 @@ Die zentralen Farbrollen stehen in `ThemeColors`, Vorgaben und Ableitung für He
 
 Das Zahnrad in jedem Hauptbereich öffnet die Einstellungen. Die App folgt zunächst dem Gerät; Hell- und Dunkelmodus können dauerhaft gewählt werden. Beide Darstellungen umfassen Ziele, Zwischenziele, Todos, Formulare und Dialoge. Unter „Allgemein“ stehen Sicherung und bestätigtes Löschen aller Inhalte bereit. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf Wunsch als klar gekennzeichnete Platzhalter sichtbar. Dateninformationen und verwendete Lizenzen sind ebenfalls erreichbar.
 
-Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 9 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 12 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+
+Ziele lassen sich durch langes Drücken und Ziehen sortieren. Dasselbe gilt für Zwischenziele in den Zieldetails und im Zwischenziele-Tab. Dort kann ein Zwischenziel auch auf die Überschrift eines anderen Ziels oder zwischen dessen Zwischenziele gezogen werden. Todo-Verknüpfungen und bisherige Fortschrittsgutschriften bleiben erhalten; beide Ziel-Fortschritte werden neu berechnet. Die Reihenfolge übersteht Neustarts und Datensicherungen. Am Listenrand wird beim Ziehen automatisch gescrollt; ein eigener Bearbeitungsmodus ist nicht nötig.
+
+Die Emoji-Markierung blinkt beim Tippen für 180 ms auf und verschwindet direkt, ohne Fade. Beim Scrollen wird die gesamte Sprungleiste weich aus- beziehungsweise eingeblendet.
 
 ## Daten sichern
 
 Über das Zahnrad **Einstellungen → Datensicherung** oben rechts lassen sich Ziele, Zwischenziele, Todo-Vorlagen, Tages-/Wochenstände und Archive als JSON-Datei exportieren. Android öffnet die Dateiauswahl für den Speicherort. Die Datei enthält auch Motivationstexte und ist unverschlüsselt; eine Kopie außerhalb des Geräts schützt vor Geräteverlust.
 
-**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 8, bis 10 MB. Alte Sicherungen mit Version 1 bis 7 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
+**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 11, bis 10 MB. Alte Sicherungen mit Version 1 bis 10 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
 
 ## APK fürs Handy
 

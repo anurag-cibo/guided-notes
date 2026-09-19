@@ -35,12 +35,14 @@ void main() {
       );
       final id = (await repository.load()).goals.single.id;
       await repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: id,
         title: 'Regelmäßig bewegen',
         progress: 60,
         status: MilestoneStatus.onTrack,
       );
       await repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: id,
         title: 'Bewusst essen',
         progress: 30,

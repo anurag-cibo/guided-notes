@@ -34,6 +34,7 @@ void main() {
       );
       final id = (await controller.repository.load()).goals.single.id;
       await controller.repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: id,
         title: 'Ein Buch',
         progress: 50,
@@ -57,6 +58,7 @@ void main() {
         200,
         scrollable: find.byType(Scrollable).first,
       );
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Speichern'));
       await tester.pumpAndSettle();
       expect(find.text('Neue Motivation'), findsOneWidget);
@@ -183,6 +185,7 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(find.text('Bitte einen Titel eingeben.'), findsOneWidget);
@@ -200,6 +203,7 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Balkon begrünen'));
@@ -210,11 +214,16 @@ void main() {
       find.byType(TextFormField).first,
       'Pflanzen auswählen',
     );
+    await tester.enterText(
+      find.byKey(const ValueKey('milestone-why')),
+      'Frisches Gemüse genießen',
+    );
     await tester.scrollUntilVisible(
       find.text('Speichern'),
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Pflanzen auswählen'));
@@ -229,6 +238,7 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Speichern'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Erreicht · 100 %'), findsOneWidget);
@@ -282,6 +292,7 @@ void main() {
     final goals = (await controller.repository.load()).goals;
     for (var i = 0; i < 80; i++) {
       await controller.repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: goals.first.id,
         title: 'Schritt $i',
       );
@@ -298,9 +309,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Schritt 79').hitTestable(), findsOneWidget);
-    await tester.tap(find.byType(DropdownButtonFormField<int>));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('◎ Zweites Ziel').last);
+    await tester.tap(find.byKey(ValueKey('goal-jump-${goals.last.id}')));
     await tester.pumpAndSettle();
     expect(find.text('Noch keine Zwischenziele').hitTestable(), findsOneWidget);
     expect(tester.takeException(), isNull);

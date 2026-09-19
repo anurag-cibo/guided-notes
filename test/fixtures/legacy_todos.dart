@@ -1,8 +1,10 @@
 import 'package:sqlite3/sqlite3.dart';
 
-/// Remove schema-8 additions when deriving legacy fixtures from a fresh store.
+/// Remove newer goal fields and schema-8/9 todo additions when deriving legacy fixtures from a fresh store.
 void removeTodoLinks(Database db) {
   db.execute('PRAGMA foreign_keys=OFF');
+  db.execute('ALTER TABLE goals DROP COLUMN show_card_cover');
+  db.execute('ALTER TABLE goals DROP COLUMN sort_order');
   db.execute('CREATE TEMP TABLE old_milestones AS SELECT * FROM milestones');
   db.execute('DROP TABLE milestones');
   db.execute('''CREATE TABLE milestones (
@@ -26,4 +28,18 @@ void removeTodoLinks(Database db) {
     db.execute('ALTER TABLE $table DROP COLUMN milestone_id');
     db.execute('ALTER TABLE $table DROP COLUMN progress_increment');
   }
+}
+
+/// Derive a schema-11 fixture; measurement fields did not exist then.
+void removeMetricScale(Database db) {
+  for (final column in [
+    'motivation',
+    'start_value',
+    'target_value',
+    'current_value',
+    'unit',
+  ]) {
+    db.execute('ALTER TABLE milestones DROP COLUMN $column');
+  }
+  db.execute('ALTER TABLE todo_progress_credits DROP COLUMN value_amount');
 }

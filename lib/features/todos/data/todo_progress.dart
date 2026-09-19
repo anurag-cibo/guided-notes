@@ -19,22 +19,30 @@ class TodoProgress {
   Future<void> complete(TodoEntry entry, int ordinal) async {
     final row = await _milestone(entry.milestoneId);
     var amount = 0;
+    var valueAmount = 0;
     var previous = MilestoneStatus.notStarted;
     if (row != null) {
       previous = MilestoneStatus.values.byName(row.read<String>('status'));
-      final before = row.read<int>('progress');
+      final before = row.read<int>('current_value');
+      final scale = _scale(row);
       if (row.read<int>('archived') == 0 &&
           (entry.progressMode == TodoProgressMode.perCompletion ||
               ordinal == entry.target)) {
-        amount = progressUnits(entry.progressIncrement)
-            .clamp(0, 10000 - before);
-        if (amount > 0) {
-          await _update(entry.milestoneId!, before + amount, previous);
+        final after = scale.clampUnits(
+          before + metricUnits(entry.progressIncrement) * scale.direction,
+        );
+        valueAmount = after - before;
+        amount =
+            (progressUnits(scale.percent(after / 100)) -
+                    row.read<int>('progress'))
+                .clamp(0, 10000);
+        if (valueAmount != 0) {
+          await _update(entry.milestoneId!, after, previous, scale);
         }
       }
     }
     await database.customStatement(
-      'INSERT INTO todo_progress_credits(template_id,period,ordinal,milestone_id,amount,previous_status) VALUES(?,?,?,?,?,?)',
+      'INSERT INTO todo_progress_credits(template_id,period,ordinal,milestone_id,amount,previous_status,value_amount) VALUES(?,?,?,?,?,?,?)',
       [
         entry.templateId,
         entry.period,
@@ -42,6 +50,7 @@ class TodoProgress {
         entry.milestoneId,
         amount,
         previous.name,
+        valueAmount,
       ],
     );
   }
@@ -60,11 +69,13 @@ class TodoProgress {
     if (credit == null) return; // Existing completions from before linking.
     final id = credit.readNullable<int>('milestone_id');
     final row = await _milestone(id);
-    final amount = credit.read<int>('amount');
-    if (row != null && amount > 0) {
-      final progress = (row.read<int>('progress') - amount).clamp(0, 10000);
+    final amount = credit.read<int>('value_amount');
+    if (row != null && amount != 0) {
+      final scale = _scale(row);
+      final current = scale.clampUnits(row.read<int>('current_value') - amount);
+      final progress = scale.percent(current / 100);
       var status = MilestoneStatus.values.byName(row.read<String>('status'));
-      if (status == MilestoneStatus.achieved && progress < 10000) {
+      if (status == MilestoneStatus.achieved && progress < 100) {
         status = MilestoneStatus.values.byName(
           credit.read<String>('previous_status'),
         );
@@ -72,7 +83,7 @@ class TodoProgress {
           status = MilestoneStatus.onTrack;
         }
       }
-      await _update(id!, progress, status);
+      await _update(id!, current, status, scale);
     }
     await database.customStatement(
       'DELETE FROM todo_progress_credits WHERE template_id=? AND period=? AND ordinal=?',
@@ -80,11 +91,22 @@ class TodoProgress {
     );
   }
 
-  Future<void> _update(int id, int progress, MilestoneStatus status) async {
-    final normalized = normalizeProgress(progressPercent(progress), status);
+  static MetricScale _scale(QueryRow row) => MetricScale(
+    start: row.read<int>('start_value') / 100,
+    target: row.read<int>('target_value') / 100,
+    unit: row.read<String>('unit'),
+  );
+
+  Future<void> _update(
+    int id,
+    int current,
+    MilestoneStatus status,
+    MetricScale scale,
+  ) async {
+    final normalized = normalizeProgress(scale.percent(current / 100), status);
     await database.customStatement(
-      'UPDATE milestones SET progress=?,status=? WHERE id=?',
-      [progressUnits(normalized.progress), normalized.status.name, id],
+      'UPDATE milestones SET progress=?,status=?,current_value=? WHERE id=?',
+      [progressUnits(normalized.progress), normalized.status.name, current, id],
     );
   }
 
@@ -107,6 +129,7 @@ class TodoProgress {
         milestoneId: r.readNullable<int>('milestone_id'),
         amount: progressPercent(r.read<int>('amount')),
         previousStatus: r.read<String>('previous_status'),
+        valueAmount: r.read<int>('value_amount') / 100,
       ),
   ];
 }

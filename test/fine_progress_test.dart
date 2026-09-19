@@ -18,7 +18,12 @@ void main() {
     final r = GoalsRepository(db, now: () => now);
     await r.saveGoal(title: 'A');
     final goal = (await r.load()).goals.single;
-    await r.saveMilestone(goalId: goal.id, title: 'Schritt', progress: 98.9);
+    await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: goal.id,
+      title: 'Schritt',
+      progress: 98.9,
+    );
     final milestone = (await r.load()).milestones.single;
     await r.todos.save(
       title: 'Klein',
@@ -49,7 +54,12 @@ void main() {
     final r = GoalsRepository(db, now: () => now);
     await r.saveGoal(title: 'A');
     final goal = (await r.load()).goals.single;
-    await r.saveMilestone(goalId: goal.id, title: 'Schritt', progress: 10);
+    await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: goal.id,
+      title: 'Schritt',
+      progress: 10,
+    );
     final milestone = (await r.load()).milestones.single;
     await r.todos.save(
       title: 'Woche',
@@ -137,7 +147,11 @@ void main() {
       progressIncrement: 0.25,
       progressMode: TodoProgressMode.onTarget,
     );
-    await r.saveMilestone(goalId: 1, title: 'Neu');
+    await r.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: 1,
+      title: 'Neu',
+    );
     expect((await r.load()).milestones.last.id, greaterThan(50));
     final before = await r.exportBackup();
     await db.close();
