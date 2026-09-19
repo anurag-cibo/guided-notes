@@ -302,6 +302,10 @@ void main() {
         final slider = find.byKey(const ValueKey('metric-slider'));
         final label = find.byKey(const ValueKey('metric-slider-value'));
         final right = tester.getCenter(label).dx;
+        tester.widget<Slider>(slider).onChanged!(33.33);
+        await tester.pumpAndSettle();
+        expect(value(), '96,7');
+        expect(tester.widget<Text>(label).data, '96,7');
         tester.widget<Slider>(slider).onChanged!(0);
         await tester.pumpAndSettle();
         expect(value(), '100');

@@ -205,24 +205,54 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
   );
 
   Widget _measurementFields(BuildContext context) {
-    final unit = DropdownButtonFormField<String>(
-      key: ValueKey('metric-unit-$_customUnit'),
-      initialValue: _customUnit ? '__custom' : _unit.text,
-      isExpanded: true,
-      decoration: const InputDecoration(labelText: 'Einheit'),
-      items: [
-        for (final entry in _units.entries)
-          DropdownMenuItem(value: entry.key, child: Text(entry.value)),
-        const DropdownMenuItem(
-          value: '__custom',
-          child: Text('Eigene Einheit'),
-        ),
-      ],
-      onChanged: (value) => setState(() {
-        _customUnit = value == '__custom';
-        _unit.text = _customUnit ? '' : value!;
-      }),
-    );
+    void selectUnit(String value) => setState(() {
+      final custom = value == '__custom';
+      if (!custom || !_customUnit) _unit.text = custom ? '' : value;
+      _customUnit = custom;
+    });
+    final unit = _customUnit
+        ? TextFormField(
+            key: const ValueKey('metric-custom-unit'),
+            controller: _unit,
+            maxLength: 30,
+            decoration: InputDecoration(
+              labelText: 'Einheit',
+              hintText: 'Eigene Einheit',
+              counterText: '',
+              suffixIcon: PopupMenuButton<String>(
+                key: const ValueKey('metric-unit-true'),
+                tooltip: 'Einheit auswählen',
+                icon: const Icon(Icons.arrow_drop_down),
+                onSelected: selectUnit,
+                itemBuilder: (_) => [
+                  for (final entry in _units.entries)
+                    PopupMenuItem(value: entry.key, child: Text(entry.value)),
+                  const PopupMenuItem(
+                    value: '__custom',
+                    child: Text('Eigene Einheit'),
+                  ),
+                ],
+              ),
+            ),
+            onChanged: (_) => setState(() {}),
+          )
+        : DropdownButtonFormField<String>(
+            key: const ValueKey('metric-unit-false'),
+            initialValue: _unit.text,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Einheit'),
+            items: [
+              for (final entry in _units.entries)
+                DropdownMenuItem(value: entry.key, child: Text(entry.value)),
+              const DropdownMenuItem(
+                value: '__custom',
+                child: Text('Eigene Einheit'),
+              ),
+            ],
+            onChanged: (value) {
+              if (value != null) selectUnit(value);
+            },
+          );
     final current = _numberField(
       'Aktueller Wert',
       'metric-current',
@@ -248,20 +278,6 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
             );
           },
         ),
-        if (_customUnit) ...[
-          gap,
-          TextFormField(
-            key: const ValueKey('metric-custom-unit'),
-            controller: _unit,
-            maxLength: 30,
-            decoration: const InputDecoration(
-              labelText: 'Eigene Einheit',
-              hintText: 'z. B. Gläser',
-              counterText: '',
-            ),
-            onChanged: (_) => setState(() {}),
-          ),
-        ],
         gap,
         LayoutBuilder(
           builder: (context, constraints) {
@@ -273,7 +289,16 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
               onChanged: _scale == null
                   ? null
                   : (value) => setState(() {
-                      _setCurrent(_scale!.valueForPercent(value));
+                      final scale = _scale!;
+                      final rounded =
+                          (scale.valueForPercent(value) * 10).round() / 10;
+                      // Preserve exact bounds for existing hundredth-based scales.
+                      final current = value == 0
+                          ? scale.start
+                          : value == 100
+                          ? scale.target
+                          : rounded;
+                      _setCurrent(scale.clampUnits(metricUnits(current)) / 100);
                       _measurementChanged();
                     }),
             );

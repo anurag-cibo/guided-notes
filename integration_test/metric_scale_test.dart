@@ -78,10 +78,14 @@ void main() {
         milestoneId: 4,
         progressIncrement: .5,
       );
-      await SettingsRepository(db).saveAppearance(AppAppearance.light);
+      await SettingsRepository(db).saveAppearance(AppAppearance.dark);
       await c.load();
       await tester.pumpWidget(GuideApp(controller: c));
       await tester.pumpAndSettle();
+      expect(
+        tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+        ThemeMode.light,
+      );
       await binding.convertFlutterSurfaceToImage();
       await tester.pumpAndSettle();
       for (final dark in [false, true]) {

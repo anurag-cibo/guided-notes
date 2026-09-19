@@ -1,5 +1,11 @@
 # Projektübergabe · 19.09.2026
 
+## Einheit direkt im Feld, Zehntelschritte und heller Start · 19.09.2026
+
+Eigene Einheit wird direkt im Einheitenfeld eingegeben; der Pfeil öffnet weiterhin die drei Optionen. Keine zusätzliche Eingabezeile. Der Slider rundet auf eine Nachkommastelle, erhält aber exakte bestehende Bereichsgrenzen; manuelle Eingaben bleiben bis zwei Nachkommastellen möglich. GuideApp startet bei jedem Neustart sofort hell, auch bei gespeicherter dunkler Wahl und dunklem Gerät. Manuelles Umschalten während der Nutzung bleibt möglich. Schema/Backup unverändert.
+
+84 Unit-/Widgettests, Analyse, Format, Android-Prüfung in Hell/Dunkel und normaler Debug-Build bestanden. Tests prüfen Zehntelrundung, Wechsel zur freien Einheit und zurück, Layout bei großer Schrift sowie hellen Start trotz dunklem Gerät und gespeicherter dunkler Auswahl. Visuelles Zweitreview mit gpt-5.6-luna: 8,5/10. Normale Emulator-App nach Sicherung outputs/before-inline-unit.tar per Update geöffnet, Datenbank bytegleich. Schema und Backup unverändert.
+
 ## Kleine Zeitkreise und kompakter Messwert-Editor · 19.09.2026
 
 Neuester Folgeauftrag: Zielkarten ersetzen die Restzeitformulierung durch einen 18-px-Zeitkreis plus z. B. „103 Tage“, mit derselben Zeitberechnung wie in den Details und praktisch gleicher Kartenhöhe. Heute/überfällige Fristen bleiben ausdrücklich benannt. Zwischenziel-Editor: Einheit und aktueller Wert nebeneinander; Regler zwischen Start-/Zielwert mit dauerhaft mitlaufender Zahl, bei schmaler Ansicht/großer Schrift vertikal. Einheitenliste auf Prozent, Ohne Einheit und Eigene Einheit reduziert. Gültige Grenzänderungen begrenzen den aktuellen Wert sofort in beiden Richtungen. Todo-Anzeige übernimmt die Entwurfseinheit/-richtung direkt; Abbrechen verwirft den Entwurf, Todo-Aktionen speichern wie bisher vorher. Schema und Backup unverändert.

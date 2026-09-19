@@ -135,6 +135,44 @@ void main() {
   });
 
   testWidgets(
+    'each app launch starts light even after dark selection and dark system',
+    (tester) async {
+      final db = AppDatabase(NativeDatabase.memory());
+      final goals = GoalsController(GoalsRepository(db));
+      await goals.load();
+      await SettingsRepository(db).saveAppearance(AppAppearance.dark);
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+      try {
+        await tester.pumpWidget(GuideApp(controller: goals));
+        expect(
+          tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+          ThemeMode.light,
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Einstellungen'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Dunkelmodus'));
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+          ThemeMode.dark,
+        );
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpWidget(GuideApp(controller: goals));
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+          ThemeMode.light,
+        );
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        goals.dispose();
+        await db.close();
+      }
+    },
+  );
+  testWidgets(
     'settings changes theme, follows system, confirms deletion and fits large text',
     (tester) async {
       final db = AppDatabase(NativeDatabase.memory());

@@ -207,3 +207,7 @@ Analyse, Format und normaler Debug-Build erfolgreich. Unabhängiges Screenshotre
 ## Zeitkreis und kompakter Messwert-Editor · 19.09.2026
 
 83 Unit-/Widgettests, Analyse, Format und nativer Android-Test in Hell/Dunkel erfolgreich. Grenzen, sofortige Todo-Vorschau, Abbrechen sowie die Position der Reglerzahl sind geprüft. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10, keine optischen Blocker; statische Bilder belegen den Zustand, die mitlaufende Position ist per Widgettest geprüft. Normaler Debug-Build 0.3.3+9 nach Sicherung outputs/before-compact-metrics.tar per Update geöffnet, Datenbank bytegleich (SHA256 ebf33a0e6de45b8c46bfb817e114001557858f4f8654b1ea9c56c89072dc6296). Screenshots: outputs/compact-{light,dark}-goals.png, metrics-{light,dark}-editor-top.png und compact-{light,dark}-live-draft.png. Der neue Fristtest deckt zukünftige/heutige/überfällige sowie undatierte und erreichte Ziele bei normaler und doppelter Schrift ab.
+
+## Einheit im Feld und heller Start · 19.09.2026
+
+84 Unit-/Widgettests, Analyse, Format, Android-Prüfung in Hell/Dunkel und normaler Debug-Build bestanden. Tests prüfen Zehntelrundung, Wechsel zur freien Einheit und zurück, Layout bei großer Schrift sowie hellen Start trotz dunklem Gerät und gespeicherter dunkler Auswahl. Visuelles Zweitreview mit gpt-5.6-luna: 8,5/10. Normale Emulator-App nach Sicherung outputs/before-inline-unit.tar per Update geöffnet, Datenbank bytegleich. Schema und Backup unverändert.

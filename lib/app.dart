@@ -21,7 +21,7 @@ class _GuideAppState extends State<GuideApp> {
   @override
   void initState() {
     super.initState();
-    settings.load();
+    settings.load(startLight: true);
   }
 
   @override
