@@ -6,6 +6,14 @@ enum TodoFrequency {
   final String label;
 }
 
+enum TodoProgressMode {
+  perCompletion('Je Wiederholung'),
+  onTarget('Bei vollständiger Wochenaufgabe');
+
+  const TodoProgressMode(this.label);
+  final String label;
+}
+
 String calendarDate(DateTime now) =>
     '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
@@ -27,6 +35,7 @@ class TodoTemplate {
     required this.active,
     this.milestoneId,
     this.progressIncrement = 0,
+    this.progressMode = TodoProgressMode.perCompletion,
   });
   final int id;
   final String title;
@@ -34,7 +43,8 @@ class TodoTemplate {
   final int target;
   final bool active;
   final int? milestoneId;
-  final int progressIncrement;
+  final double progressIncrement;
+  final TodoProgressMode progressMode;
 }
 
 /// A period owns its title and target, independent of later template edits.
@@ -48,6 +58,7 @@ class TodoEntry {
     required this.completed,
     this.milestoneId,
     this.progressIncrement = 0,
+    this.progressMode = TodoProgressMode.perCompletion,
   });
   final int templateId;
   final String period;
@@ -56,7 +67,8 @@ class TodoEntry {
   final int target;
   final int completed;
   final int? milestoneId;
-  final int progressIncrement;
+  final double progressIncrement;
+  final TodoProgressMode progressMode;
   bool isCurrent(DateTime now) => period == periodStart(frequency, now);
 }
 
@@ -74,6 +86,6 @@ class TodoProgressCredit {
   final String period;
   final int ordinal;
   final int? milestoneId;
-  final int amount;
+  final double amount;
   final String previousStatus;
 }

@@ -86,7 +86,7 @@ void main() {
           frequency: TodoFrequency.weekly,
           target: 3,
           milestoneId: (await r.load()).milestones.first.id,
-          progressIncrement: 5,
+          progressIncrement: 2.5,
         );
         await SettingsRepository(database).saveAppearance(AppAppearance.light);
         await controller.load();
@@ -127,7 +127,7 @@ void main() {
           await tester.ensureVisible(find.byTooltip('Sport: einmal erledigt'));
           await tester.tap(find.byTooltip('Sport: einmal erledigt'));
           await tester.pumpAndSettle();
-          expect(controller.snapshot.milestones.first.progress, 65);
+          expect(controller.snapshot.milestones.first.progress, 62.5);
           await tester.tap(find.byTooltip('Sport: einmal rückgängig'));
           await tester.pumpAndSettle();
           expect(controller.snapshot.milestones.first.progress, 60);
@@ -159,6 +159,31 @@ void main() {
           await tester.tap(find.text('Ziele').last);
           await tester.pumpAndSettle();
         }
+        await tester.tap(find.text('Todos'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Sport bearbeiten'));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byType(DropdownButtonFormField<TodoProgressMode>),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Bei vollständiger Wochenaufgabe').last);
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Speichern'));
+        await tester.tap(find.text('Speichern'));
+        await tester.pumpAndSettle();
+        for (var i = 1; i <= 3; i++) {
+          await tester.ensureVisible(find.byTooltip('Sport: einmal erledigt'));
+          await tester.tap(find.byTooltip('Sport: einmal erledigt'));
+          await tester.pumpAndSettle();
+          expect(
+            controller.snapshot.milestones.first.progress,
+            i == 3 ? 62.5 : 60,
+          );
+        }
+        await tester.tap(find.byTooltip('Sport: einmal rückgängig'));
+        await tester.pumpAndSettle();
+        expect(controller.snapshot.milestones.first.progress, 60);
         final backup = await r.exportBackup();
         await tester.pumpWidget(const SizedBox());
         controller.dispose();

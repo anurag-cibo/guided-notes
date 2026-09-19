@@ -23,7 +23,7 @@ void main() {
       const Milestone(id: 3, goalId: 1, title: 'C'),
       const Milestone(id: 4, goalId: 2, title: 'Other', progress: 100),
     ]);
-    expect(snapshot.progressFor(1), 42);
+    expect(snapshot.progressFor(1), 41.67);
   });
   test('status and progress stay consistent', () {
     expect(normalizeProgress(20, MilestoneStatus.achieved).progress, 100);

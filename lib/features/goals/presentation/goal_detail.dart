@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../domain/progress_amount.dart';
+
 import '../application/goals_controller.dart';
 import 'common.dart';
 import 'goal_editor.dart';
@@ -151,7 +153,7 @@ class GoalDetail extends StatelessWidget {
                       ),
                       title: Text(milestone.title),
                       subtitle: Text(
-                        '${milestone.status.label} · ${milestone.progress} %',
+                        '${milestone.status.label} · ${formatProgress(milestone.progress)} %',
                       ),
                       trailing: goal.archived
                           ? null

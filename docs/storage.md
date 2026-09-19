@@ -81,3 +81,7 @@ Import erfolgt ausschließlich in einen leeren Datenbestand (einschließlich Arc
 Der Decoder prüft Formatversion, Feldtypen, positive eindeutige IDs, Beziehungen, maximal fünf aktive Ziele, Status/Fortschritt und reale Kalenderdaten von 1900 bis 2200 entsprechend der Datumsauswahl. Erst nach vollständiger Validierung werden sämtliche Zeilen in einer Transaktion angelegt. Die Leerheitsprüfung geschieht innerhalb derselben Transaktion; ein Fehler rollt alle neuen Zeilen zurück. Es gibt keine Schemaänderung für dieses Feature.
 
 Tests belegen Export/Import-Rundlauf einschließlich Archiv, sämtlicher Statuswerte, Unicode, Fristen und erneuter Dateiöffnung. Fehlerfälle umfassen inkompatible Versionen, ungültige Daten, verwaiste/duplizierte IDs, bestehende Daten und einen erzwungenen Datenbankfehler während des Imports. Ein Android-Gerätetest prüft zusätzlich den echten System-Dateidialog mit temporären Testdatenbanken.
+
+## Hundertstel und Wochenabschluss · 19.09.2026
+
+Fortschritt und Todo-Beiträge werden intern und in SQLite als ganzzahlige Hundertstel gespeichert (100 % = 10000). JSON-Backups Version 8 enthalten lesbare Prozentzahlen und progressMode; ältere Backups werden als je-Wiederholung-Modus gelesen. Schema 8 → 9 kopiert abhängige Tabellen, baut die angepassten Constraints in FK-Reihenfolge neu auf und übernimmt Werte mit Faktor 100. Ziele/Bilder/Einstellungen bleiben unverändert. Die IDs und bisherigen Autoinkrement-Stände werden erhalten. Die Migration läuft atomar.

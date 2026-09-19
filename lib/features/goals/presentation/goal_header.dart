@@ -13,7 +13,7 @@ class GoalHeader extends StatelessWidget {
     this.now,
   });
   final Goal goal;
-  final int? progress;
+  final double? progress;
   final DateTime? now;
 
   @override
@@ -127,7 +127,10 @@ class GoalHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Text('${progress ?? 0} %', style: theme.textTheme.labelLarge),
+            Text(
+              '${formatProgress(progress ?? 0)} %',
+              style: theme.textTheme.labelLarge,
+            ),
           ],
         ),
         const SizedBox(height: 12),

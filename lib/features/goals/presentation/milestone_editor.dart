@@ -21,7 +21,7 @@ class MilestoneEditor extends StatefulWidget {
 class _MilestoneEditorState extends State<MilestoneEditor> {
   final _form = GlobalKey<FormState>();
   late final _title = TextEditingController(text: widget.milestone?.title);
-  late int _progress = widget.milestone?.progress ?? 0;
+  late double _progress = widget.milestone?.progress ?? 0;
   late MilestoneStatus _status =
       widget.milestone?.status ?? MilestoneStatus.notStarted;
   late DateTime? _due = widget.milestone?.dueDate;
@@ -105,19 +105,19 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
             },
           ),
           gap,
-          Text('Fortschritt: $_progress %'),
+          Text('Fortschritt: ${formatProgress(_progress)} %'),
           Slider(
             value: _progress.toDouble(),
             min: 0,
             max: 100,
             divisions: 100,
-            label: '$_progress %',
+            label: '${formatProgress(_progress)} %',
             onChanged:
                 _status == MilestoneStatus.achieved ||
                     _status == MilestoneStatus.notStarted
                 ? null
                 : (v) => setState(() {
-                    _progress = v.round().clamp(0, 99);
+                    _progress = v.round().clamp(0, 99).toDouble();
                   }),
           ),
           if (_status == MilestoneStatus.notStarted)
