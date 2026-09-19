@@ -1,5 +1,14 @@
 # Speicherung und Migration
 
+## Schema 11 und Backupformat 10: Reihenfolge und Zuordnung · 19.09.2026
+
+Die Spalte `sort_order` in `goals` und `milestones` speichert die Reihenfolge, unabhängig von stabilen IDs. Migrationen übernehmen die bisherige ID-Reihenfolge. Neue Einträge kommen ans Ende; bei Gleichstand dient die ID als stabile Zweitsortierung. Verschieben schreibt die Reihenfolge der betroffenen Liste atomar. Archivierte Ziele sind nicht verschiebbar.
+
+Beim Wechsel eines Zwischenziels ändert sich nur seine Zielzuordnung und Position, nicht seine ID, Fortschritt, Status, Frist, Todo-Verknüpfungen oder historischen Beiträge. Der durchschnittliche Zielfortschritt wird weiterhin aus der aktuellen Zuordnung abgeleitet. Der bewusst gesetzte Zielerfolg bleibt unverändert. Rücknahme einer früheren Todo-Erledigung wirkt weiterhin auf dasselbe Zwischenziel.
+
+Backupformat 10 definiert die Position in den Ziel- und Zwischenziel-Arrays als Reihenfolge. Der Import übernimmt diese Positionen; zusätzliche technische Rangfelder sind im JSON nicht nötig. Formate 1–9 bleiben lesbar. Tests decken Migration aus Schema 10, Dateineustart, Backup-Rundlauf, Wechsel in ein anderes Ziel, Todo-Rücknahme und unveränderte Daten bei ungültigen Ablagezielen ab.
+
+
 ## Schema 10 und Backupformat 9: Cover-Sichtbarkeit · 19.09.2026
 
 Ein boolesches Feld goals.show_card_cover (0/1, Standard 1) steuert ausschließlich das Cover auf Zielkarten. Ausgeschaltete Cover behalten ihre Bildbytes. Die Migration 9 → 10 ergänzt nur diese Spalte; vorhandene Fortschritte, Beiträge, IDs, Bilder und Einstellungen bleiben unverändert. Migrationen aus 1–8 führen zunächst ihre bisherigen Schritte bis Schema 9 aus. Die Hundertstelumrechnung erfolgt ausschließlich bei Ausgangsversionen unter 9.

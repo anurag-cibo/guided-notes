@@ -1,5 +1,16 @@
 # Projektübergabe · 19.09.2026
 
+## Sortieren und zeitgesteuerte Emoji-Markierung · 19.09.2026
+
+Folgeauftrag #50 ergänzt den offenen PR #49: Ziele und Zwischenziele per langem Drücken (600 ms) und vertikalem Ziehen sortieren, ohne Bearbeitungsmodus. Im Zwischenziele-Tab ist Wechsel zwischen aktiven Zielgruppen möglich; Überschriften und leere Gruppen sind Ablageziele. Eine Linie zeigt davor/dahinter, am Rand scrollt die Liste weiter, auch bei stillstehendem Finger. Die gezogene Karte hat einen deckenden Hintergrund. Ein aktiver Drag bleibt bei Listen-Rebuilds/Scrollen erhalten; Abbruch ändert keine Reihenfolge.
+
+Emoji-Markierungen blenden jetzt nach Tippen ein und nach 1,5 Sekunden automatisch aus (280-ms-Übergang). Die ganze Leiste blendet beim Scrollen mit 320 ms weich aus/ein. Das ersetzt das frühere Aufheben der Markierung beim Scrollbeginn.
+
+Schema 11 ergänzt sort_order in goals/milestones; Backupformat 10 erhält die Array-Reihenfolge. Zwischenzielwechsel erhält IDs, Status, Fortschritt, Frist, Todos und historische Beiträge. Zielfortschritte werden aus der Zuordnung abgeleitet, bewusster Zielerfolg bleibt bestehen. 71 Tests, Analyse, Format und native Android-Gestenprüfung bestanden. Review durch gpt-5.6-luna anhand zeitmarkierter Video-Frames: 7,5/10 nach Behebung von Durchscheinen/seitlichem Abschneiden; keine direkte MP4-Wiedergabe beim Reviewer. Timing und Fade-Zwischenzustand zusätzlich per Widgettest geprüft.
+
+Normale Emulator-App auf 0.3.3+9 aktualisiert und geöffnet. Sicherung outputs/before-reorder.tar; vor/nach Migration alle vorherigen Datenbankzeilen/-spalten unverändert, Schema 11 und Fremdschlüssel geprüft. Demo-Video outputs/ziele-ziehen-und-animationen.mp4. Arbeitsbranch weiterhin codex/emoji-navigation-card-covers, PR #49 offen; für diese Folgeaufträge kein weiteres Release oder Merge. Aktuellen GitHub-Stand prüfen.
+
+
 ## Emoji-Leiste und Karten-Cover · 19.09.2026
 
 Folgeauftrag #48 umgesetzt: einzeilige Emoji-Zielsprünge im Zwischenziele-Tab, Prozentzahl rechts neben dem Zielbalken, Standardmotiv auf Zielkarten ohne eigenes Bild. Die Restzeit steht direkt unter dem Zwischenziel-Status im Cover. Freies Scrollen lässt die Emoji-Markierung ausfaden, ohne den Sprunganker zu verändern; erneutes Antippen markiert wieder das gewählte Ziel. Rechts neben der Bildauswahl/Papierkorb im Ziel-Editor steuert ein kleiner Schalter ausschließlich das Karten-Cover. Foto und Detailcover bleiben erhalten. Schema 10/Backup 9 speichern showCardCover; ältere Daten erhalten true. Die Migration aus Schema 9 skaliert Fortschritte nicht erneut.

@@ -53,7 +53,7 @@ class GoalsRepository {
       }
       for (final g in snapshot.goals) {
         await database.customStatement(
-          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id,started_on,show_card_cover) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+          'INSERT INTO goals(id,title,emoji,motivation,due_date,achieved,archived,cover_image,color,custom_theme_id,started_on,show_card_cover,sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
           [
             g.id,
             g.title,
@@ -67,12 +67,13 @@ class GoalsRepository {
             g.customThemeId,
             _encodeDate(g.startedOn ?? now()),
             g.showCardCover ? 1 : 0,
+            snapshot.goals.indexOf(g),
           ],
         );
       }
       for (final m in snapshot.milestones) {
         await database.customStatement(
-          'INSERT INTO milestones(id,goal_id,title,progress,status,due_date) VALUES (?,?,?,?,?,?)',
+          'INSERT INTO milestones(id,goal_id,title,progress,status,due_date,sort_order) VALUES (?,?,?,?,?,?,?)',
           [
             m.id,
             m.goalId,
@@ -80,6 +81,7 @@ class GoalsRepository {
             progressUnits(m.progress),
             m.status.name,
             BackupCodec.date(m.dueDate),
+            snapshot.milestones.indexOf(m),
           ],
         );
       }
@@ -209,10 +211,12 @@ class GoalsRepository {
     );
     await todos.ensureCurrentPeriods();
     final goals = await database
-        .customSelect('SELECT * FROM goals ORDER BY id')
+        .customSelect('SELECT * FROM goals ORDER BY sort_order, id')
         .get();
     final milestones = await database
-        .customSelect('SELECT * FROM milestones ORDER BY goal_id, id')
+        .customSelect(
+          'SELECT * FROM milestones ORDER BY goal_id, sort_order, id',
+        )
         .get();
     return GoalSnapshot(
       goals.map(_readGoal),
@@ -310,7 +314,7 @@ class GoalsRepository {
     if (id == null) {
       await _checkCapacity();
       await database.customStatement(
-        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id, started_on, show_card_cover) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO goals(title, emoji, motivation, due_date, cover_image, color, custom_theme_id, started_on, show_card_cover, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT COALESCE(MAX(sort_order),0)+1 FROM goals))',
         [
           name,
           symbol,
@@ -366,7 +370,7 @@ class GoalsRepository {
     ];
     if (id == null) {
       await database.customStatement(
-        'INSERT INTO milestones(title, progress, status, due_date, goal_id) VALUES (?, ?, ?, ?, ?)',
+        'INSERT INTO milestones(title, progress, status, due_date, goal_id, sort_order) VALUES (?, ?, ?, ?, ?, (SELECT COALESCE(MAX(sort_order),0)+1 FROM milestones))',
         [...values, goalId],
       );
     } else {
@@ -385,6 +389,58 @@ class GoalsRepository {
       );
     }
   });
+
+  /// Move relative to a stable ID, so stale UI indices cannot reorder other rows.
+  Future<void> moveGoal(int id, int targetId, {required bool after}) =>
+      database.transaction(() async {
+        await _requireGoal(id, active: true);
+        await _requireGoal(targetId, active: true);
+        if (id == targetId) return;
+        final ids = (await load()).activeGoals.map((g) => g.id).toList();
+        ids.remove(id);
+        ids.insert(ids.indexOf(targetId) + (after ? 1 : 0), id);
+        await _writeOrder('goals', ids);
+      });
+
+  Future<void> moveMilestone(
+    int id,
+    int goalId, {
+    int? targetId,
+    bool after = false,
+  }) => database.transaction(() async {
+    final snapshot = await load();
+    final milestone = snapshot.milestone(id);
+    if (milestone == null) {
+      throw const RuleViolation('Dieses Zwischenziel existiert nicht mehr.');
+    }
+    await _requireGoal(milestone.goalId, active: true);
+    await _requireGoal(goalId, active: true);
+    if (targetId == id) return;
+    final ids = snapshot.forGoal(goalId).map((m) => m.id).toList()..remove(id);
+    if (targetId != null && !ids.contains(targetId)) {
+      throw const RuleViolation(
+        'Die Zielposition hat sich geändert. Bitte erneut versuchen.',
+      );
+    }
+    ids.insert(
+      targetId == null ? ids.length : ids.indexOf(targetId) + (after ? 1 : 0),
+      id,
+    );
+    await database.customStatement(
+      'UPDATE milestones SET goal_id = ? WHERE id = ?',
+      [goalId, id],
+    );
+    await _writeOrder('milestones', ids);
+  });
+
+  Future<void> _writeOrder(String table, List<int> ids) async {
+    for (var i = 0; i < ids.length; i++) {
+      await database.customStatement(
+        'UPDATE $table SET sort_order = ? WHERE id = ?',
+        [i, ids[i]],
+      );
+    }
+  }
 
   Future<void> setArchived(int id, bool archived) =>
       database.transaction(() async {

@@ -26,7 +26,7 @@ Beim Erstellen oder Bearbeiten einer Aufgabe lässt sich optional ein Zwischenzi
 
 Der Zwischenzielfortschritt steigt höchstens auf 100 %. Rückgängig zieht nur den tatsächlich gutgeschriebenen Beitrag ab – auch nach Neustart, Backup oder einem Wechsel der Zuordnung. Beispiel: 97 % + 10 Prozentpunkte ergibt 100 %, Rückgängig wieder 97 %. Änderungen an Zuordnung und Beitrag gelten sofort für neue Erledigungen; alte Erledigungen werden nicht nachträglich gewertet. Titel und Wochenanzahl ändern sich weiterhin erst ab dem nächsten Zeitraum. Archivierte Ziele erhalten keine neuen Beiträge. Löschen eines Zwischenziels erhält die Todos und löst ihre Zuordnung.
 
-„Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die einzeilige Emoji-Leiste im Zwischenziele-Tab springt beim Antippen direkt zum jeweiligen Ziel. Zielnamen sind per langem Drücken und für Screenreader verfügbar. Nach einem Emoji-Tipp wird das Ziel markiert; beim freien Scrollen blendet die Markierung aus. Die Leiste blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
+„Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die einzeilige Emoji-Leiste im Zwischenziele-Tab springt beim Antippen direkt zum jeweiligen Ziel. Zielnamen sind per langem Drücken und für Screenreader verfügbar. Nach einem Emoji-Tipp blendet die Markierung ein und nach 1,5 Sekunden automatisch wieder aus. Die Leiste blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
 
 Antippen eines Zwischenziels in den Zieldetails öffnet direkt seinen Editor; Speichern und Zurück führen zu diesen Zieldetails zurück.
 
@@ -52,13 +52,17 @@ Die zentralen Farbrollen stehen in `ThemeColors`, Vorgaben und Ableitung für He
 
 Das Zahnrad in jedem Hauptbereich öffnet die Einstellungen. Die App folgt zunächst dem Gerät; Hell- und Dunkelmodus können dauerhaft gewählt werden. Beide Darstellungen umfassen Ziele, Zwischenziele, Todos, Formulare und Dialoge. Unter „Allgemein“ stehen Sicherung und bestätigtes Löschen aller Inhalte bereit. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind auf Wunsch als klar gekennzeichnete Platzhalter sichtbar. Dateninformationen und verwendete Lizenzen sind ebenfalls erreichbar.
 
-Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 10 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+Theme und Statusflächen liegen in `lib/theme`, Speicherung, Steuerung und Oberfläche der Einstellungen getrennt in `lib/features/settings`. Schema 11 migriert die bisherigen Inhalte ohne Datenverlust. Die Darstellungswahl ist gerätebezogen und wird nicht exportiert.
+
+Ziele lassen sich durch langes Drücken und Ziehen sortieren. Dasselbe gilt für Zwischenziele in den Zieldetails und im Zwischenziele-Tab. Dort kann ein Zwischenziel auch auf die Überschrift eines anderen Ziels oder zwischen dessen Zwischenziele gezogen werden. Todo-Verknüpfungen und bisherige Fortschrittsgutschriften bleiben erhalten; beide Ziel-Fortschritte werden neu berechnet. Die Reihenfolge übersteht Neustarts und Datensicherungen. Am Listenrand wird beim Ziehen automatisch gescrollt; ein eigener Bearbeitungsmodus ist nicht nötig.
+
+Die Emoji-Markierung blendet beim Tippen ein und nach 1,5 Sekunden automatisch aus. Beim Scrollen wird die gesamte Sprungleiste weich aus- beziehungsweise eingeblendet.
 
 ## Daten sichern
 
 Über das Zahnrad **Einstellungen → Datensicherung** oben rechts lassen sich Ziele, Zwischenziele, Todo-Vorlagen, Tages-/Wochenstände und Archive als JSON-Datei exportieren. Android öffnet die Dateiauswahl für den Speicherort. Die Datei enthält auch Motivationstexte und ist unverschlüsselt; eine Kopie außerhalb des Geräts schützt vor Geräteverlust.
 
-**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 9, bis 10 MB. Alte Sicherungen mit Version 1 bis 8 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
+**Wiederherstellen ist nur in einer leeren App möglich**, einschließlich Todos und Historie, beispielsweise auf einem neuen Gerät. Es gibt kein stilles Zusammenführen oder Überschreiben. Vor dem Import werden die Anzahlen der Inhalte zur Bestätigung angezeigt. Ungültige Dateien werden abgelehnt; ein fehlgeschlagener Import wird vollständig zurückgerollt. Exportformat: `the-guide`, Version 10, bis 10 MB. Alte Sicherungen mit Version 1 bis 9 bleiben importierbar. Details: [Speicherstrategie](docs/storage.md).
 
 ## APK fürs Handy
 

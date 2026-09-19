@@ -4,6 +4,7 @@ import '../domain/progress_amount.dart';
 
 import '../application/goals_controller.dart';
 import 'common.dart';
+import 'drag_order.dart';
 import 'goal_editor.dart';
 import 'goal_header.dart';
 import 'goal_theme.dart';
@@ -144,31 +145,53 @@ class GoalDetail extends StatelessWidget {
                     ),
                   ),
                 for (final milestone in milestones)
-                  Card(
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 4,
+                  DragOrder(
+                    key: ValueKey('drag-milestone-${milestone.id}'),
+                    enabled: !goal.archived,
+                    data: OrderDrag(
+                      OrderKind.milestone,
+                      milestone.id,
+                      goalId: goalId,
+                    ),
+                    accepts: (data) =>
+                        data.kind == OrderKind.milestone &&
+                        data.goalId == goalId,
+                    onDrop: (data, after) => runMutation(
+                      context,
+                      controller,
+                      (r) => r.moveMilestone(
+                        data.id,
+                        goalId,
+                        targetId: milestone.id,
+                        after: after,
                       ),
-                      title: Text(milestone.title),
-                      subtitle: Text(
-                        '${milestone.status.label} · ${formatProgress(milestone.progress)} %',
-                      ),
-                      trailing: goal.archived
-                          ? null
-                          : const Icon(Icons.chevron_right),
-                      onTap: goal.archived
-                          ? null
-                          : () => Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (_) => MilestoneEditor(
-                                  controller: controller,
-                                  goal: goal,
-                                  milestone: milestone,
+                    ),
+                    child: Card(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        title: Text(milestone.title),
+                        subtitle: Text(
+                          '${milestone.status.label} · ${formatProgress(milestone.progress)} %',
+                        ),
+                        trailing: goal.archived
+                            ? null
+                            : const Icon(Icons.chevron_right),
+                        onTap: goal.archived
+                            ? null
+                            : () => Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (_) => MilestoneEditor(
+                                    controller: controller,
+                                    goal: goal,
+                                    milestone: milestone,
+                                  ),
                                 ),
                               ),
-                            ),
+                      ),
                     ),
                   ),
                 if (goal.archived) ...[

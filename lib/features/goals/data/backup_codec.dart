@@ -13,7 +13,7 @@ class BackupCodec {
   static String encode(GoalSnapshot snapshot) =>
       const JsonEncoder.withIndent('  ').convert({
         'format': 'the-guide',
-        'version': 9,
+        'version': 10,
         'todoCredits': [
           for (final c in snapshot.todoCredits)
             {
@@ -105,7 +105,7 @@ class BackupCodec {
       final root = jsonDecode(source) as Map<String, dynamic>;
       if (root['format'] != 'the-guide' ||
           root['version'] is! int ||
-          ![1, 2, 3, 4, 5, 6, 7, 8, 9].contains(root['version'])) {
+          ![1, 2, 3, 4, 5, 6, 7, 8, 9, 10].contains(root['version'])) {
         throw const FormatException();
       }
       final themes = <CustomGoalTheme>[];

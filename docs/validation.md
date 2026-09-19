@@ -1,5 +1,14 @@
 # Validierung
 
+## Sortieren, Zielwechsel und Animationen · 19.09.2026
+
+- Finale Formatierung und Analyse ohne Befunde; 71 Unit-/Widgettests bestanden.
+- Reale Schema-10-Datei nach Schema 11 migriert; sämtliche Inhalte erhalten. Reihenfolge nach Datei-Neustart und Backup-Rundlauf identisch. Todo-Gutschriften und Rücknahme nach Wechsel des Zwischenziels erhalten; ungültige/archivierte Zielpositionen ändern keine Daten.
+- Gesten: Ziele vor/nach einem Ziel, Zwischenziele in Zieldetails, Wechsel zu anderer/leerem Ziel, Abbruch, Autoscroll mit stillstehendem Finger und Timer-Rebuild während eines Drags geprüft. Zeitgesteuertes Aufheben und Zurücksetzen der Emoji-Markierung sowie teiltransparenter Zwischenzustand der ganzen Leiste geprüft.
+- Native Android-Prüfung integration_test/reorder_motion_test.dart im separaten Testpaket erfolgreich: Ziehen in allen drei Ansichten, Zielwechsel, leere Gruppe, Emoji- und Leistenanimation. Debug-Build der normalen App erfolgreich, ausschließlich per adb install -r aktualisiert. Vor Installation Sicherung outputs/before-reorder.tar; bestehende Daten nach echter Migration im normalen App-Prozess spalten-/zeilenweise unverändert, Fremdschlüssel intakt.
+- Kurze Demo-Aufnahme outputs/ziele-ziehen-und-animationen.mp4. Unabhängiges Review mit gpt-5.6-luna: 7,5/10 anhand zeitmarkierter Frames. Nachgebessert: keine durchscheinenden Texte und kein seitliches Abschneiden der gezogenen Karte. Reviewer konnte die MP4 nicht direkt abspielen; die genaue Animationsdauer ist durch Widgettests, nicht durch dessen visuelles Urteil belegt. Einfügelinie kann von der darübergezogenen Karte teilweise verdeckt werden.
+
+
 ## Todos-Erweiterung · 17.09.2026
 
 - `flutter analyze --no-pub lib test integration_test`: keine Befunde.

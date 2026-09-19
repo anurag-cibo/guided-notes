@@ -19,7 +19,16 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
+
+  Future<void> _addOrdering() async {
+    for (final table in ['goals', 'milestones']) {
+      await customStatement(
+        'ALTER TABLE $table ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0',
+      );
+      await customStatement('UPDATE $table SET sort_order = id');
+    }
+  }
 
   Future<void> _addTodoLinks({int scale = 1}) async {
     for (final table in ['todo_templates', 'todo_entries']) {
@@ -189,9 +198,10 @@ class AppDatabase extends GeneratedDatabase {
       await _addTodoLinks(scale: 100);
       await _addProgressMode();
       await _createSettings();
+      await _addOrdering();
     },
     onUpgrade: (_, from, to) async {
-      if (from < 1 || from > 9 || to != 10) {
+      if (from < 1 || from > 10 || to != 11) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
@@ -217,9 +227,12 @@ class AppDatabase extends GeneratedDatabase {
       }
       if (from < 8) await _addTodoLinks();
       if (from < 9) await _migrateProgressUnits();
-      await customStatement(
-        'ALTER TABLE goals ADD COLUMN show_card_cover INTEGER NOT NULL DEFAULT 1 CHECK(show_card_cover IN (0, 1))',
-      );
+      if (from < 10) {
+        await customStatement(
+          'ALTER TABLE goals ADD COLUMN show_card_cover INTEGER NOT NULL DEFAULT 1 CHECK(show_card_cover IN (0, 1))',
+        );
+      }
+      await _addOrdering();
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

@@ -40,20 +40,20 @@ class GoalEmojiSelector extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       onTap: () => onSelected(goal.id),
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
+                        duration: const Duration(milliseconds: 280),
                         width: 48,
                         height: 48,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: selected
                               ? Theme.of(context).colorScheme.primaryContainer
-                              : null,
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(16),
-                          border: selected
-                              ? Border.all(
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              : null,
+                          border: Border.all(
+                            color: selected
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.transparent,
+                          ),
                         ),
                         child: ExcludeSemantics(
                           child: Text(

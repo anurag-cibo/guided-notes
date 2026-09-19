@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -7,6 +9,7 @@ import 'goal_emoji_selector.dart';
 import '../application/goals_controller.dart';
 import '../domain/models.dart';
 import 'common.dart';
+import 'drag_order.dart';
 import 'milestone_editor.dart';
 
 class MilestonesScreen extends StatelessWidget {
@@ -51,9 +54,15 @@ class MilestonesView extends StatefulWidget {
 
 class _MilestonesViewState extends State<MilestonesView> {
   late int? _focusGoal = widget.focusGoalId;
-  late int? _selectedGoal =
-      widget.focusGoalId ??
-      widget.controller.snapshot.activeGoals.firstOrNull?.id;
+  int? _selectedGoal;
+  Timer? _selectionTimer;
+
+  @override
+  void dispose() {
+    _selectionTimer?.cancel();
+    super.dispose();
+  }
+
   late int? _focusMilestone = widget.focusMilestoneId;
   int _jump = 0;
   final _center = GlobalKey();
@@ -77,25 +86,34 @@ class _MilestonesViewState extends State<MilestonesView> {
     for (final goal in goals) {
       rows.add((
         id: 'goal-${goal.id}',
-        child: Padding(
-          padding: const EdgeInsets.only(top: 16, bottom: 12),
-          child: GoalTheme(
-            color: goal.color,
-            colors: snapshot.theme(goal.customThemeId)?.colors,
-            child: SectionHeading(
-              title: '${goal.emoji} ${goal.title}',
-              addLabel: 'Zwischenziel hinzufügen',
-              onAdd: widget.controller.saving
-                  ? null
-                  : () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => MilestoneEditor(
-                          controller: widget.controller,
-                          goal: goal,
+        child: DragOrder(
+          key: ValueKey('drop-goal-${goal.id}'),
+          accepts: (data) => data.kind == OrderKind.milestone,
+          onDrop: (data, after) => runMutation(
+            context,
+            widget.controller,
+            (r) => r.moveMilestone(data.id, goal.id),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 16, bottom: 12),
+            child: GoalTheme(
+              color: goal.color,
+              colors: snapshot.theme(goal.customThemeId)?.colors,
+              child: SectionHeading(
+                title: '${goal.emoji} ${goal.title}',
+                addLabel: 'Zwischenziel hinzufügen',
+                onAdd: widget.controller.saving
+                    ? null
+                    : () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => MilestoneEditor(
+                            controller: widget.controller,
+                            goal: goal,
+                          ),
                         ),
                       ),
-                    ),
+              ),
             ),
           ),
         ),
@@ -104,65 +122,88 @@ class _MilestonesViewState extends State<MilestonesView> {
       if (milestones.isEmpty) {
         rows.add((
           id: 'empty-${goal.id}',
-          child: const Padding(
-            padding: EdgeInsets.only(bottom: 12),
-            child: Text('Noch keine Zwischenziele'),
+          child: DragOrder(
+            accepts: (data) => data.kind == OrderKind.milestone,
+            onDrop: (data, after) => runMutation(
+              context,
+              widget.controller,
+              (r) => r.moveMilestone(data.id, goal.id),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text('Noch keine Zwischenziele'),
+            ),
           ),
         ));
       }
       for (final milestone in milestones) {
         rows.add((
           id: 'milestone-${milestone.id}',
-          child: GoalTheme(
-            color: goal.color,
-            colors: snapshot.theme(goal.customThemeId)?.colors,
-            child: Builder(
-              builder: (context) => Card(
-                shape: milestone.id == _focusMilestone
-                    ? RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2,
-                        ),
-                      )
-                    : null,
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  title: Text(milestone.title),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 8),
-                      Text(
-                        '${milestone.status.label} · ${formatProgress(milestone.progress)} %',
-                      ),
-                      const SizedBox(height: 8),
-                      LinearProgressIndicator(
-                        value: milestone.progress / 100,
-                        minHeight: 5,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      if (milestone.dueDate != null) ...[
+          child: DragOrder(
+            key: ValueKey('drag-milestone-${milestone.id}'),
+            data: OrderDrag(OrderKind.milestone, milestone.id, goalId: goal.id),
+            accepts: (data) => data.kind == OrderKind.milestone,
+            onDrop: (data, after) => runMutation(
+              context,
+              widget.controller,
+              (r) => r.moveMilestone(
+                data.id,
+                goal.id,
+                targetId: milestone.id,
+                after: after,
+              ),
+            ),
+            child: GoalTheme(
+              color: goal.color,
+              colors: snapshot.theme(goal.customThemeId)?.colors,
+              child: Builder(
+                builder: (context) => Card(
+                  shape: milestone.id == _focusMilestone
+                      ? RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 2,
+                          ),
+                        )
+                      : null,
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
+                    title: Text(milestone.title),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         const SizedBox(height: 8),
                         Text(
-                          deadlineLabel(
-                            milestone.dueDate,
-                            achieved:
-                                milestone.status == MilestoneStatus.achieved,
-                          ),
+                          '${milestone.status.label} · ${formatProgress(milestone.progress)} %',
                         ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: milestone.progress / 100,
+                          minHeight: 5,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        if (milestone.dueDate != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            deadlineLabel(
+                              milestone.dueDate,
+                              achieved:
+                                  milestone.status == MilestoneStatus.achieved,
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => MilestoneEditor(
-                        controller: widget.controller,
-                        goal: goal,
-                        milestone: milestone,
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (_) => MilestoneEditor(
+                          controller: widget.controller,
+                          goal: goal,
+                          milestone: milestone,
+                        ),
                       ),
                     ),
                   ),
@@ -181,24 +222,36 @@ class _MilestonesViewState extends State<MilestonesView> {
     return Column(
       children: [
         if (goals.length > 1)
-          AnimatedSize(
-            duration: const Duration(milliseconds: 180),
-            alignment: Alignment.topCenter,
-            child: ClipRect(
+          TweenAnimationBuilder<double>(
+            tween: Tween(end: _showSelector ? 1 : 0),
+            duration: const Duration(milliseconds: 320),
+            curve: Curves.easeInOutCubic,
+            builder: (context, value, child) => ClipRect(
               child: Align(
-                heightFactor: _showSelector ? 1 : 0,
-                child: GoalEmojiSelector(
-                  snapshot: snapshot,
-                  selectedId: _selectedGoal,
-                  onSelected: (id) => setState(() {
-                    _focusGoal = id;
-                    _selectedGoal = id;
-                    _focusMilestone = null;
-                    _jump++;
-                    _showSelector = true;
-                  }),
+                heightFactor: value,
+                alignment: Alignment.topCenter,
+                child: Opacity(
+                  opacity: value,
+                  child: IgnorePointer(ignoring: !_showSelector, child: child),
                 ),
               ),
+            ),
+            child: GoalEmojiSelector(
+              snapshot: snapshot,
+              selectedId: _selectedGoal,
+              onSelected: (id) {
+                _selectionTimer?.cancel();
+                setState(() {
+                  _focusGoal = id;
+                  _selectedGoal = id;
+                  _focusMilestone = null;
+                  _jump++;
+                  _showSelector = true;
+                });
+                _selectionTimer = Timer(const Duration(milliseconds: 1500), () {
+                  if (mounted) setState(() => _selectedGoal = null);
+                });
+              },
             ),
           ),
         Expanded(
@@ -209,10 +262,9 @@ class _MilestonesViewState extends State<MilestonesView> {
                 return false;
               }
               final show = notification.direction == ScrollDirection.forward;
-              if (show != _showSelector || _selectedGoal != null) {
+              if (show != _showSelector) {
                 setState(() {
                   _showSelector = show;
-                  _selectedGoal = null;
                 });
               }
               return false;
@@ -225,7 +277,10 @@ class _MilestonesViewState extends State<MilestonesView> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
-                      (context, i) => rows[split - i - 1].child,
+                      (context, i) => KeyedSubtree(
+                        key: ValueKey(rows[split - i - 1].id),
+                        child: rows[split - i - 1].child,
+                      ),
                       childCount: split,
                     ),
                   ),
@@ -235,7 +290,10 @@ class _MilestonesViewState extends State<MilestonesView> {
                   padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
-                      (context, i) => rows[split + i].child,
+                      (context, i) => KeyedSubtree(
+                        key: ValueKey(rows[split + i].id),
+                        child: rows[split + i].child,
+                      ),
                       childCount: rows.length - split,
                     ),
                   ),

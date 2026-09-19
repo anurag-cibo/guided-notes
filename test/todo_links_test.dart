@@ -381,6 +381,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(selectedEmojis(), hasLength(1));
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 160));
+      final fade = tester.widget<Opacity>(
+        find.ancestor(of: selector, matching: find.byType(Opacity)).first,
+      );
+      expect(fade.opacity, greaterThan(0));
+      expect(fade.opacity, lessThan(1));
       await tester.pumpAndSettle();
       expect(selector.hitTestable(), findsNothing);
       await tester.drag(find.byType(CustomScrollView), const Offset(0, 80));

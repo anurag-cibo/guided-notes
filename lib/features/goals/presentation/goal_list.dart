@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../application/goals_controller.dart';
 import 'common.dart';
+import 'drag_order.dart';
 import 'goal_detail.dart';
 import 'goal_editor.dart';
 import 'goal_theme.dart';
@@ -42,18 +43,29 @@ class GoalList extends StatelessWidget {
               : 'Was möchtest du erreichen? Beginne mit einem Ziel.',
         ),
       for (final goal in goals)
-        GoalTheme(
-          color: goal.color,
-          colors: controller.snapshot.theme(goal.customThemeId)?.colors,
-          child: Builder(
-            builder: (context) => GoalCard(
-              controller: controller,
-              goal: goal,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) =>
-                      GoalDetail(controller: controller, goalId: goal.id),
+        DragOrder(
+          key: ValueKey('drag-goal-${goal.id}'),
+          enabled: !archived,
+          data: OrderDrag(OrderKind.goal, goal.id),
+          accepts: (data) => data.kind == OrderKind.goal,
+          onDrop: (data, after) => runMutation(
+            context,
+            controller,
+            (r) => r.moveGoal(data.id, goal.id, after: after),
+          ),
+          child: GoalTheme(
+            color: goal.color,
+            colors: controller.snapshot.theme(goal.customThemeId)?.colors,
+            child: Builder(
+              builder: (context) => GoalCard(
+                controller: controller,
+                goal: goal,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        GoalDetail(controller: controller, goalId: goal.id),
+                  ),
                 ),
               ),
             ),

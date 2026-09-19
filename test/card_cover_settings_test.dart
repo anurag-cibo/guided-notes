@@ -36,6 +36,8 @@ void main() {
       await db.close();
       final legacy = sqlite.sqlite3.open(file.path);
       legacy.execute('ALTER TABLE goals DROP COLUMN show_card_cover');
+      legacy.execute('ALTER TABLE goals DROP COLUMN sort_order');
+      legacy.execute('ALTER TABLE milestones DROP COLUMN sort_order');
       legacy.execute('PRAGMA user_version=9');
       legacy.close();
       db = AppDatabase(NativeDatabase(file));
