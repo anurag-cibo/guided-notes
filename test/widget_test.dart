@@ -219,9 +219,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Pflanzen auswählen'));
     await tester.pumpAndSettle();
-    expect(find.byType(MilestonesScreen), findsOneWidget);
-    await tester.tap(find.text('Pflanzen auswählen'));
-    await tester.pumpAndSettle();
+    expect(find.text('Zwischenziel bearbeiten'), findsOneWidget);
     await tester.tap(find.byType(DropdownButtonFormField<MilestoneStatus>));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Erreicht').last);

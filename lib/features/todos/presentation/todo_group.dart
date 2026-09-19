@@ -27,6 +27,8 @@ class TodoGroup extends StatelessWidget {
           (entry) =>
               entry.frequency == frequency &&
               entry.isCurrent(now) &&
+              controller.snapshot.todoTemplate(entry.templateId)?.active ==
+                  true &&
               (milestoneId == null || entry.milestoneId == milestoneId),
         )
         .toList();

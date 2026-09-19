@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,26 @@ void main() {
       var controller = GoalsController(GoalsRepository(database));
       try {
         final r = controller.repository;
+        final recorder = ui.PictureRecorder();
+        final canvas = Canvas(recorder);
+        canvas.drawColor(const Color(0xfff4e9be), BlendMode.src);
+        for (var x = 0; x < 600; x += 45) {
+          canvas.drawCircle(
+            Offset(x.toDouble(), 110),
+            70,
+            Paint()
+              ..color = x.isEven
+                  ? const Color(0xff396d56)
+                  : const Color(0xffd7bb72),
+          );
+        }
+        final drawing = recorder.endRecording();
+        final image = await drawing.toImage(600, 300);
+        final cover = (await image.toByteData(format: ui.ImageByteFormat.png))!
+            .buffer
+            .asUint8List();
+        image.dispose();
+        drawing.dispose();
         final customThemeId = await r.saveTheme(
           name: 'Abend am Meer',
           colors: const ThemeColors(
@@ -36,6 +57,7 @@ void main() {
         );
         await r.saveGoal(
           title: 'Gesundheit',
+          coverImage: cover,
           dueDate: DateTime.now().add(const Duration(days: 45)),
           emoji: '🌿',
           color: GoalColor.ocean,

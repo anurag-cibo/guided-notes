@@ -8,7 +8,6 @@ import 'goal_editor.dart';
 import 'goal_header.dart';
 import 'goal_theme.dart';
 import 'milestone_editor.dart';
-import 'milestones_screen.dart';
 
 class GoalDetail extends StatelessWidget {
   const GoalDetail({super.key, required this.controller, required this.goalId});
@@ -163,10 +162,10 @@ class GoalDetail extends StatelessWidget {
                           : () => Navigator.push(
                               context,
                               MaterialPageRoute<void>(
-                                builder: (_) => MilestonesScreen(
+                                builder: (_) => MilestoneEditor(
                                   controller: controller,
-                                  focusGoalId: goalId,
-                                  focusMilestoneId: milestone.id,
+                                  goal: goal,
+                                  milestone: milestone,
                                 ),
                               ),
                             ),

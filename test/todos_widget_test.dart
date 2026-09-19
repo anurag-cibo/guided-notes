@@ -178,7 +178,7 @@ void main() {
       await tester.tap(find.byTooltip('$title bearbeiten'));
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(
-        find.text('Aufgabe beenden'),
+        find.text('Aufgabe entfernen'),
         250,
         scrollable: find
             .descendant(
@@ -188,14 +188,14 @@ void main() {
             .first,
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Aufgabe beenden'));
+      await tester.tap(find.text('Aufgabe entfernen'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Abbrechen'));
       await tester.pumpAndSettle();
       expect(controller.snapshot.todoTemplates.single.active, isTrue);
-      await tester.tap(find.text('Aufgabe beenden'));
+      await tester.tap(find.text('Aufgabe entfernen'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Beenden'));
+      await tester.tap(find.text('Entfernen'));
       await tester.pumpAndSettle();
       expect(controller.snapshot.todoTemplates.single.active, isFalse);
       expect(controller.snapshot.todoEntries, hasLength(1));
