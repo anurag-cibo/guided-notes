@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../goals/domain/metric_scale.dart';
+
 import '../../goals/application/goals_controller.dart';
-import '../../goals/domain/progress_amount.dart';
 import '../../goals/presentation/common.dart';
 import '../domain/todo_models.dart';
 import 'todo_editor.dart';
@@ -12,10 +13,12 @@ class TodoRow extends StatelessWidget {
     required this.controller,
     required this.entry,
     this.beforeAction,
+    this.previewScale,
   });
   final GoalsController controller;
   final TodoEntry entry;
   final Future<bool> Function()? beforeAction;
+  final MetricScale? previewScale;
 
   Future<bool> _changeCount(BuildContext context, int delta) async {
     if (beforeAction != null && !await beforeAction!()) return false;
@@ -69,15 +72,18 @@ class TodoRow extends StatelessWidget {
                                   : null,
                             ),
                       ),
-                      if (goal != null &&
+                      if (milestone != null &&
+                          goal != null &&
                           !goal.archived &&
                           entry.progressIncrement > 0)
                         Semantics(
                           label:
-                              '${formatProgress(entry.progressIncrement)} Prozentpunkte ${entry.progressMode == TodoProgressMode.onTarget ? 'bei vollständiger Wochenaufgabe' : 'pro Erledigung'}',
+                              '${(previewScale ?? milestone.scale).contribution(entry.progressIncrement)} ${entry.progressMode == TodoProgressMode.onTarget ? 'bei vollständiger Wochenaufgabe' : 'pro Erledigung'}',
                           excludeSemantics: true,
                           child: Text(
-                            '+${formatProgress(entry.progressIncrement)} %',
+                            (previewScale ?? milestone.scale).contribution(
+                              entry.progressIncrement,
+                            ),
                             style: Theme.of(context).textTheme.labelLarge
                                 ?.copyWith(
                                   color:

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../goals/domain/metric_scale.dart';
+
 import '../../goals/application/goals_controller.dart';
 import 'todo_row.dart';
 import '../../goals/presentation/common.dart';
@@ -13,11 +15,13 @@ class TodoGroup extends StatelessWidget {
     required this.frequency,
     this.milestoneId,
     this.beforeAction,
+    this.previewScale,
   });
   final GoalsController controller;
   final TodoFrequency frequency;
   final int? milestoneId;
   final Future<bool> Function()? beforeAction;
+  final MetricScale? previewScale;
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +87,7 @@ class TodoGroup extends StatelessWidget {
                 controller: controller,
                 entry: entry,
                 beforeAction: beforeAction,
+                previewScale: previewScale,
               ),
           ],
         ),

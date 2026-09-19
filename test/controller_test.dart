@@ -38,12 +38,20 @@ void main() {
     controller.addListener(() => notifications++);
     final first = controller.mutate((r) async {
       await gate.future;
-      await r.saveGoal(title: 'Einmal');
+      await r.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Einmal',
+      );
     });
     expect(controller.saving, isTrue);
     expect(notifications, 0, reason: 'No intermediate disabled UI frame');
     expect(
-      await controller.mutate((r) => r.saveGoal(title: 'Doppelt')),
+      await controller.mutate(
+        (r) => r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Doppelt',
+        ),
+      ),
       contains('Bitte kurz warten'),
     );
     gate.complete();
@@ -62,10 +70,23 @@ void main() {
       c.dispose();
       await db.close();
     });
-    await repository.saveGoal(title: 'Ziel');
+    await repository.saveGoal(
+      motivation: 'Meine persönliche Richtung',
+      title: 'Ziel',
+    );
     final goalId = (await repository.load()).goals.single.id;
-    await repository.saveMilestone(goalId: goalId, title: 'A', progress: 95);
-    await repository.saveMilestone(goalId: goalId, title: 'B', progress: 20);
+    await repository.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: goalId,
+      title: 'A',
+      progress: 95,
+    );
+    await repository.saveMilestone(
+      motivation: 'Mein nächster Schritt zum Ziel',
+      goalId: goalId,
+      title: 'B',
+      progress: 20,
+    );
     final milestones = (await repository.load()).milestones;
     await repository.todos.save(
       title: 'Wochenaufgabe',

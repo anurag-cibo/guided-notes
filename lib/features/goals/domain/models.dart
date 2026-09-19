@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import '../../todos/domain/todo_models.dart';
 import 'theme_colors.dart';
 import 'progress_amount.dart';
+import 'metric_scale.dart';
+export 'metric_scale.dart';
 export 'progress_amount.dart';
 export 'theme_colors.dart';
 
@@ -39,6 +41,7 @@ class Goal {
     this.achieved = false,
     this.archived = false,
     this.coverImage,
+    this.showCardCover = true,
     this.color = GoalColor.forest,
     this.customThemeId,
   });
@@ -51,6 +54,7 @@ class Goal {
   final bool achieved;
   final bool archived;
   final Uint8List? coverImage;
+  final bool showCardCover;
   final GoalColor color;
   final int? customThemeId;
 }
@@ -63,13 +67,25 @@ class Milestone {
     this.progress = 0,
     this.status = MilestoneStatus.notStarted,
     this.dueDate,
-  });
+    this.motivation = '',
+    this.scale = const MetricScale(),
+    double? currentValue,
+    // Public argument keeps legacy percent-only model construction compatible.
+    // ignore: prefer_initializing_formals
+  }) : _currentValue = currentValue;
   final int id;
   final int goalId;
   final String title;
   final double progress;
   final MilestoneStatus status;
   final DateTime? dueDate;
+  final String motivation;
+  final MetricScale scale;
+  final double? _currentValue;
+  double get currentValue => _currentValue ?? scale.valueForPercent(progress);
+  String get measurementLabel => scale.isStandardPercent
+      ? scale.format(currentValue)
+      : '${formatProgress(currentValue)} / ${scale.format(scale.target)}';
 }
 
 class GoalSnapshot {

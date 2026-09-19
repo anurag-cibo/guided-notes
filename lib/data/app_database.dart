@@ -19,15 +19,78 @@ class AppDatabase extends GeneratedDatabase {
   );
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 12;
 
-  Future<void> _addTodoLinks({int scale = 1}) async {
+  Future<void> _addMetricScale() async {
+    await customStatement(
+      "ALTER TABLE milestones ADD COLUMN motivation TEXT NOT NULL DEFAULT ''",
+    );
+    await customStatement(
+      'ALTER TABLE milestones ADD COLUMN start_value INTEGER NOT NULL DEFAULT 0',
+    );
+    await customStatement(
+      'ALTER TABLE milestones ADD COLUMN target_value INTEGER NOT NULL DEFAULT 10000',
+    );
+    await customStatement(
+      "ALTER TABLE milestones ADD COLUMN unit TEXT NOT NULL DEFAULT '%'",
+    );
+    await customStatement(
+      'ALTER TABLE milestones ADD COLUMN current_value INTEGER NOT NULL DEFAULT 0',
+    );
+    await customStatement('UPDATE milestones SET current_value = progress');
+
+    // Rebuild only Todo tables to widen contribution constraints. Stable IDs,
+    // foreign keys, ledger rows and the AUTOINCREMENT high-water mark survive.
+    await customStatement(
+      "CREATE TEMP TABLE metric_sequence AS SELECT * FROM sqlite_sequence WHERE name='todo_templates'",
+    );
+    const tables = ['todo_progress_credits', 'todo_entries', 'todo_templates'];
+    for (final table in tables) {
+      await customStatement(
+        'CREATE TEMP TABLE metric_$table AS SELECT * FROM $table',
+      );
+    }
+    for (final table in tables) {
+      await customStatement('DROP TABLE $table');
+    }
+    await _createTodos();
+    await _addTodoLinks(scale: 100, maxIncrement: 100000000000);
+    await _addProgressMode();
+    for (final table in tables.reversed) {
+      await customStatement('INSERT INTO $table SELECT * FROM metric_$table');
+      await customStatement('DROP TABLE metric_$table');
+    }
+    await customStatement(
+      "UPDATE sqlite_sequence SET seq=MAX(seq,COALESCE((SELECT seq FROM metric_sequence),0)) WHERE name='todo_templates'",
+    );
+    await customStatement(
+      "INSERT INTO sqlite_sequence(name,seq) SELECT name,seq FROM metric_sequence WHERE NOT EXISTS(SELECT 1 FROM sqlite_sequence WHERE name='todo_templates')",
+    );
+    await customStatement('DROP TABLE metric_sequence');
+    await customStatement(
+      'ALTER TABLE todo_progress_credits ADD COLUMN value_amount INTEGER NOT NULL DEFAULT 0',
+    );
+    await customStatement(
+      'UPDATE todo_progress_credits SET value_amount = amount',
+    );
+  }
+
+  Future<void> _addOrdering() async {
+    for (final table in ['goals', 'milestones']) {
+      await customStatement(
+        'ALTER TABLE $table ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0',
+      );
+      await customStatement('UPDATE $table SET sort_order = id');
+    }
+  }
+
+  Future<void> _addTodoLinks({int scale = 1, int? maxIncrement}) async {
     for (final table in ['todo_templates', 'todo_entries']) {
       await customStatement(
         'ALTER TABLE $table ADD COLUMN milestone_id INTEGER REFERENCES milestones(id) ON DELETE SET NULL',
       );
       await customStatement(
-        'ALTER TABLE $table ADD COLUMN progress_increment INTEGER NOT NULL DEFAULT 0 CHECK(progress_increment BETWEEN 0 AND ${100 * scale})',
+        'ALTER TABLE $table ADD COLUMN progress_increment INTEGER NOT NULL DEFAULT 0 CHECK(progress_increment BETWEEN 0 AND ${maxIncrement ?? 100 * scale})',
       );
     }
     await customStatement('''CREATE TABLE todo_progress_credits (
@@ -172,6 +235,7 @@ class AppDatabase extends GeneratedDatabase {
         achieved INTEGER NOT NULL DEFAULT 0 CHECK(achieved IN (0, 1)),
         archived INTEGER NOT NULL DEFAULT 0 CHECK(archived IN (0, 1)),
         cover_image BLOB,
+        show_card_cover INTEGER NOT NULL DEFAULT 1 CHECK(show_card_cover IN (0, 1)),
         color TEXT NOT NULL DEFAULT 'forest',
         custom_theme_id INTEGER REFERENCES goal_themes(id)
       )''');
@@ -188,9 +252,11 @@ class AppDatabase extends GeneratedDatabase {
       await _addTodoLinks(scale: 100);
       await _addProgressMode();
       await _createSettings();
+      await _addOrdering();
+      await _addMetricScale();
     },
     onUpgrade: (_, from, to) async {
-      if (from < 1 || from > 8 || to != 9) {
+      if (from < 1 || from > 11 || to != 12) {
         throw StateError(
           'Keine Migration von Schema $from nach $to vorhanden.',
         );
@@ -215,7 +281,14 @@ class AppDatabase extends GeneratedDatabase {
         await customStatement('ALTER TABLE goals ADD COLUMN started_on TEXT');
       }
       if (from < 8) await _addTodoLinks();
-      await _migrateProgressUnits();
+      if (from < 9) await _migrateProgressUnits();
+      if (from < 10) {
+        await customStatement(
+          'ALTER TABLE goals ADD COLUMN show_card_cover INTEGER NOT NULL DEFAULT 1 CHECK(show_card_cover IN (0, 1))',
+        );
+      }
+      if (from < 11) await _addOrdering();
+      await _addMetricScale();
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../application/goals_controller.dart';
 import '../domain/models.dart';
 import 'common.dart';
+import 'measurement_slider.dart';
 import '../../todos/domain/todo_models.dart';
 import '../../todos/presentation/todo_group.dart';
 
@@ -23,12 +24,73 @@ class MilestoneEditor extends StatefulWidget {
 class _MilestoneEditorState extends State<MilestoneEditor> {
   final _form = GlobalKey<FormState>();
   late final _title = TextEditingController(text: widget.milestone?.title);
-  late double _progress = widget.milestone?.progress ?? 0;
+  late final _start = TextEditingController(
+    text: formatProgress(widget.milestone?.scale.start ?? 0),
+  );
+  late final _target = TextEditingController(
+    text: formatProgress(widget.milestone?.scale.target ?? 100),
+  );
+  late final _current = TextEditingController(
+    text: formatProgress(widget.milestone?.currentValue ?? 0),
+  );
+  late final _unit = TextEditingController(
+    text: widget.milestone?.scale.unit ?? '%',
+  );
+  static const _units = {'%': 'Prozent (%)', '': 'Ohne Einheit'};
+  late bool _customUnit = !_units.containsKey(_unit.text);
+
+  MetricScale? get _scale {
+    try {
+      final start = parseMetric(_start.text),
+          target = parseMetric(_target.text);
+      if (start == null || target == null) return null;
+      final scale = MetricScale(
+        start: start,
+        target: target,
+        unit: _unit.text.trim(),
+      );
+      scale.validate();
+      return scale;
+    } on ArgumentError {
+      return null;
+    }
+  }
+
+  double get _progress {
+    try {
+      return _scale?.percent(parseMetric(_current.text) ?? 0) ?? 0;
+    } on ArgumentError {
+      return 0;
+    }
+  }
+
+  void _setCurrent(num value) => _current.text = formatProgress(value);
+  void _measurementChanged({bool clamp = false}) {
+    final scale = _scale;
+    var value = parseMetric(_current.text);
+    if (scale == null || value == null) return;
+    if (clamp) {
+      try {
+        final bounded = scale.clampUnits(metricUnits(value)) / 100;
+        if (bounded != value) _setCurrent(bounded);
+        value = bounded;
+      } on ArgumentError {
+        return;
+      }
+    }
+    if (value == scale.target) {
+      _status = MilestoneStatus.achieved;
+    } else if (_status == MilestoneStatus.achieved ||
+        (_status == MilestoneStatus.notStarted && value != scale.start)) {
+      _status = MilestoneStatus.onTrack;
+    }
+  }
+
   late MilestoneStatus _status =
       widget.milestone?.status ?? MilestoneStatus.notStarted;
   late DateTime? _due = widget.milestone?.dueDate;
   bool _saving = false;
-  late double _persistedProgress = widget.milestone?.progress ?? 0;
+  late double _persistedProgress = widget.milestone?.currentValue ?? 0;
   late MilestoneStatus _persistedStatus =
       widget.milestone?.status ?? MilestoneStatus.notStarted;
 
@@ -44,9 +106,10 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
         : widget.controller.snapshot.milestone(widget.milestone!.id);
     setState(() {
       if (milestone != null &&
-          (milestone.progress != _persistedProgress ||
+          (milestone.currentValue != _persistedProgress ||
               milestone.status != _persistedStatus)) {
-        _progress = _persistedProgress = milestone.progress;
+        _persistedProgress = milestone.currentValue;
+        _setCurrent(milestone.currentValue);
         _status = _persistedStatus = milestone.status;
       }
     });
@@ -57,7 +120,10 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
     final saved = widget.controller.snapshot.milestone(widget.milestone!.id);
     if (saved != null &&
         saved.title == _title.text.trim() &&
-        saved.progress == _progress &&
+        saved.currentValue == parseMetric(_current.text) &&
+        saved.scale.start == parseMetric(_start.text) &&
+        saved.scale.target == parseMetric(_target.text) &&
+        saved.scale.unit == _unit.text.trim() &&
         saved.status == _status &&
         saved.dueDate == _due) {
       return true;
@@ -71,6 +137,9 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
   void dispose() {
     widget.controller.removeListener(_refreshTodos);
     _title.dispose();
+    for (final field in [_start, _target, _current, _unit]) {
+      field.dispose();
+    }
     super.dispose();
   }
 
@@ -84,7 +153,8 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
         id: widget.milestone?.id,
         goalId: widget.goal.id,
         title: _title.text,
-        progress: _progress,
+        currentValue: parseMetric(_current.text),
+        scale: _scale,
         status: _status,
         dueDate: _due,
       ),
@@ -96,6 +166,168 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
       setState(() => _saving = false);
     }
     return saved;
+  }
+
+  Widget _numberField(
+    String label,
+    String key,
+    TextEditingController controller, {
+    bool current = false,
+  }) => TextFormField(
+    key: ValueKey(key),
+    controller: controller,
+    keyboardType: const TextInputType.numberWithOptions(
+      decimal: true,
+      signed: true,
+    ),
+    decoration: InputDecoration(
+      labelText: label,
+      errorMaxLines: 3,
+      suffixText: !current || _unit.text.isEmpty ? null : _unit.text,
+    ),
+    onChanged: (_) => setState(() => _measurementChanged(clamp: !current)),
+    validator: (text) {
+      final value = parseMetric(text ?? '');
+      try {
+        if (value == null) throw ArgumentError();
+        metricUnits(value);
+      } on ArgumentError {
+        return 'Zahl mit maximal 2 Nachkommastellen eingeben.';
+      }
+      final scale = _scale;
+      if (scale == null) return 'Start und Ziel müssen verschieden sein.';
+      if (current &&
+          scale.clampUnits(metricUnits(value)) != metricUnits(value)) {
+        return 'Wert muss zwischen Start und Ziel liegen.';
+      }
+      return null;
+    },
+  );
+
+  Widget _measurementFields(BuildContext context) {
+    void selectUnit(String value) => setState(() {
+      final custom = value == '__custom';
+      if (!custom || !_customUnit) _unit.text = custom ? '' : value;
+      _customUnit = custom;
+    });
+    final unit = _customUnit
+        ? TextFormField(
+            key: const ValueKey('metric-custom-unit'),
+            controller: _unit,
+            maxLength: 30,
+            decoration: InputDecoration(
+              labelText: 'Einheit',
+              hintText: 'Eigene Einheit',
+              counterText: '',
+              suffixIcon: PopupMenuButton<String>(
+                key: const ValueKey('metric-unit-true'),
+                tooltip: 'Einheit auswählen',
+                icon: const Icon(Icons.arrow_drop_down),
+                onSelected: selectUnit,
+                itemBuilder: (_) => [
+                  for (final entry in _units.entries)
+                    PopupMenuItem(value: entry.key, child: Text(entry.value)),
+                  const PopupMenuItem(
+                    value: '__custom',
+                    child: Text('Eigene Einheit'),
+                  ),
+                ],
+              ),
+            ),
+            onChanged: (_) => setState(() {}),
+          )
+        : DropdownButtonFormField<String>(
+            key: const ValueKey('metric-unit-false'),
+            initialValue: _unit.text,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Einheit'),
+            items: [
+              for (final entry in _units.entries)
+                DropdownMenuItem(value: entry.key, child: Text(entry.value)),
+              const DropdownMenuItem(
+                value: '__custom',
+                child: Text('Eigene Einheit'),
+              ),
+            ],
+            onChanged: (value) {
+              if (value != null) selectUnit(value);
+            },
+          );
+    final current = _numberField(
+      'Aktueller Wert',
+      'metric-current',
+      _current,
+      current: true,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 300 ||
+                MediaQuery.textScalerOf(context).scale(16) > 22) {
+              return Column(children: [unit, gap, current]);
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: unit),
+                const SizedBox(width: 12),
+                Expanded(child: current),
+              ],
+            );
+          },
+        ),
+        gap,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final start = _numberField('Startwert', 'metric-start', _start);
+            final target = _numberField('Zielwert', 'metric-target', _target);
+            final slider = MeasurementSlider(
+              progress: _progress,
+              valueLabel: formatProgress(parseMetric(_current.text) ?? 0),
+              onChanged: _scale == null
+                  ? null
+                  : (value) => setState(() {
+                      final scale = _scale!;
+                      final rounded =
+                          (scale.valueForPercent(value) * 10).round() / 10;
+                      // Preserve exact bounds for existing hundredth-based scales.
+                      final current = value == 0
+                          ? scale.start
+                          : value == 100
+                          ? scale.target
+                          : rounded;
+                      _setCurrent(scale.clampUnits(metricUnits(current)) / 100);
+                      _measurementChanged();
+                    }),
+            );
+            if (constraints.maxWidth < 330 ||
+                MediaQuery.textScalerOf(context).scale(16) > 22) {
+              return Column(children: [start, slider, target]);
+            }
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(width: 92, child: start),
+                Expanded(child: slider),
+                SizedBox(width: 92, child: target),
+              ],
+            );
+          },
+        ),
+        if (widget.milestone != null &&
+            (_unit.text != widget.milestone!.scale.unit ||
+                parseMetric(_start.text) != widget.milestone!.scale.start ||
+                parseMetric(_target.text) != widget.milestone!.scale.target) &&
+            widget.controller.snapshot.todoTemplates.any(
+              (t) => t.active && t.milestoneId == widget.milestone!.id,
+            ))
+          const Text(
+            'Todo-Beiträge verwenden diese Einheit. Bei einer Änderung der Einheit bleiben die Zahlenwerte erhalten.',
+          ),
+      ],
+    );
   }
 
   Widget _statusAndDue(BuildContext context) => LayoutBuilder(
@@ -113,11 +345,11 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
           setState(() {
             _status = s;
             if (s == MilestoneStatus.achieved) {
-              _progress = 100;
+              _setCurrent(_scale?.target ?? 100);
             } else if (s == MilestoneStatus.notStarted) {
-              _progress = 0;
+              _setCurrent(_scale?.start ?? 0);
             } else if (_progress == 100) {
-              _progress = 99;
+              _setCurrent(_scale?.valueForPercent(99) ?? 99);
             }
           });
         },
@@ -141,6 +373,41 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
       );
     },
   );
+  GoalSnapshot? _todoSnapshot;
+  MetricScale? _todoScale;
+  List<Widget> _todoGroups = const [];
+
+  List<Widget> _linkedTodos() {
+    final snapshot = widget.controller.snapshot;
+    final scale =
+        _scale ??
+        MetricScale(
+          start: widget.milestone!.scale.start,
+          target: widget.milestone!.scale.target,
+          unit: _unit.text.trim(),
+        );
+    // Slider frames only change the measurement. Reuse the immutable Todo
+    // widgets until their data or contribution unit/direction actually changes.
+    if (!identical(snapshot, _todoSnapshot) ||
+        _todoScale?.start != scale.start ||
+        _todoScale?.target != scale.target ||
+        _todoScale?.unit != scale.unit) {
+      _todoSnapshot = snapshot;
+      _todoScale = scale;
+      _todoGroups = [
+        for (final frequency in TodoFrequency.values)
+          TodoGroup(
+            controller: widget.controller,
+            frequency: frequency,
+            milestoneId: widget.milestone!.id,
+            beforeAction: _beforeTodoAction,
+            previewScale: scale,
+          ),
+      ];
+    }
+    return _todoGroups;
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -152,105 +419,83 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
     ),
     body: Form(
       key: _form,
-      child: ListView(
+      child: SingleChildScrollView(
         padding: pagePadding,
-        children: [
-          Text(
-            '${widget.goal.emoji} ${widget.goal.title}',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          gap,
-          TextFormField(
-            controller: _title,
-            decoration: const InputDecoration(labelText: 'Titel'),
-            textCapitalization: TextCapitalization.sentences,
-            validator: (v) => v == null || v.trim().isEmpty
-                ? 'Bitte einen Titel eingeben.'
-                : null,
-          ),
-          gap,
-          _statusAndDue(context),
-          gap,
-          Text('Fortschritt: ${formatProgress(_progress)} %'),
-          Slider(
-            value: _progress.toDouble(),
-            min: 0,
-            max: 100,
-            divisions: 100,
-            label: '${formatProgress(_progress)} %',
-            onChanged:
-                _status == MilestoneStatus.achieved ||
-                    _status == MilestoneStatus.notStarted
-                ? null
-                : (v) => setState(() {
-                    _progress = v.round().clamp(0, 99).toDouble();
-                  }),
-          ),
-          if (_status == MilestoneStatus.notStarted)
-            const Text('Wähle „Im Plan“, um den Fortschritt einzutragen.'),
-          if (_status != MilestoneStatus.achieved &&
-              _status != MilestoneStatus.notStarted)
-            const Text('Fertig? Wähle den Status „Erreicht“ für 100 %.'),
-          gap,
-          FilledButton(
-            onPressed: _saving ? null : _save,
-            child: Text(_saving ? 'Wird gespeichert …' : 'Speichern'),
-          ),
-          if (widget.milestone == null) ...[
-            gap,
-            const Text('Speichere das Zwischenziel, um Todos hinzuzufügen.'),
-          ],
-          if (widget.milestone != null) ...[
-            gap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
             Text(
-              'Verknüpfte Todos',
-              style: Theme.of(context).textTheme.titleLarge,
+              '${widget.goal.emoji} ${widget.goal.title}',
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Todo-Aktionen speichern auch deine Änderungen am Zwischenziel.',
-              style: Theme.of(context).textTheme.bodySmall,
+            gap,
+            TextFormField(
+              controller: _title,
+              decoration: const InputDecoration(labelText: 'Titel'),
+              textCapitalization: TextCapitalization.sentences,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? 'Bitte einen Titel eingeben.'
+                  : null,
             ),
-            const SizedBox(height: 8),
-            for (final frequency in TodoFrequency.values)
-              TodoGroup(
-                controller: widget.controller,
-                frequency: frequency,
-                milestoneId: widget.milestone!.id,
-                beforeAction: _beforeTodoAction,
+            gap,
+            _statusAndDue(context),
+            gap,
+            _measurementFields(context),
+            gap,
+            FilledButton(
+              onPressed: _saving ? null : _save,
+              child: Text(_saving ? 'Wird gespeichert …' : 'Speichern'),
+            ),
+            if (widget.milestone == null) ...[
+              gap,
+              const Text('Speichere das Zwischenziel, um Todos hinzuzufügen.'),
+            ],
+            if (widget.milestone != null) ...[
+              gap,
+              Text(
+                'Verknüpfte Todos',
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-            gap,
-            TextButton(
-              onPressed: _saving
-                  ? null
-                  : () async {
-                      if (!await confirmDeletion(
-                        context,
-                        'Dieses Zwischenziel wird gelöscht. Der Zielfortschritt wird neu berechnet.',
-                      )) {
-                        return;
-                      }
-                      if (!context.mounted) return;
-                      setState(() => _saving = true);
-                      final saved = await runMutation(
-                        context,
-                        widget.controller,
-                        (r) => r.deleteMilestone(
-                          widget.milestone!.id,
-                          widget.goal.id,
-                        ),
-                      );
-                      if (!context.mounted) return;
-                      if (saved) {
-                        Navigator.pop(context);
-                      } else {
-                        setState(() => _saving = false);
-                      }
-                    },
-              child: const Text('Zwischenziel löschen'),
-            ),
+              const SizedBox(height: 4),
+              Text(
+                'Todo-Aktionen speichern auch deine Änderungen am Zwischenziel.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              const SizedBox(height: 8),
+              ..._linkedTodos(),
+              gap,
+              TextButton(
+                onPressed: _saving
+                    ? null
+                    : () async {
+                        if (!await confirmDeletion(
+                          context,
+                          'Dieses Zwischenziel wird gelöscht. Der Zielfortschritt wird neu berechnet.',
+                        )) {
+                          return;
+                        }
+                        if (!context.mounted) return;
+                        setState(() => _saving = true);
+                        final saved = await runMutation(
+                          context,
+                          widget.controller,
+                          (r) => r.deleteMilestone(
+                            widget.milestone!.id,
+                            widget.goal.id,
+                          ),
+                        );
+                        if (!context.mounted) return;
+                        if (saved) {
+                          Navigator.pop(context);
+                        } else {
+                          setState(() => _saving = false);
+                        }
+                      },
+                child: const Text('Zwischenziel löschen'),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     ),
   );

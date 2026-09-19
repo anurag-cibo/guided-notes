@@ -83,7 +83,7 @@ class _MilestonePickerState extends State<_MilestonePicker> {
                           ListTile(
                             title: Text(m.title),
                             subtitle: Text(
-                              '${formatProgress(m.progress)} % · ${m.status.label}',
+                              '${m.measurementLabel} · ${m.status.label}',
                             ),
                             selected: m.id == widget.selected,
                             trailing: m.id == widget.selected

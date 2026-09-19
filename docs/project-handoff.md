@@ -1,5 +1,70 @@
 # Projektübergabe · 19.09.2026
 
+## Abschlussstand für die nächste Testpause · 0.4.0+10
+
+Signierte universelle APK outputs/the-guide-0.4.0.apk erfolgreich gebaut und mit apksigner geprüft; Zertifikat identisch zu 0.3.2. Android ab API 24, ARM64/ARMv7/x86_64. SHA256 6b30e1aa302df68293530c28efafc79c56fb19de7d18169530ea8909e7cbdd52. Normale Emulator-App auf 0.4.0+10 per Debug-Update geöffnet; Sicherung outputs/before-release-0.4.0.tar, Datenbank bytegleich (24ac662348bd4733ee5307aeae665c26fe34ab69ccb103240f1f0ba6176225b7).
+
+Prüfgrenze: Der zusätzliche Installations-/Updatetest der signierten APK auf dem separaten GuideReleaseCheck-AVD konnte wegen dessen nicht bestätigbarer ADB-Autorisierung nicht ausgeführt werden. Der Test-AVD wird beendet; Nutzerdaten und normaler Emulator bleiben erhalten. Funktions-/Migrations-/Neustart-/Backuptests sowie Profiltest auf emulator-5554 sind erfolgreich, ersetzen aber keinen aktuellen Gerätelauf der signierten Release-APK.
+
+Release 0.4.0 bündelt #48, #50 und #51 über PR #49. Beauftragt: nach Prüfungen squash mergen, signierte universelle APK veröffentlichen, erledigten Branch löschen und diese Aufgabe archivieren. Integrations-/Veröffentlichungsstatus direkt in GitHub prüfen. Der vorhandene Release-Schlüssel bleibt unverändert und privat. Normale Emulator-App ausschließlich per Debug-Update aktualisieren; nie deinstallieren.
+
+Maßgeblich sind README und der aktuelle Abschnitt in docs/product-decisions.md. Kurz: Warum ausschließlich bei neuen großen Zielen verpflichtend; Zwischenziele mit frei definierter Skala in beide Richtungen, Einheitenfeld direkt editierbar, Zehntelslider und manuelle Hundertstel. Todo-Vorschau sofort, tatsächliche Beiträge/Undo/Historie bleiben erhalten. Ziele/Zwischenziele per langem Drücken sortierbar, Wechsel zwischen Zielen möglich. Emoji-Leiste mit kurzem Impuls, weich ausblendende Leiste, verknüpfte Überschriften. Zielkarten mit schaltbarem Cover und kleinem Zeitkreis. Jeder App-Neustart beginnt hell. Schema 12, Backup 11, Import 1–10 kompatibel.
+
+84 Tests und Profilprüfung bestanden. Farbpaletten und unveränderte Todo-Widgets werden wiederverwendet. Im finalen Emulatorlauf keine UI-/Rasterframes über 16,67 ms in den drei gemessenen Abläufen; keine allgemeine Hardware-FPS-Garantie. Messwerte in docs/validation.md.
+
+Nächster Schritt: ein bis zwei Tage Alltagserprobung (#4), konkrete Ruckler mit Bildschirm/Aktion/Gerät notieren. Auf Nutzerwunsch neu angelegt: [#52 vollständige Feature-Liste und konsolidierte Entscheidungen](https://github.com/anurag-cibo/guided-notes/issues/52). #20 und #21 bleiben offene Produktfragen, nicht Teil dieses Releases. Die folgenden Abschnitte sind historische Zwischenstände; insbesondere das frühere Zwischenziel-Warum wurde ausdrücklich verworfen.
+
+## Einheit direkt im Feld, Zehntelschritte und heller Start · 19.09.2026
+
+Eigene Einheit wird direkt im Einheitenfeld eingegeben; der Pfeil öffnet weiterhin die drei Optionen. Keine zusätzliche Eingabezeile. Der Slider rundet auf eine Nachkommastelle, erhält aber exakte bestehende Bereichsgrenzen; manuelle Eingaben bleiben bis zwei Nachkommastellen möglich. GuideApp startet bei jedem Neustart sofort hell, auch bei gespeicherter dunkler Wahl und dunklem Gerät. Manuelles Umschalten während der Nutzung bleibt möglich. Schema/Backup unverändert.
+
+84 Unit-/Widgettests, Analyse, Format, Android-Prüfung in Hell/Dunkel und normaler Debug-Build bestanden. Tests prüfen Zehntelrundung, Wechsel zur freien Einheit und zurück, Layout bei großer Schrift sowie hellen Start trotz dunklem Gerät und gespeicherter dunkler Auswahl. Visuelles Zweitreview mit gpt-5.6-luna: 8,5/10. Normale Emulator-App nach Sicherung outputs/before-inline-unit.tar per Update geöffnet, Datenbank bytegleich. Schema und Backup unverändert.
+
+## Kleine Zeitkreise und kompakter Messwert-Editor · 19.09.2026
+
+Neuester Folgeauftrag: Zielkarten ersetzen die Restzeitformulierung durch einen 18-px-Zeitkreis plus z. B. „103 Tage“, mit derselben Zeitberechnung wie in den Details und praktisch gleicher Kartenhöhe. Heute/überfällige Fristen bleiben ausdrücklich benannt. Zwischenziel-Editor: Einheit und aktueller Wert nebeneinander; Regler zwischen Start-/Zielwert mit dauerhaft mitlaufender Zahl, bei schmaler Ansicht/großer Schrift vertikal. Einheitenliste auf Prozent, Ohne Einheit und Eigene Einheit reduziert. Gültige Grenzänderungen begrenzen den aktuellen Wert sofort in beiden Richtungen. Todo-Anzeige übernimmt die Entwurfseinheit/-richtung direkt; Abbrechen verwirft den Entwurf, Todo-Aktionen speichern wie bisher vorher. Schema und Backup unverändert.
+
+83 Unit-/Widgettests, Analyse, Format und nativer Android-Test in Hell/Dunkel erfolgreich. Grenzen, sofortige Todo-Vorschau, Abbrechen sowie die Position der Reglerzahl sind geprüft. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10, keine optischen Blocker; statische Bilder belegen den Zustand, die mitlaufende Position ist per Widgettest geprüft. Normaler Debug-Build 0.3.3+9 nach Sicherung outputs/before-compact-metrics.tar per Update geöffnet, Datenbank bytegleich (SHA256 ebf33a0e6de45b8c46bfb817e114001557858f4f8654b1ea9c56c89072dc6296).
+
+## Korrektur: Warum nur beim großen Ziel · 19.09.2026
+
+Die neueste Nutzerkorrektur ersetzt die vorherige Zwischenziel-Warum-Anforderung vollständig: kein Warum-Feld und keine Pflichtprüfung bei Zwischenzielen. Beim Erstellen großer Ziele ist das bestehende Warum jetzt verpflichtend; leere/Whitespace-Eingaben verhindern das Anlegen, mit mehrzeiligem Hinweis direkt am Feld. Formular und Repository prüfen die Regel. Bestehende Ziele ohne Warum bleiben bearbeitbar. Bereits gespeicherte Zwischenziel-Motivationen bleiben lediglich für verlustfreie Backups in Schema 12 erhalten; keine erneute Migration. Alle Messskalen bleiben unverändert.
+
+81 Unit-/Widgettests erfolgreich. Der native Test prüft den blockierten und erfolgreichen Erstellungsablauf sowie Zwischenziele ohne Warum in Hell/Dunkel. Aktueller GitHub-Stand: PR #49, Issue #51. Die älteren Abschnitte beschreiben den vorherigen Stand. Analyse, Format und normaler Debug-Build erfolgreich. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8,5/10, keine optischen Blocker. Normale Emulator-App nach Sicherung outputs/before-why-correction.tar per Update geöffnet; Datenbank bytegleich (SHA256 0691e7228c44dc36efe6cf2e4e415ac96303594cf0e21687abf24369ad305842).
+
+## Eigene Messskalen und Zwischenziel-Warum · 19.09.2026
+
+Folgeauftrag #51 ergänzt PR #49. Zwischenziele haben ein eigenes verpflichtendes Warum, Startwert, Zielwert, aktuellen Wert und eine voreingestellte/freie oder leere Einheit. Nutzerbestätigt sind beide Richtungen, etwa 100 → 80 kg. Bis zu zwei Nachkommastellen; aktueller Wert innerhalb der Skala. Zielfortschritt bleibt der normalisierte Durchschnitt. Todos buchen positive Beitragsgrößen automatisch in Richtung des Zielwerts; Anzeige z. B. −0,5 kg. Deckelung und Rücknahme verwenden den tatsächlich gebuchten Messwert. Standard 0–100 % behält das kompakte Beitragsrad, andere Skalen eine Zahleneingabe.
+
+Schema 12 und Backupformat 11; alte Backups 1–10 bleiben lesbar. Bestehende Zwischenziele bleiben bei 0–100 %, bisherige Werte und Beiträge erhalten. Ihr Warum bleibt leer, bis es beim nächsten Speichern ergänzt wird. Einheitenwechsel konvertiert keine Zahlenwerte; bei vorhandenen Todo-Beiträgen weist der Editor darauf hin. Bereichsänderungen bewahren historische Messwert-Beiträge für Undo.
+
+80 Unit-/Widgettests, Analyse, Format und native Android-Prüfung in Hell/Dunkel erfolgreich, einschließlich Dateineustart/Backup. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10. Normaler Debug-Build 0.3.3+9 aktualisiert und geöffnet. Sicherung outputs/before-metrics.tar; sämtliche bisherigen Datenbankzeilen/-spalten nach Migration unverändert, Schema 12 und Fremdschlüssel geprüft. Kein zusätzliches Release; Arbeitsbranch codex/emoji-navigation-card-covers und PR #49. Aktuellen Integrationsstand in GitHub prüfen.
+
+## Kurzer Emoji-Impuls und Überschriften-Navigation · 19.09.2026
+
+Neuester Nutzerwunsch ersetzt die zeitgesteuerte Fade-Markierung: Emoji-Hintergrund blinkt 180 ms ohne Fade auf und verschwindet direkt. Die gesamte Leiste behält ihren 320-ms-Fade beim Scrollen. Zielüberschriften im Zwischenziele-Tab öffnen Zieldetails. Dort wechselt die Überschrift Zwischenziele zum bestehenden Haupttab und fokussiert die passende Zielgruppe; keine gestapelten Detailseiten. Plus-Buttons bleiben getrennt bedienbar. Archivierte Ziele sind weiterhin nicht im aktiven Zwischenziele-Tab enthalten.
+
+72 Tests und Analyse erfolgreich; native Android-Prüfung heading_navigation_test.dart bestätigt Wechsel, korrekten Haupttab und Zielgruppe. Unabhängiges Screenshotreview mit gpt-5.6-luna: 8/10, keine auffälligen Layout-/Kontrastprobleme. Screenshots outputs/navigation-focused-group.png, navigation-goal-detail.png und navigation-after-flash.png. Speicherung/Schema unverändert. Normales Emulator-Update mit vorheriger Sicherung; kein zusätzliches Release.
+
+
+## Sortieren und zeitgesteuerte Emoji-Markierung · 19.09.2026
+
+Folgeauftrag #50 ergänzt den offenen PR #49: Ziele und Zwischenziele per langem Drücken (600 ms) und vertikalem Ziehen sortieren, ohne Bearbeitungsmodus. Im Zwischenziele-Tab ist Wechsel zwischen aktiven Zielgruppen möglich; Überschriften und leere Gruppen sind Ablageziele. Eine Linie zeigt davor/dahinter, am Rand scrollt die Liste weiter, auch bei stillstehendem Finger. Die gezogene Karte hat einen deckenden Hintergrund. Ein aktiver Drag bleibt bei Listen-Rebuilds/Scrollen erhalten; Abbruch ändert keine Reihenfolge.
+
+Emoji-Markierungen blenden jetzt nach Tippen ein und nach 1,5 Sekunden automatisch aus (280-ms-Übergang). Die ganze Leiste blendet beim Scrollen mit 320 ms weich aus/ein. Das ersetzt das frühere Aufheben der Markierung beim Scrollbeginn.
+
+Schema 11 ergänzt sort_order in goals/milestones; Backupformat 10 erhält die Array-Reihenfolge. Zwischenzielwechsel erhält IDs, Status, Fortschritt, Frist, Todos und historische Beiträge. Zielfortschritte werden aus der Zuordnung abgeleitet, bewusster Zielerfolg bleibt bestehen. 71 Tests, Analyse, Format und native Android-Gestenprüfung bestanden. Review durch gpt-5.6-luna anhand zeitmarkierter Video-Frames: 7,5/10 nach Behebung von Durchscheinen/seitlichem Abschneiden; keine direkte MP4-Wiedergabe beim Reviewer. Timing und Fade-Zwischenzustand zusätzlich per Widgettest geprüft.
+
+Normale Emulator-App auf 0.3.3+9 aktualisiert und geöffnet. Sicherung outputs/before-reorder.tar; vor/nach Migration alle vorherigen Datenbankzeilen/-spalten unverändert, Schema 11 und Fremdschlüssel geprüft. Demo-Video outputs/ziele-ziehen-und-animationen.mp4. Arbeitsbranch weiterhin codex/emoji-navigation-card-covers, PR #49 offen; für diese Folgeaufträge kein weiteres Release oder Merge. Aktuellen GitHub-Stand prüfen.
+
+
+## Emoji-Leiste und Karten-Cover · 19.09.2026
+
+Folgeauftrag #48 umgesetzt: einzeilige Emoji-Zielsprünge im Zwischenziele-Tab, Prozentzahl rechts neben dem Zielbalken, Standardmotiv auf Zielkarten ohne eigenes Bild. Die Restzeit steht direkt unter dem Zwischenziel-Status im Cover. Freies Scrollen lässt die Emoji-Markierung ausfaden, ohne den Sprunganker zu verändern; erneutes Antippen markiert wieder das gewählte Ziel. Rechts neben der Bildauswahl/Papierkorb im Ziel-Editor steuert ein kleiner Schalter ausschließlich das Karten-Cover. Foto und Detailcover bleiben erhalten. Schema 10/Backup 9 speichern showCardCover; ältere Daten erhalten true. Die Migration aus Schema 9 skaliert Fortschritte nicht erneut.
+
+68 Tests, Analyse und Android-Darstellungs-/Neustarttest erfolgreich. Visuelles Review: Karten 8/10, Emoji-Leiste 8,5/10, Editor 7,5/10 in Hell/Dunkel. Emulator enthält den Debug-Stand 0.3.3+9. Bestehende Daten vor/nach Migration vollständig verglichen und unverändert erhalten; Sicherung outputs/before-emoji-covers.tar. Arbeitsbranch codex/emoji-navigation-card-covers; Integration anhand GitHub prüfen. Für diesen Folgeauftrag wurde kein neues Release veröffentlicht.
+
+
 ## Kompaktes Release 0.3.2 · 19.09.2026
 
 Issues #44–46 umgesetzt: Zielcover auf Karten, direkter Zwischenziel-Editor aus Zieldetails und sofortiges Entfernen von Todos aus beiden aktuellen Ansichten. Nutzerbestätigt bleiben Historie und bereits gutgeschriebene Beiträge erhalten. Mönchslogo beim Start kreisrund. Schema 9 und Backupformat 8 unverändert. Version 0.3.2+8, vorhandener Release-Schlüssel weiterverwendet.

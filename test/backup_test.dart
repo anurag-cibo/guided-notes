@@ -27,6 +27,7 @@ void main() {
     final id = (await repository.load()).goals.single.id;
     for (final status in MilestoneStatus.values) {
       await repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: id,
         title: status.label,
         status: status,
@@ -36,7 +37,10 @@ void main() {
     }
     await repository.setAchieved(id, true);
     await repository.setArchived(id, true);
-    await repository.saveGoal(title: 'Aktives Ziel');
+    await repository.saveGoal(
+      motivation: 'Meine persönliche Richtung',
+      title: 'Aktives Ziel',
+    );
     return repository.exportBackup();
   }
 
@@ -63,7 +67,10 @@ void main() {
           (await restored.load()).progressFor(snapshot.goals.first.id),
           44,
         );
-        await restored.saveGoal(title: 'Danach');
+        await restored.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Danach',
+        );
         expect(
           (await restored.load()).goals.last.id,
           greaterThan(snapshot.goals.last.id),

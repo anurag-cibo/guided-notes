@@ -74,6 +74,7 @@ void main() {
         expect(existing.startedOn, DateTime(2026, 9, 18));
         expect(existing.motivation, 'Bleibt');
         await repo.saveGoal(
+          motivation: 'Meine persönliche Richtung',
           id: existing.id,
           title: 'Bearbeitet',
           dueDate: DateTime(2026, 10),
@@ -110,11 +111,13 @@ void main() {
         colors: GoalColor.rose.colors,
       );
       await repo.saveGoal(
+        motivation: 'Meine persönliche Richtung',
         title: 'Aktiv',
         customThemeId: id,
         color: GoalColor.ocean,
       );
       await repo.saveGoal(
+        motivation: 'Meine persönliche Richtung',
         title: 'Archiv',
         customThemeId: id,
         color: GoalColor.amber,
@@ -122,6 +125,7 @@ void main() {
       final goals = (await repo.load()).goals;
       await repo.setArchived(goals.last.id, true);
       await repo.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: goals.first.id,
         title: 'Bleibt',
         progress: 30,
@@ -158,7 +162,10 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       final c = GoalsController(GoalsRepository(db));
       try {
-        await c.repository.saveGoal(title: 'Erstes Ziel');
+        await c.repository.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Erstes Ziel',
+        );
         await c.load();
         await tester.pumpWidget(GuideApp(controller: c));
         await tester.pumpAndSettle();
@@ -169,6 +176,7 @@ void main() {
         expect(tester.getRect(archive).top, greaterThan(650));
         for (var i = 0; i < 4; i++) {
           await c.repository.saveGoal(
+            motivation: 'Meine persönliche Richtung',
             title: 'Weiteres Ziel $i mit einem langen mehrzeiligen Titel',
           );
         }
@@ -239,7 +247,11 @@ void main() {
           name: 'Eigenes',
           colors: GoalColor.rose.colors,
         );
-        await c.repository.saveGoal(title: 'Bleibt', customThemeId: id);
+        await c.repository.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Bleibt',
+          customThemeId: id,
+        );
         await c.load();
         await tester.pumpWidget(
           MaterialApp(home: CustomThemesScreen(controller: c)),

@@ -1,6 +1,18 @@
-# Erste Version: Ziele und Zwischenziele
+# Produktentscheidungen: Ziele, Zwischenziele und Todos
 
-Entscheidungsstand vom 16.09.2026 für #1, #5 und #6. Diese kleinen, reversiblen Produktentscheidungen konkretisieren den beauftragten ersten Ablauf; nach dem Nutzungsversuch können wir sie ändern.
+## Maßgeblicher Produktstand · 19.09.2026
+
+Dieser Abschnitt fasst den aktuellen, mit README und Nutzerentscheidungen abgeglichenen Stand zusammen. Die datierten Abschnitte darunter dokumentieren frühere Entscheidungen und Entwicklungsschritte. Wo sie abweichen, sind sie überholt und keine aktuellen Produktregeln.
+
+- **Ziele und Motivation:** Neue große Ziele benötigen beim Erstellen ein nicht leeres Warum. Das gilt nicht für Zwischenziele. Bereits vorhandene Ziele ohne Warum bleiben bearbeitbar.
+- **Messskalen:** Zwischenziele haben Startwert, Zielwert, aktuellen Wert und eine eigene Einheit. Skalen dürfen auf- oder absteigend sein. Die Einheit wird direkt im Einheitenfeld gewählt oder eingegeben; die Auswahl umfasst Prozent, Ohne Einheit und Eigene Einheit. Manuelle Zahlen erlauben zwei Nachkommastellen; der Regler rundet auf Zehntel und zeigt den aktuellen Messwert dauerhaft über seinem Griff. Start- und Zielwerte bleiben erreichbar. Zwischenziele haben kein Warum-Feld.
+- **Todo-Beiträge:** Ein Todo kann optional einem Zwischenziel zugeordnet werden. Beiträge werden in dessen Einheit eingegeben; die Skalenrichtung bestimmt das Vorzeichen. Tagesaufgaben und wöchentliche Aufgaben können je Erledigung beitragen oder bei Wochenaufgaben erst nach Abschluss aller Wiederholungen. Rückgängigmachen entfernt den tatsächlich verbuchten Beitrag des passenden Zwischenziels, auch nach Neustart und Sicherung.
+- **Karten und Navigation:** Zielkarten zeigen den Zeitkreis. Das Cover lässt sich pro Zielkarte ein- und ausblenden; eigenes Bild und Detailcover bleiben erhalten. Zwischenziele sind nach Ziel gruppiert und haben eine Emoji-Leiste statt einer Dropdown-Auswahl. Ziel- und Zwischenzielreihenfolgen lassen sich durch Ziehen ändern und bleiben gespeichert; Zwischenziele können auch zwischen Zielgruppen verschoben werden.
+- **Darstellung:** Die App startet nach jedem Neustart hell. Während einer Sitzung kann auf Dunkelmodus oder „Wie das Gerät“ umgeschaltet werden; diese Auswahl gilt nur für die laufende Sitzung.
+
+## Historischer Beschlussstand vom 16.09.2026
+
+Die folgenden Abschnitte halten frühere Entscheidungen und ihre Begründungen fest. Einzelne Regeln wurden durch den maßgeblichen Produktstand oben geändert; insbesondere die damaligen Annahmen zu Fristdarstellung, Reihenfolge, Emoji-Auswahl, Einheiten, Todo-Beiträgen und Darstellung sind überholt.
 
 ## Produktkern (#1)
 
@@ -12,13 +24,13 @@ The Guide bleibt ein austauschbarer Arbeitsname. Die erste Version führt vom le
 | Ein kleines Buch schreiben | Gliederung; erster Entwurf; Überarbeitung | 100 %, 25 %, 0 % ergeben gerundet 42 % |
 | Balkon begrünen | Pflanzen auswählen; Kästen aufstellen; einpflanzen | Drei erreichte Zwischenziele ergeben 100 % |
 
-Erste Nutzungsstrecke: „Ziel hinzufügen“ → Titel, optional Emoji/Motivation/Frist → Zieldetail → „Zwischenziel hinzufügen“ → Titel → Eintrag öffnen → Status „Erreicht“ → Fortschritt im Ziel sehen. Änderungen werden lokal gespeichert. Der Zustand muss einen vollständigen App-Neustart überstehen.
+Erste Nutzungsstrecke: „Ziel hinzufügen“ → Titel und verpflichtendes Warum, optional Emoji/Frist → Zieldetail → „Zwischenziel hinzufügen“ → Titel und Messskala → Eintrag öffnen → Status „Erreicht“ → Fortschritt im Ziel sehen. Änderungen werden lokal gespeichert. Der Zustand muss einen vollständigen App-Neustart überstehen.
 
-## Fachregeln (#5)
+## Fachregeln (#5) — historischer Beschlussstand
 
 - Höchstens **fünf nicht archivierte Ziele**. Erreichte Ziele zählen mit, bis sie ausdrücklich archiviert werden. Archivierte Ziele haben kein Mengenlimit. Wiederherstellen bei fünf aktiven Zielen wird mit einer verständlichen Meldung abgelehnt, ohne Daten zu ändern.
-- Zwischenziele haben einen ganzzahligen Fortschritt von 0 bis 100. „Noch nicht begonnen“ bedeutet 0 %, „Erreicht“ 100 %. Die übrigen Zustände erlauben 0–99 %. Beim Wechsel weg von „Erreicht“ muss wieder ein Wert unter 100 gewählt werden. Bei 100 % wird der Status „Erreicht“ gesetzt; bei einem positiven Wert wechselt „Noch nicht begonnen“ zu „Im Plan“.
-- Zielfortschritt ist das ungewichtete arithmetische Mittel seiner Zwischenziele, zur Anzeige auf ganze Prozent gerundet. Ohne Zwischenziele: „Noch keine Zwischenziele“, kein erfundener Fortschritt. Hinzufügen/Ändern/Löschen eines Zwischenziels berechnet das Mittel neu; dadurch darf es sinken.
+- Zwischenziele haben eine frei definierte auf- oder absteigende Skala aus Start, Ziel und aktuellem Messwert, eine optionale Einheit (leer ist einheitenlos) und kein eigenes Warum-Feld. Der normalisierte Anteil liegt zwischen 0 und 100 %. Am Start ist der Anteil 0 %, am Ziel 100 % und der Status Erreicht. Positive Strecke wechselt Noch nicht begonnen zu Im Plan. Messwerte unterstützen zwei Nachkommastellen.
+- Zielfortschritt ist das ungewichtete arithmetische Mittel seiner Zwischenziele, zur Anzeige auf zwei Nachkommastellen gerundet. Ohne Zwischenziele: „Noch keine Zwischenziele“, kein erfundener Fortschritt. Hinzufügen/Ändern/Löschen eines Zwischenziels berechnet das Mittel neu; dadurch darf es sinken.
 - Zielerfolg ist eine bewusste, separate Markierung. 100 % Zwischenzielfortschritt markiert das große Ziel nicht automatisch als erreicht. Ein Ziel kann auch ohne Zwischenziele erreicht sein; sein inhaltlicher Erfolg ist nicht dieselbe Größe wie der berechnete Zwischenzielfortschritt.
 - Es gibt eine optionale **Frist als lokales Kalenderdatum**, keinen Zeitkreis und kein Startdatum. Anzeige: „Ohne Frist“, „Heute fällig“, „Noch … Tage“ oder „… Tage überfällig“. Der ganze Fälligkeitstag zählt; Sommerzeit wird durch Kalenderdatumsarithmetik berücksichtigt. Bei erreichten Einträgen steht „Erreicht“ statt eines Überfälligkeitsdrucks. Frist und Fortschritt stehen getrennt.
 
@@ -34,7 +46,7 @@ Erste Nutzungsstrecke: „Ziel hinzufügen“ → Titel, optional Emoji/Motivati
 
 Archivieren verändert weder Fortschritt noch Zielerfolg. Es verbirgt das Ziel einschließlich seiner Zwischenziele aus aktiven Ansichten. Wiederherstellen behält IDs, Inhalte, Status und Fristen. Beispiel: Nach Archivieren von Ziel A sind vier Plätze belegt; A kann wiederhergestellt werden. Wurde inzwischen Ziel F angelegt, bleibt A unverändert im Archiv. Endgültiges Löschen verlangt eine Bestätigung mit Hinweis auf alle zugehörigen Zwischenziele; das Löschen geschieht atomar. Ein Zwischenziel zu löschen verändert den berechneten Fortschritt, niemals andere Zwischenziele.
 
-## Oberfläche und Navigation (#6)
+## Oberfläche und Navigation (#6) — historischer Beschlussstand
 
 Zwei beschriftete Hauptbereiche: **Ziele** und **Zwischenziele**. Ziele ist der Startbereich. Details, Formulare und Archiv sind eigene Seiten im Navigator. Android-Zurück und der sichtbare Zurück-Pfeil schließen die aktuelle Seite und führen zur vorherigen Ansicht; vom Zwischenziele-Hauptbereich führt Zurück zuerst zu Ziele. Es gibt keine externen Deep Links.
 
@@ -63,7 +75,7 @@ Zwischenziele                   Archiv
 
 Die technische Basis verwendet Flutter-Navigator und Listenable/ChangeNotifier. Ein State- oder Routing-Paket hat für diesen begrenzten Ablauf keinen konkreten Nutzen. Speicherung, Fachmodell und Widgets werden getrennt, damit spätere Gestaltung keine Datenmigration erfordert.
 
-## Todos: Tages- und Wochenaufgaben
+## Todos: Tages- und Wochenaufgaben — historischer Beschlussstand, später erweitert
 
 **Erweiterung #35:** Todos dürfen optional einem Zwischenziel zugeordnet werden. Tracking ist ein getrennter Schalter mit 1–100 ganzen Prozentpunkten je Erledigung, auch je einzelner Wochen-Wiederholung (vom Nutzer bestätigt). Rücknahme zieht den tatsächlichen Beitrag ab, höchstens bis 0; die Erhöhung ist bei 100 gedeckelt. Zuordnungs-/Beitragsänderungen gelten sofort nur für neue Erledigungen. Bei einer Rücknahme nach Zuordnungswechsel wird das ursprünglich betroffene Zwischenziel korrigiert. Manuelle Fortschrittsänderungen bleiben möglich; spätere Rücknahmen ziehen den vorher gebuchten Beitrag vom dann aktuellen Stand ab. Pausiert/Außer Plan bleiben bei Fortschritt unter 100 erhalten; 100 setzt Erreicht, Rücknahme unter 100 stellt den vorherigen Status soweit konsistent wieder her. Der separate Ziel-erreicht-Schalter bleibt unabhängig. Archivierte Ziele erhalten keine neuen Beiträge, bestehende Beiträge bleiben rücknehmbar. Löschen löst Zuordnungen und erhält Todo-Stände. Frühere Aussagen zur vollständigen Unabhängigkeit sind damit ergänzt, die Verknüpfung bleibt optional.
 
@@ -80,7 +92,7 @@ Am 17.09.2026 ausdrücklich als nächster Schritt beauftragt: ein Todos-Tab mit 
 - Am Ende des Tabs liegt **Vergangene Zeiträume**: eine nur lesbare Liste mit Zeitraum, damaligem Titel und Erledigungsstand. Bei zurückgestellter Gerätezeit können dort auch bereits gespeicherte spätere Daten erscheinen.
 - Drei getrennte Bereiche im Code: Todo-Fachmodell, Datenzugriff und Oberfläche. Bestehende SQLite-Verbindung, Änderungssteuerung und Backup werden mitgenutzt.
 
-## Einstellungen und Gestaltung · 17.09.2026
+## Einstellungen und Gestaltung · 17.09.2026 — historischer Beschlussstand
 
 Der Auftrag, die App anhand der Referenz weiter zu vervollständigen, zieht #18 vor die noch offene mehrtägige Erprobung aus #4. Systemdarstellung ist der Ausgangspunkt; Hell- und Dunkelmodus lassen sich ausdrücklich wählen. Die Auswahl wird lokal gespeichert, wirkt unmittelbar auf alle Screens und bleibt nach Neustart erhalten. Farben und Komponenten sind zentral austauschbar; Status behält zusätzlich seine Textbeschriftung.
 
@@ -88,13 +100,13 @@ Das Zahnrad öffnet Einstellungen mit Darstellung, Datensicherung, Informationen
 
 Ziele behalten kompakte Emoji-Karten als einfache Alternative zu eigenen Bildern. Eigene Zielbilder (#19) bleiben offen: konsistente Dateiverwaltung, Android-Auswahl, Größenbegrenzung und Backup müssen zusammen umgesetzt werden. Streak (#20) und Einführung (#21) warten weiterhin auf Nutzungsfeedback. Die drei bestehenden Hauptbereiche bleiben erhalten, Einstellungen sind von jedem Tab erreichbar.
 
-### Konkretisierung der Referenzoberfläche · 17.09.2026
+### Konkretisierung der Referenzoberfläche · 17.09.2026 — historischer Beschlussstand
 
 Auf Nutzerwunsch stehen Hell- und Dunkelmodus als zwei gleich breite Kästen nebeneinander; Systemdarstellung bleibt darunter wählbar. Sprache, Benachrichtigungen, Erinnerungen und Impressum sind ausdrücklich als „Platzhalter – noch nicht verfügbar“ sichtbar. Antippen erklärt den fehlenden Funktionsumfang; es werden keine Einstellungen vorgetäuscht. Das überschreibt die frühere Entscheidung gegen sichtbare Platzhalter.
 
 Im Ziele-Tab bleibt das Archiv fest über der Hauptnavigation, während die Ziele separat scrollen. Der Zielkopf hat ein flaches, dekoratives Landschaftscover als austauschbaren Hintergrund. Der Emoji steht im Kreis neben dem Titel. Unter dem Titel stehen Frist und Fortschrittskreis; der zusätzliche Fortschrittsbalken und die doppelte Fristangabe wurden entfernt. Eigene Coverauswahl bleibt offen.
 
-### Eigene Zielbilder und einzelnes Emoji · 17.09.2026
+### Eigene Zielbilder und einzelnes Emoji · 17.09.2026 — historischer Beschlussstand
 
 Der Nutzer beauftragt #19 ausdrücklich: Bildauswahl oben im Ziel-Editor, ersetzbar und entfernbar, als Cover im Zielkopf. Verkleinerte lokale Kopien werden mit dem Ziel und im Backup gespeichert. Der dekorative Hintergrund bleibt der Fallback ohne Bild; es gibt keine verpflichtende Auswahl. Das Emoji-Feld steht links neben dem Titel und akzeptiert einen Unicode-Graphemcluster statt eines einzelnen Codepoints, sodass etwa Hautfarben und Flaggen zusammenbleiben. Alte gespeicherte Emoji-Texte werden bei Migration und Backup nicht verändert; beim Bearbeiten wird nur das erste sichtbare Zeichen angeboten.
 

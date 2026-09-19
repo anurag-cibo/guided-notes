@@ -21,6 +21,22 @@ void main() {
     await database.close();
     await directory.delete(recursive: true);
   });
+  test('only new goals require why; milestones do not', () async {
+    for (final why in ['', '   ']) {
+      await expectLater(
+        repository.saveGoal(title: 'Lesen', motivation: why),
+        throwsA(isA<RuleViolation>()),
+      );
+      expect((await repository.load()).goals, isEmpty);
+    }
+    await repository.saveGoal(title: 'Lesen', motivation: '  Neugier  ');
+    expect((await repository.load()).goals.single.motivation, 'Neugier');
+    await repository.saveMilestone(goalId: 1, title: 'Ein Buch');
+    expect((await repository.load()).milestones.single.title, 'Ein Buch');
+    await database.customStatement("UPDATE goals SET motivation='' WHERE id=1");
+    await repository.saveGoal(id: 1, title: 'Bestehendes Ziel');
+    expect((await repository.load()).goals.single.title, 'Bestehendes Ziel');
+  });
   test(
     'full close/reopen retains IDs, edits, status, dates and archived children',
     () async {
@@ -31,6 +47,7 @@ void main() {
       );
       final id = (await repository.load()).goals.single.id;
       await repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: id,
         title: 'Entwurf',
         progress: 25,
@@ -38,6 +55,7 @@ void main() {
       );
       final milestoneId = (await repository.load()).milestones.single.id;
       await repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         id: milestoneId,
         goalId: id,
         title: 'Erster Entwurf',
@@ -77,7 +95,10 @@ void main() {
     final outcomes = await Future.wait(
       List.generate(8, (i) async {
         try {
-          await repository.saveGoal(title: 'Ziel $i');
+          await repository.saveGoal(
+            motivation: 'Meine persönliche Richtung',
+            title: 'Ziel $i',
+          );
           return true;
         } on RuleViolation {
           return false;
@@ -87,7 +108,10 @@ void main() {
     expect(outcomes.where((saved) => saved), hasLength(5));
     final id = (await repository.load()).goals.first.id;
     await repository.setArchived(id, true);
-    await repository.saveGoal(title: 'Neues Ziel');
+    await repository.saveGoal(
+      motivation: 'Meine persönliche Richtung',
+      title: 'Neues Ziel',
+    );
     await expectLater(
       repository.setArchived(id, false),
       throwsA(isA<RuleViolation>()),
@@ -109,7 +133,11 @@ void main() {
     'foreign keys, rollback, cascade and validation preserve integrity',
     () async {
       await expectLater(
-        repository.saveMilestone(goalId: 999, title: 'Orphan'),
+        repository.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: 999,
+          title: 'Orphan',
+        ),
         throwsA(isA<RuleViolation>()),
       );
       await expectLater(
@@ -118,9 +146,16 @@ void main() {
         ),
         throwsA(anything),
       );
-      await repository.saveGoal(title: 'Original');
+      await repository.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Original',
+      );
       final id = (await repository.load()).goals.single.id;
-      await repository.saveMilestone(goalId: id, title: 'Kind');
+      await repository.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
+        goalId: id,
+        title: 'Kind',
+      );
       await expectLater(
         database.transaction(() async {
           await database.customStatement(
@@ -141,7 +176,11 @@ void main() {
       );
       await repository.setArchived(id, true);
       await expectLater(
-        repository.saveMilestone(goalId: id, title: 'Hidden'),
+        repository.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: id,
+          title: 'Hidden',
+        ),
         throwsA(isA<RuleViolation>()),
       );
       await repository.deleteGoal(id);

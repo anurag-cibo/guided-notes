@@ -5,18 +5,20 @@ import '../data/settings_repository.dart';
 class SettingsController extends ChangeNotifier {
   SettingsController(this.repository);
   final SettingsRepository repository;
-  AppAppearance appearance = AppAppearance.system;
+  AppAppearance appearance = AppAppearance.light;
   bool loading = true;
   bool saving = false;
   String? error;
   bool _disposed = false;
 
-  Future<void> load() async {
+  Future<void> load({bool startLight = false}) async {
     loading = true;
     error = null;
     _notify();
     try {
-      appearance = await repository.loadAppearance();
+      appearance = startLight
+          ? AppAppearance.light
+          : await repository.loadAppearance();
     } catch (_) {
       error = 'Die Darstellung konnte nicht geladen werden.';
     } finally {

@@ -26,7 +26,10 @@ void main() {
       var db = AppDatabase(NativeDatabase(file));
       try {
         final goals = GoalsRepository(db, now: () => fixedNow);
-        await goals.saveGoal(title: 'Bleibt erhalten');
+        await goals.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Bleibt erhalten',
+        );
         await goals.todos.save(
           title: 'Lesen',
           frequency: TodoFrequency.daily,
@@ -76,9 +79,16 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       try {
         final goals = GoalsRepository(db);
-        await goals.saveGoal(title: 'Gesundheit');
+        await goals.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: 'Gesundheit',
+        );
         final id = (await goals.load()).goals.single.id;
-        await goals.saveMilestone(goalId: id, title: 'Bewegen');
+        await goals.saveMilestone(
+          motivation: 'Mein nächster Schritt zum Ziel',
+          goalId: id,
+          title: 'Bewegen',
+        );
         await goals.todos.save(
           title: 'Lesen',
           frequency: TodoFrequency.daily,
@@ -125,11 +135,52 @@ void main() {
   });
 
   testWidgets(
+    'each app launch starts light even after dark selection and dark system',
+    (tester) async {
+      final db = AppDatabase(NativeDatabase.memory());
+      final goals = GoalsController(GoalsRepository(db));
+      await goals.load();
+      await SettingsRepository(db).saveAppearance(AppAppearance.dark);
+      tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+      addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+      try {
+        await tester.pumpWidget(GuideApp(controller: goals));
+        expect(
+          tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+          ThemeMode.light,
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Einstellungen'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Dunkelmodus'));
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+          ThemeMode.dark,
+        );
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpWidget(GuideApp(controller: goals));
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+          ThemeMode.light,
+        );
+      } finally {
+        await tester.pumpWidget(const SizedBox());
+        goals.dispose();
+        await db.close();
+      }
+    },
+  );
+  testWidgets(
     'settings changes theme, follows system, confirms deletion and fits large text',
     (tester) async {
       final db = AppDatabase(NativeDatabase.memory());
       final goals = GoalsController(GoalsRepository(db));
-      await goals.repository.saveGoal(title: 'Mein Ziel');
+      await goals.repository.saveGoal(
+        motivation: 'Meine persönliche Richtung',
+        title: 'Mein Ziel',
+      );
       await goals.load();
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1;

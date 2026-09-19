@@ -18,8 +18,9 @@ void main() {
     var db = AppDatabase(NativeDatabase(file));
     var r = GoalsRepository(db, now: () => now);
     try {
-      await r.saveGoal(title: 'Ziel');
+      await r.saveGoal(motivation: 'Meine persönliche Richtung', title: 'Ziel');
       await r.saveMilestone(
+        motivation: 'Mein nächster Schritt zum Ziel',
         goalId: (await r.load()).goals.single.id,
         title: 'Schritt',
       );
@@ -73,10 +74,14 @@ void main() {
       final r = GoalsRepository(db);
       final c = GoalsController(r);
       for (final title in ['Erstes Ziel', 'Zweites Ziel']) {
-        await r.saveGoal(title: title);
+        await r.saveGoal(
+          motivation: 'Meine persönliche Richtung',
+          title: title,
+        );
         final goal = (await r.load()).goals.last;
         for (final name in ['Eins', 'Zwei']) {
           await r.saveMilestone(
+            motivation: 'Mein nächster Schritt zum Ziel',
             goalId: goal.id,
             title: '$title $name',
             progress: name == 'Zwei' ? 30 : 10,
