@@ -91,6 +91,12 @@ void main() {
         milestoneId: selected.id,
         progressIncrement: 2.5,
       );
+      await r.todos.save(
+        title: 'Bleibender Schritt',
+        frequency: TodoFrequency.daily,
+        target: 1,
+        milestoneId: selected.id,
+      );
       await c.load();
       await tester.pumpWidget(GuideApp(controller: c));
       await tester.pumpAndSettle();
@@ -149,6 +155,7 @@ void main() {
       await tester.tap(find.text('Entfernen'));
       await tester.pumpAndSettle();
       expect(find.text('Entfernbarer Schritt'), findsNothing);
+      expect(find.text('Bleibender Schritt'), findsOneWidget);
       await tester.tap(find.byType(BackButton));
       await tester.pumpAndSettle();
       await tester.tap(find.byType(BackButton));
@@ -156,6 +163,7 @@ void main() {
       await tester.tap(find.text('Todos'));
       await tester.pumpAndSettle();
       expect(find.text('Entfernbarer Schritt'), findsNothing);
+      expect(find.text('Bleibender Schritt'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
       c.dispose();
       await db.close();

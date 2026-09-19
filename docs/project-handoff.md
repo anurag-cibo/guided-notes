@@ -6,7 +6,7 @@ Issues #44–46 umgesetzt: Zielcover auf Karten, direkter Zwischenziel-Editor au
 
 64 Tests, Analyse, isolierter Android-Darstellungs-/Neustarttest sowie Debug-/Release-Build erfolgreich. Zweiter visueller Reviewer: Zielkarten 8/10 in Hell und Dunkel. Großschrift/320 px durch Widgettest geprüft. Validierungsdetails in docs/validation.md.
 
-Normale App in emulator-5554 per Update geöffnet, Datenbank dabei bytegleich. Sicherung outputs/before-compact-release.tar erhalten. Keine Testdaten in den normalen Bestand geschrieben. APK outputs/the-guide-0.3.2.apk, SHA256 6bfde27a6f727f57fa52552377d3ba286ea6f0dced384bfeb0cb7fa1044b0592.
+Normale App in emulator-5554 per Update geöffnet, Datenbank dabei bytegleich. Sicherung outputs/before-compact-release.tar erhalten. Keine Testdaten in den normalen Bestand geschrieben. APK outputs/the-guide-0.3.2.apk, zugehörige SHA256-Datei outputs/the-guide-0.3.2.apk.sha256.
 
 Beauftragt sind Integration, GitHub-Release und Löschen des Arbeitsbranches codex/goal-covers-todo-removal nach Abschluss. Den aktuellen Integrations-/Veröffentlichungsstatus anhand GitHub prüfen; ältere Abschlussstände darunter sind historisch. #4, #20 und #21 bleiben außerhalb dieses Auftrags.
 

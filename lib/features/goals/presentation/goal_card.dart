@@ -116,7 +116,7 @@ class GoalCard extends StatelessWidget {
                         minHeight: 4,
                         borderRadius: BorderRadius.circular(8),
                         semanticsLabel: 'Zwischenzielfortschritt',
-                        semanticsValue: '$progress %',
+                        semanticsValue: '${formatProgress(progress)} %',
                       ),
                     ],
                     if (goal.achieved || goal.dueDate != null) ...[
