@@ -2,6 +2,10 @@
 
 ## Release 0.4.0 und Performanceprüfung · 19.09.2026
 
+Signierte universelle APK outputs/the-guide-0.4.0.apk erfolgreich gebaut und mit apksigner geprüft; Zertifikat identisch zu 0.3.2. Android ab API 24, ARM64/ARMv7/x86_64. SHA256 6b30e1aa302df68293530c28efafc79c56fb19de7d18169530ea8909e7cbdd52. Normale Emulator-App auf 0.4.0+10 per Debug-Update geöffnet; Sicherung outputs/before-release-0.4.0.tar, Datenbank bytegleich (24ac662348bd4733ee5307aeae665c26fe34ab69ccb103240f1f0ba6176225b7).
+
+Prüfgrenze: Der zusätzliche Installations-/Updatetest der signierten APK auf dem separaten GuideReleaseCheck-AVD konnte wegen dessen nicht bestätigbarer ADB-Autorisierung nicht ausgeführt werden. Der Test-AVD wird beendet; Nutzerdaten und normaler Emulator bleiben erhalten. Funktions-/Migrations-/Neustart-/Backuptests sowie Profiltest auf emulator-5554 sind erfolgreich, ersetzen aber keinen aktuellen Gerätelauf der signierten Release-APK.
+
 84 Unit-/Widgettests und Analyse erfolgreich. Profiltest integration_test/performance_test.dart mit 5 Zielen, 100 Zwischenzielen und 12 aktuellen Todos im getrennten Android-Paket. Flutter-Profilmodus, x86_64-Emulator API 36; Scroll-/Sliderablauf zuvor aufgewärmt, gleiche synthetische Daten und Gesten vorher/nachher. Keine Bildschirmaufnahme während der Messung. FrameTiming misst UI-Aufbau und Rasterdauer getrennt.
 
 | Ablauf | Frames vorher/nachher | UI p95 vorher/nachher (ms) | Raster p95 vorher/nachher (ms) | UI/Raster >16,67 ms vorher → nachher |

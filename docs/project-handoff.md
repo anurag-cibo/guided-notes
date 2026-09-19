@@ -2,6 +2,10 @@
 
 ## Abschlussstand für die nächste Testpause · 0.4.0+10
 
+Signierte universelle APK outputs/the-guide-0.4.0.apk erfolgreich gebaut und mit apksigner geprüft; Zertifikat identisch zu 0.3.2. Android ab API 24, ARM64/ARMv7/x86_64. SHA256 6b30e1aa302df68293530c28efafc79c56fb19de7d18169530ea8909e7cbdd52. Normale Emulator-App auf 0.4.0+10 per Debug-Update geöffnet; Sicherung outputs/before-release-0.4.0.tar, Datenbank bytegleich (24ac662348bd4733ee5307aeae665c26fe34ab69ccb103240f1f0ba6176225b7).
+
+Prüfgrenze: Der zusätzliche Installations-/Updatetest der signierten APK auf dem separaten GuideReleaseCheck-AVD konnte wegen dessen nicht bestätigbarer ADB-Autorisierung nicht ausgeführt werden. Der Test-AVD wird beendet; Nutzerdaten und normaler Emulator bleiben erhalten. Funktions-/Migrations-/Neustart-/Backuptests sowie Profiltest auf emulator-5554 sind erfolgreich, ersetzen aber keinen aktuellen Gerätelauf der signierten Release-APK.
+
 Release 0.4.0 bündelt #48, #50 und #51 über PR #49. Beauftragt: nach Prüfungen squash mergen, signierte universelle APK veröffentlichen, erledigten Branch löschen und diese Aufgabe archivieren. Integrations-/Veröffentlichungsstatus direkt in GitHub prüfen. Der vorhandene Release-Schlüssel bleibt unverändert und privat. Normale Emulator-App ausschließlich per Debug-Update aktualisieren; nie deinstallieren.
 
 Maßgeblich sind README und der aktuelle Abschnitt in docs/product-decisions.md. Kurz: Warum ausschließlich bei neuen großen Zielen verpflichtend; Zwischenziele mit frei definierter Skala in beide Richtungen, Einheitenfeld direkt editierbar, Zehntelslider und manuelle Hundertstel. Todo-Vorschau sofort, tatsächliche Beiträge/Undo/Historie bleiben erhalten. Ziele/Zwischenziele per langem Drücken sortierbar, Wechsel zwischen Zielen möglich. Emoji-Leiste mit kurzem Impuls, weich ausblendende Leiste, verknüpfte Überschriften. Zielkarten mit schaltbarem Cover und kleinem Zeitkreis. Jeder App-Neustart beginnt hell. Schema 12, Backup 11, Import 1–10 kompatibel.
