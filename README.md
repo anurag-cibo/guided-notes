@@ -28,6 +28,8 @@ Der Zwischenzielfortschritt steigt höchstens auf 100 %. Rückgängig zieht nur 
 
 „Vergangene Zeiträume“ liegt am Ende des scrollenden Inhalts. Die kompaktere Zielauswahl im Zwischenziele-Tab blendet sich beim Hinunterscrollen aus und beim Hochscrollen wieder ein.
 
+Im Zwischenziel-Editor stehen Status und Frist nebeneinander. Darunter lassen sich die aktuell verknüpften Todos in „Täglich“ und „Wöchentlich“ genau wie im Todos-Tab bedienen. Plus öffnet eine neue Aufgabe mit vorausgewähltem Zwischenziel und 2,5 % Beitrag. Todo-Aktionen speichern zuvor auch offene Änderungen am Zwischenziel; danach bleibt dessen Fortschritt synchron. Neue Zwischenziele zuerst speichern, anschließend können Todos zugeordnet werden.
+
 ## Hintergrundbild und Emoji
 
 Beim Anlegen oder Bearbeiten eines Ziels oben **Hintergrundbild auswählen** antippen. Android öffnet die Dateiauswahl; das Bild lässt sich ersetzen oder entfernen. Die App speichert eine lokale, verkleinerte Kopie (maximal 1280 Pixel an der längsten Seite und 256 KB); das Original bleibt unverändert. Eingabedateien dürfen höchstens 20 MB groß sein. Das Bild erscheint als Cover im Ziel und ist im Backup enthalten.

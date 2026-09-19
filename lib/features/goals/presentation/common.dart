@@ -134,37 +134,79 @@ class EmptyMessage extends StatelessWidget {
 }
 
 class DueDateField extends StatelessWidget {
-  const DueDateField({super.key, required this.value, required this.onChanged});
+  const DueDateField({
+    super.key,
+    required this.value,
+    required this.onChanged,
+    this.compact = false,
+  });
   final DateTime? value;
   final ValueChanged<DateTime?> onChanged;
+  final bool compact;
   @override
-  Widget build(BuildContext context) => Wrap(
-    crossAxisAlignment: WrapCrossAlignment.center,
-    spacing: 8,
-    children: [
-      OutlinedButton.icon(
-        icon: const Icon(Icons.event_outlined),
-        label: Text(
-          value == null
-              ? 'Frist hinzufügen'
-              : 'Frist: ${MaterialLocalizations.of(context).formatMediumDate(value!)}',
+  Widget build(BuildContext context) {
+    if (compact) {
+      return InputDecorator(
+        decoration: const InputDecoration(
+          labelText: 'Frist',
+          contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         ),
-        onPressed: () async {
-          final selected = await showDatePicker(
-            context: context,
-            initialDate: value ?? DateTime.now(),
-            firstDate: DateTime(1900),
-            lastDate: DateTime(2200),
-          );
-          if (selected != null) onChanged(selected);
-        },
-      ),
-      if (value != null)
-        IconButton(
-          tooltip: 'Frist entfernen',
-          onPressed: () => onChanged(null),
-          icon: const Icon(Icons.close),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextButton(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () => _pick(context),
+                child: Text(
+                  value == null
+                      ? 'Hinzufügen'
+                      : MaterialLocalizations.of(context)
+                            .formatCompactDate(value!),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+            if (value != null)
+              IconButton(
+                tooltip: 'Frist entfernen',
+                onPressed: () => onChanged(null),
+                icon: const Icon(Icons.close, size: 18),
+              ),
+          ],
         ),
-    ],
-  );
+      );
+    }
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      children: [
+        OutlinedButton.icon(
+          icon: const Icon(Icons.event_outlined),
+          label: Text(
+            value == null
+                ? 'Frist hinzufügen'
+                : 'Frist: ${MaterialLocalizations.of(context).formatMediumDate(value!)}',
+          ),
+          onPressed: () => _pick(context),
+        ),
+        if (value != null)
+          IconButton(
+            tooltip: 'Frist entfernen',
+            onPressed: () => onChanged(null),
+            icon: const Icon(Icons.close),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _pick(BuildContext context) async {
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: value ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2200),
+    );
+    if (selected != null) onChanged(selected);
+  }
 }

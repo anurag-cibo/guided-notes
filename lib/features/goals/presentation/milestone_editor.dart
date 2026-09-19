@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../application/goals_controller.dart';
 import '../domain/models.dart';
 import 'common.dart';
+import '../../todos/domain/todo_models.dart';
+import '../../todos/presentation/todo_group.dart';
 
 class MilestoneEditor extends StatefulWidget {
   const MilestoneEditor({
@@ -26,14 +28,54 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
       widget.milestone?.status ?? MilestoneStatus.notStarted;
   late DateTime? _due = widget.milestone?.dueDate;
   bool _saving = false;
+  late double _persistedProgress = widget.milestone?.progress ?? 0;
+  late MilestoneStatus _persistedStatus =
+      widget.milestone?.status ?? MilestoneStatus.notStarted;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_refreshTodos);
+  }
+
+  void _refreshTodos() {
+    final milestone = widget.milestone == null
+        ? null
+        : widget.controller.snapshot.milestone(widget.milestone!.id);
+    setState(() {
+      if (milestone != null &&
+          (milestone.progress != _persistedProgress ||
+              milestone.status != _persistedStatus)) {
+        _progress = _persistedProgress = milestone.progress;
+        _status = _persistedStatus = milestone.status;
+      }
+    });
+  }
+
+  Future<bool> _beforeTodoAction() async {
+    if (_saving) return false;
+    final saved = widget.controller.snapshot.milestone(widget.milestone!.id);
+    if (saved != null &&
+        saved.title == _title.text.trim() &&
+        saved.progress == _progress &&
+        saved.status == _status &&
+        saved.dueDate == _due) {
+      return true;
+    }
+    // Commit a manual progress draft before crediting a Todo. Otherwise saving
+    // the editor later could overwrite the new contribution with a stale value.
+    return _save(close: false);
+  }
+
   @override
   void dispose() {
+    widget.controller.removeListener(_refreshTodos);
     _title.dispose();
     super.dispose();
   }
 
-  Future<void> _save() async {
-    if (_saving || !_form.currentState!.validate()) return;
+  Future<bool> _save({bool close = true}) async {
+    if (_saving || !_form.currentState!.validate()) return false;
     setState(() => _saving = true);
     final saved = await runMutation(
       context,
@@ -47,14 +89,58 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
         dueDate: _due,
       ),
     );
-    if (!mounted) return;
-    if (saved) {
+    if (!mounted) return false;
+    if (saved && close) {
       Navigator.pop(context);
     } else {
       setState(() => _saving = false);
     }
+    return saved;
   }
 
+  Widget _statusAndDue(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final status = DropdownButtonFormField<MilestoneStatus>(
+        key: ValueKey(_status),
+        initialValue: _status,
+        isExpanded: true,
+        decoration: const InputDecoration(labelText: 'Status'),
+        items: MilestoneStatus.values
+            .map((s) => DropdownMenuItem(value: s, child: Text(s.label)))
+            .toList(),
+        onChanged: (s) {
+          if (s == null) return;
+          setState(() {
+            _status = s;
+            if (s == MilestoneStatus.achieved) {
+              _progress = 100;
+            } else if (s == MilestoneStatus.notStarted) {
+              _progress = 0;
+            } else if (_progress == 100) {
+              _progress = 99;
+            }
+          });
+        },
+      );
+      final due = DueDateField(
+        value: _due,
+        compact: true,
+        onChanged: (date) => setState(() => _due = date),
+      );
+      if (constraints.maxWidth < 300 ||
+          MediaQuery.textScalerOf(context).scale(16) > 22) {
+        return Column(children: [status, gap, due]);
+      }
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: status),
+          const SizedBox(width: 12),
+          Expanded(child: due),
+        ],
+      );
+    },
+  );
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -83,27 +169,7 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
                 : null,
           ),
           gap,
-          DropdownButtonFormField<MilestoneStatus>(
-            initialValue: _status,
-            isExpanded: true,
-            decoration: const InputDecoration(labelText: 'Status'),
-            items: MilestoneStatus.values
-                .map((s) => DropdownMenuItem(value: s, child: Text(s.label)))
-                .toList(),
-            onChanged: (s) {
-              if (s == null) return;
-              setState(() {
-                _status = s;
-                if (s == MilestoneStatus.achieved) {
-                  _progress = 100;
-                } else if (s == MilestoneStatus.notStarted) {
-                  _progress = 0;
-                } else if (_progress == 100) {
-                  _progress = 99;
-                }
-              });
-            },
-          ),
+          _statusAndDue(context),
           gap,
           Text('Fortschritt: ${formatProgress(_progress)} %'),
           Slider(
@@ -126,16 +192,33 @@ class _MilestoneEditorState extends State<MilestoneEditor> {
               _status != MilestoneStatus.notStarted)
             const Text('Fertig? Wähle den Status „Erreicht“ für 100 %.'),
           gap,
-          DueDateField(
-            value: _due,
-            onChanged: (date) => setState(() => _due = date),
-          ),
-          gap,
           FilledButton(
             onPressed: _saving ? null : _save,
             child: Text(_saving ? 'Wird gespeichert …' : 'Speichern'),
           ),
+          if (widget.milestone == null) ...[
+            gap,
+            const Text('Speichere das Zwischenziel, um Todos hinzuzufügen.'),
+          ],
           if (widget.milestone != null) ...[
+            gap,
+            Text(
+              'Verknüpfte Todos',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Todo-Aktionen speichern auch deine Änderungen am Zwischenziel.',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 8),
+            for (final frequency in TodoFrequency.values)
+              TodoGroup(
+                controller: widget.controller,
+                frequency: frequency,
+                milestoneId: widget.milestone!.id,
+                beforeAction: _beforeTodoAction,
+              ),
             gap,
             TextButton(
               onPressed: _saving

@@ -48,6 +48,7 @@ void main() {
           title: 'Regelmäßig bewegen',
           progress: 60,
           status: MilestoneStatus.onTrack,
+          dueDate: DateTime.now().add(const Duration(days: 30)),
         );
         await r.saveMilestone(
           goalId: id,
@@ -75,6 +76,8 @@ void main() {
           title: 'Wasser trinken',
           frequency: TodoFrequency.daily,
           target: 1,
+          milestoneId: (await r.load()).milestones.first.id,
+          progressIncrement: 2.5,
         );
         await r.todos.save(
           title: 'Zehn Minuten lesen',
@@ -121,6 +124,19 @@ void main() {
           await tester.tap(find.text('Zwischenziele').last);
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-milestones');
+          await tester.tap(find.text('Regelmäßig bewegen'));
+          await tester.pumpAndSettle();
+          await binding.takeScreenshot('appearance-$mode-milestone-editor');
+          await tester.ensureVisible(find.byTooltip('Sport: einmal erledigt'));
+          await tester.tap(find.byTooltip('Sport: einmal erledigt'));
+          await tester.pumpAndSettle();
+          expect(controller.snapshot.milestones.first.progress, 62.5);
+          await tester.tap(find.byTooltip('Sport: einmal rückgängig'));
+          await tester.pumpAndSettle();
+          expect(controller.snapshot.milestones.first.progress, 60);
+          await binding.takeScreenshot('appearance-$mode-milestone-todos');
+          await tester.tap(find.byType(BackButton));
+          await tester.pumpAndSettle();
           await tester.tap(find.text('Todos').last);
           await tester.pumpAndSettle();
           await binding.takeScreenshot('appearance-$mode-todos');
